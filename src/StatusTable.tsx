@@ -5,48 +5,104 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import * as React from 'react';
 
-interface ITableData {
-    id: string,
-    file_name: string,
-}
-interface ITableProps {
-    rows: ITableData[]
+interface IValidationError {
+    affected_paths: string[]
+    explanation: string,
+    raw_or_parse: 'RAW' | 'PARSE',
+    severity: 'WARNING' | 'CRITICAL'
 }
 
+interface ISampleSchema {
+    sample_id: string,
+    qc_status: string,
+    plate_id: string
+}
+
+interface IOlinkSample {
+    sample_id: string,
+    value: number,
+    qc_fail: boolean,
+    below_lod: boolean
+}
+
+interface IOlinkAssay {
+    assay: string,
+    uniprot_id: string,
+    panel: string,
+    lod: number,
+    missing_data_freq: number,
+    results: IOlinkSample[]
+}
+
+interface ITableResult {
+    _id: string,
+    validation_errors?: IValidationError[],
+    ol_panel_type: string,
+    npx_m_ver: string,
+    samples: ISampleSchema[],
+    ol_assay: IOlinkAssay,
+    trial: string,
+    record_id: string,
+    assay: string
+}
+
+interface ITableData extends ITableResult {
+    file_name: string,
+}
+
+interface ITableProps {
+    _items: ITableData[]|undefined
+}
+
+
 const StatusTable: React.SFC<ITableProps> = (props) => {
-    // tslint:disable-next-line:no-console
-    console.log(typeof props)
+    if (props._items) {
+        return (
+            <Table>
+                <TableHead>
+                    <TableRow>
+                        <TableCell>File ID</TableCell>
+                        <TableCell>File Name</TableCell>
+                        <TableCell>Validation Errors</TableCell>
+                    </TableRow>
+                </TableHead>
+                <TableBody>
+                    {props._items.map(row => {
+                        return (
+                            <TableRow key={row._id}>
+                                <TableCell>
+                                    {row._id}
+                                </TableCell>
+                                <TableCell>
+                                    {row.file_name}
+                                </TableCell>
+                                <TableCell>
+                                    {row.validation_errors ? JSON.stringify(row.validation_errors) : ''}
+                                </TableCell>
+                            </TableRow>
+                        );
+                    })}
+                </TableBody>
+            </Table>
+        );
+                }
     return (
         <Table>
             <TableHead>
                 <TableRow>
                     <TableCell>File ID</TableCell>
-                    <TableCell>
-                            File Name
-                    </TableCell>
+                    <TableCell>File Name</TableCell>
                     <TableCell>Validation Errors</TableCell>
                 </TableRow>
             </TableHead>
-            <TableBody>
-                {props.rows.map(row => {
-                    return (
-                        <TableRow key={row.id}>
-                            <TableCell>
-                                {row.id}
-                            </TableCell>
-                            <TableCell>
-                                {row.file_name}
-                            </TableCell>
-                        </TableRow>
-                    );
-                })}
-            </TableBody>
         </Table>
     );
 }
 
 export {
     StatusTable,
-    ITableData,
+    IValidationError,
     ITableProps,
+    ITableData,
+    ITableResult
 };
