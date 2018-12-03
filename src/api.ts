@@ -1,12 +1,11 @@
 import { UriOptions } from "request";
 import * as request from "request-promise-native";
+import currentUrl from './initialize';
 import { ITableData, ITableResult } from "./StatusTable";
 
 interface ICustomWindow extends Window {
   initialData?: string;
 }
-
-const customWindow: ICustomWindow = window;
 
 interface ITrialResult {
   _id: string;
@@ -20,6 +19,8 @@ interface ITrialResults {
 interface IOlinkResT {
   _items: ITableResult[];
 }
+
+const customWindow: ICustomWindow = window;
 
 // Simple http request function.
 async function makeRequest<T>(
@@ -47,24 +48,33 @@ const reqOptions = {
   json: true,
   method: "GET",
   qs: {},
-  uri: "https://lmportal.cimac-network.org:443/api/data"
+  uri: `${currentUrl}/api/data`
 };
 
 async function getFormatted(
   opts: UriOptions & request.RequestPromiseOptions
 ): Promise<ITableData[] | undefined> {
+  // Get olink results
   // tslint:disable-next-line:no-console
   const olinkResults = await getOlink(opts).catch(e => console.log(e));
   if (!olinkResults) {
     return;
   }
+
+  // tslint:disable-next-line:no-console
+  console.log(olinkResults)
+  // Map file IDs to an array
   const ids = olinkResults._items.map(item => item.record_id);
+  
+  // Create an ID-keyed dictionary for the record IDs.
   const olinkMap = {};
   olinkResults._items.forEach(ol => {
     olinkMap[ol.record_id] = ol;
   });
+
+  // Query for the data records that match the IDs.
   reqOptions.qs = {
-    where: `{"_id": "[${ids.toString()}]"}`,
+    where: `{"_id": "${ids.toString()}"}`,
     // tslint:disable-next-line:object-literal-sort-keys
     projection: `{"file_name": 1}`
   };
@@ -76,6 +86,10 @@ async function getFormatted(
   if (!dataResults) {
     return;
   }
+
+  // tslint:disable-next-line:no-console
+  console.log(dataResults)
+  // Deep copy item to add the new field for filename.
   const fileNames = dataResults._items;
   return fileNames.map(name => {
     const matchedRecord: ITableResult = olinkMap[name._id];

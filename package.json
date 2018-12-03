@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "@material-ui/core": "^3.4.0",
+    "@material-ui/icons": "^3.0.1",
     "@types/react-router": "^4.4.1",
     "@types/react-virtualized": "^9.18.7",
     "@types/request": "^2.48.1",
@@ -28,6 +29,7 @@
     "build": "react-scripts-ts build",
     "build-upload": "react-scripts-ts build ; ./google-deploy.sh",
     "test": "react-scripts-ts test --env=jsdom",
+    "test-cover": "react-scripts-ts test --env=jsdom --coverage",
     "eject": "react-scripts-ts eject"
   },
   "devDependencies": {
