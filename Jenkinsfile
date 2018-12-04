@@ -19,6 +19,7 @@ spec:
   }
   environment {
       GOOGLE_APPLICATION_CREDENTIALS = credentials('google-service-account')
+      CODECOV_TOKEN = credentials('front-end-codecov-token')
   }
   stages {
     stage('Checkout SCM') {
@@ -33,6 +34,7 @@ spec:
         steps {
             container('node') {
                 sh 'npm run tests'
+                sh 'curl -s https://codecov.io/bash | bash -s - -t ${CODECOV_TOKEN}'
             }
         }
     }
