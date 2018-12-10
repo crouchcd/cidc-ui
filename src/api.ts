@@ -1,7 +1,7 @@
 import { UriOptions } from "request";
 import * as request from "request-promise-native";
+import { ITableData, ITableResult } from "./components/UploadStatus";
 import currentUrl from './initialize';
-import { ITableData, ITableResult } from "./StatusTable";
 
 interface ICustomWindow extends Window {
   initialData?: string;

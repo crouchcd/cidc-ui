@@ -1,6 +1,6 @@
 import * as React from 'react';
 import './App.css';
-import TableDataFrame from './TableDataFrame';
+import TableDataFrame from './components/TableDataFrame';
 
 
 class App extends React.Component {

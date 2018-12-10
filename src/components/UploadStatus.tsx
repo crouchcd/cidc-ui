@@ -4,7 +4,7 @@ import TableCell from "@material-ui/core/TableCell";
 import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 import * as React from "react";
-import DeleteButton from "./components/DeleteButton";
+import DeleteButton from "./DeleteButton";
 
 interface IValidationError {
     affected_paths: string[];
@@ -51,28 +51,29 @@ interface ITableData extends ITableResult {
     file_name: string;
 }
 
-interface ITableProps {
+interface IUploadStatusProps {
     _items: ITableData[] | undefined;
     deleteFunction(fileID: string): void;
 }
 
-const StatusTable: React.SFC<ITableProps> = props => {
+const UploadStatus: React.SFC<IUploadStatusProps> = props => {
     if (props._items) {
         return (
             <Table>
                 <TableHead>
                     <TableRow>
-                        <TableCell>File ID</TableCell>
                         <TableCell>File Name</TableCell>
+                        <TableCell>File ID</TableCell>
                         <TableCell>Validation Errors</TableCell>
+                        <TableCell>Delete File</TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>
                     {props._items.map(row => {
                         return (
                             <TableRow key={row._id}>
-                                <TableCell>{row._id}</TableCell>
                                 <TableCell>{row.file_name}</TableCell>
+                                <TableCell>{row._id}</TableCell>
                                 <TableCell>
                                     {row.validation_errors
                                         ? JSON.stringify(row.validation_errors)
@@ -92,18 +93,9 @@ const StatusTable: React.SFC<ITableProps> = props => {
                 </TableBody>
             </Table>
         );
+    } else {
+        return <div>...Loading (or not Found)</div>;
     }
-    return (
-        <Table>
-            <TableHead>
-                <TableRow>
-                    <TableCell>File ID</TableCell>
-                    <TableCell>File Name</TableCell>
-                    <TableCell>Validation Errors</TableCell>
-                </TableRow>
-            </TableHead>
-        </Table>
-    );
 };
 
-export { StatusTable, IValidationError, ITableProps, ITableData, ITableResult };
+export { UploadStatus, IValidationError, IUploadStatusProps, ITableData, ITableResult };

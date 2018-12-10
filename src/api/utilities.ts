@@ -1,6 +1,6 @@
-import { Response } from "request";
-import currentUrl from "../initialize";
-import { ICustomWindow, makeRequest } from "./api";
+// import currentUrl from "../initialize";
+import { UriOptions } from "request";
+import * as request from "request-promise-native";
 
 interface IAPIHelperOptions {
     endpoint: string;
@@ -8,14 +8,31 @@ interface IAPIHelperOptions {
     itemID?: string;
     token?: string;
     parameters?: { [key: string]: string };
+    body?: { [key: string]: string };
 }
 
 interface IAPIHelper {
     baseURL: string;
-    delete(opts: IAPIHelperOptions): Promise<Response | undefined>;
-    get(opts: IAPIHelperOptions): Promise<Response | undefined>;
-    patch(opts: IAPIHelperOptions): Promise<Response | undefined>;
-    post(opts: IAPIHelperOptions): Promise<Response | undefined>;
+    delete<T>(opts: IAPIHelperOptions): Promise<T | undefined>;
+    get<T>(opts: IAPIHelperOptions): Promise<T | undefined>;
+    patch<T>(opts: IAPIHelperOptions): Promise<T | undefined>;
+    post<T>(opts: IAPIHelperOptions): Promise<T | undefined>;
+}
+
+/**
+ * Async implementation of basic HTTP type requests.
+ * @param options Standard HTTP request type options.
+ */
+async function makeRequest<T>(
+    options: UriOptions & request.RequestPromiseOptions
+): Promise<T | undefined> {
+    try {
+        return await request(options);
+    } catch (e) {
+        // tslint:disable-next-line:no-console
+        console.log(e);
+        return;
+    }
 }
 
 const generateOptions = (
@@ -24,6 +41,7 @@ const generateOptions = (
     baseURL: string
 ) => {
     return {
+        body: opts.body,
         headers: {
             Authorization: `Bearer ${opts.token}`
         },
@@ -41,23 +59,26 @@ const generateOptions = (
  * @param baseURL pass an object of the type { baseURL: your-url-here }
  */
 const createAPIHelper = ({ baseURL }: { baseURL: string }): IAPIHelper => {
-    const get = (opts: IAPIHelperOptions): Promise<Response | undefined> => {
-        return makeRequest<Response | undefined>(
+    const get = <T>(opts: IAPIHelperOptions): Promise<T | undefined> => {
+        return makeRequest<T | undefined>(
             generateOptions(opts, "GET", baseURL)
         );
     };
-    const patch = (opts: IAPIHelperOptions): Promise<Response | undefined> => {
-        return makeRequest<Response | undefined>(
-            generateOptions(opts, "PATCH", baseURL)
-        );
+    const patch = <T>(opts: IAPIHelperOptions): Promise<T | undefined> => {
+        const optid = generateOptions(opts, "POST", baseURL);
+        optid.headers["X-HTTP-METHOD-OVERRIDE"] = "PATCH";
+        if (opts.etag) {
+            optid.headers["If-Match"] = opts.etag;
+        }
+        return makeRequest<T | undefined>(optid);
     };
-    const post = (opts: IAPIHelperOptions): Promise<Response | undefined> => {
-        return makeRequest<Response | undefined>(
+    const post = <T>(opts: IAPIHelperOptions): Promise<T | undefined> => {
+        return makeRequest<T | undefined>(
             generateOptions(opts, "POST", baseURL)
         );
     };
-    const delF = (opts: IAPIHelperOptions): Promise<Response | undefined> => {
-        return makeRequest<Response | undefined>(
+    const delF = <T>(opts: IAPIHelperOptions): Promise<T | undefined> => {
+        return makeRequest<T | undefined>(
             generateOptions(opts, "DELETE", baseURL)
         );
     };
@@ -70,32 +91,10 @@ const createAPIHelper = ({ baseURL }: { baseURL: string }): IAPIHelper => {
     });
 };
 
-async function recordDelete(recordID: string): Promise<boolean> {
-    // tslint:disable-next-line:no-console
-    console.log('Delete function fired')
-    const customWindow: ICustomWindow = window;
-    const uriHelper = createAPIHelper({ baseURL: currentUrl });
-    const results = await uriHelper.patch({
-        endpoint: "data",
-        itemID: recordID,
-        parameters: {
-            visibility: "0"
-        },
-        token: customWindow.initialData
-    }).catch((e) => {
-        // tslint:disable-next-line:no-console
-        console.log(e)
-    });
-    if (!results) {
-        return false;
-    }
-    if (results.statusCode === 200) {
-        return true;
-    }
-    return false;
-}
-
 export {
-    recordDelete,
-    generateOptions
-}
+    createAPIHelper,
+    generateOptions,
+    IAPIHelper,
+    IAPIHelperOptions,
+    makeRequest
+};

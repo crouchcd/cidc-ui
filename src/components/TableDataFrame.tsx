@@ -1,8 +1,8 @@
 import * as React from "react";
-import { getFormatted } from "./api";
-import {recordDelete} from "./api/utilities";
-import currentUrl from "./initialize";
-import { ITableData, StatusTable } from "./StatusTable";
+import { getFormatted } from "../api";
+import { recordDelete } from "../api/api";
+import currentUrl from "../initialize";
+import { ITableData, UploadStatus } from "./UploadStatus";
 
 interface ICustomWindow extends Window {
     initialData?: string;
@@ -57,15 +57,17 @@ export default class TableDataFrame extends React.Component<object, IState> {
     }
 
     public render() {
-      // tslint:disable-next-line:no-console
-      console.log(this.state.olinkData)
+        // tslint:disable-next-line:no-console
+        console.log(this.state.olinkData);
         return (
-            <StatusTable
-                {...{
-                    _items: this.state.olinkData._items,
-                    deleteFunction: this.handleDelete
-                }}
-            />
+            <div>
+                <UploadStatus
+                    {...{
+                        _items: this.state.olinkData._items,
+                        deleteFunction: this.handleDelete
+                    }}
+                />
+            </div>
         );
     }
 }
