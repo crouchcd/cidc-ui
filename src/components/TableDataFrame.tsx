@@ -1,33 +1,26 @@
 import * as React from "react";
-import { getFormatted } from "../api";
-import { recordDelete } from "../api/api";
-import currentUrl from "../initialize";
-import { ITableData, UploadStatus } from "./UploadStatus";
+import { getUploaded, IDataResult, recordDelete } from "../api/api";
+import { INotificationContextState } from "./NotificationContext";
+import { UploadStatus } from "./UploadStatus";
+import withNotificationContext from "./WithNotificationContext";
 
 interface ICustomWindow extends Window {
     initialData?: string;
 }
-
 const customWindow: ICustomWindow = window;
 
-const options = {
-    headers: {
-        Authorization: `Bearer ${customWindow.initialData}`
-    },
-    json: true,
-    method: "GET",
-    uri: `${currentUrl}/api/olink`
-};
-
 interface IState {
-    olinkData: {
-        _items: ITableData[] | undefined;
+    data: {
+        _items: IDataResult[] | undefined;
     };
 }
 
-export default class TableDataFrame extends React.Component<object, IState> {
+class TableDataFrame extends React.Component<
+    { notificationContext?: INotificationContextState },
+    IState
+> {
     public state: Readonly<IState> = {
-        olinkData: {
+        data: {
             _items: []
         }
     };
@@ -36,38 +29,51 @@ export default class TableDataFrame extends React.Component<object, IState> {
      * Function that will visually banish a record that has been deleted.
      * @param recordID ID of the record to be deleted.
      */
-    public handleDelete(recordID: string) {
-        recordDelete(recordID).then(didDelete => {
-            if (didDelete && this.state.olinkData._items) {
-                const newState = this.state.olinkData._items.filter(
-                    item => item.record_id !== recordID
+    public handleDelete(id: string) {
+        recordDelete(id).then(didDelete => {
+            if (didDelete && this.state.data._items) {
+                const newState = this.state.data._items.filter(
+                    item => item._id !== id
                 );
-                this.setState({ olinkData: { _items: newState } });
+                this.setState({ data: { _items: newState } });
             }
         });
     }
 
     public componentDidMount() {
-        getFormatted(options)
-            .then(res => {
-                this.setState({ olinkData: { _items: res } });
+        const options = {
+            endpoint: "data",
+            json: true,
+            method: "GET",
+            token: customWindow.initialData
+        };
+        getUploaded(options)
+            .then(results => {
+                this.setState({ data: { _items: results } });
             })
-            // tslint:disable-next-line:no-console
-            .catch(e => console.log(e));
+            .catch(error => {
+                if (this.props.notificationContext) {
+                    this.props.notificationContext.handleClick(
+                        "Could not fetch results"
+                    );
+                }
+            });
     }
 
     public render() {
-        // tslint:disable-next-line:no-console
-        console.log(this.state.olinkData);
         return (
-            <div>
-                <UploadStatus
-                    {...{
-                        _items: this.state.olinkData._items,
-                        deleteFunction: this.handleDelete
-                    }}
-                />
-            </div>
+            this.props.notificationContext && (
+                <div>
+                    <UploadStatus
+                        {...{
+                            _items: this.state.data._items,
+                            deleteFunction: this.handleDelete
+                        }}
+                    />
+                </div>
+            )
         );
     }
 }
+
+export default withNotificationContext(TableDataFrame);

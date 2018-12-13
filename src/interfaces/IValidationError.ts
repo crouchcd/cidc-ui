@@ -1,8 +1,15 @@
+type RawOrParse = "RAW" | "PARSE";
+type Severity = "WARNING" | "CRITICAL";
+
 interface IValidationError {
     affected_paths: string[];
     explanation: string;
-    raw_or_parse: "RAW" | "PARSE";
-    severity: "WARNING" | "CRITICAL";
+    raw_or_parse: RawOrParse
+    severity: Severity;
 }
 
-export default IValidationError
+export { 
+    IValidationError,
+    RawOrParse,
+    Severity
+}

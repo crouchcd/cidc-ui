@@ -26,10 +26,11 @@
   "scripts": {
     "precommit": "lint-staged",
     "start": "react-scripts-ts start",
+    "start-dev": "REACT_APP_NODE_ENV='dev' react-scripts-ts start",
     "build": "react-scripts-ts build",
     "build-upload": "react-scripts-ts build ; ./google-deploy.sh",
-    "test": "react-scripts-ts test --env=jsdom",
-    "test-cover": "react-scripts-ts test --env=jsdom --coverage",
+    "test": "REACT_APP_NODE_ENV='dev' react-scripts-ts test --env=jsdom",
+    "test-cover": "REACT_APP_NODE_ENV='dev' react-scripts-ts test --env=jsdom --coverage",
     "eject": "react-scripts-ts eject"
   },
   "devDependencies": {

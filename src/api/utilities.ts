@@ -26,13 +26,7 @@ interface IAPIHelper {
 async function makeRequest<T>(
     options: UriOptions & request.RequestPromiseOptions
 ): Promise<T | undefined> {
-    try {
-        return await request(options);
-    } catch (e) {
-        // tslint:disable-next-line:no-console
-        console.log(e);
-        return;
-    }
+    return await request(options);
 }
 
 const generateOptions = (

@@ -6,16 +6,7 @@ import createStyles from "@material-ui/core/styles/createStyles";
 import withStyles, { WithStyles } from "@material-ui/core/styles/withStyles";
 import CloseIcon from "@material-ui/icons/Close";
 import * as React from "react";
-
-interface IMessage {
-    message: string;
-    key: number;
-}
-
-interface INotificationState {
-    open: boolean;
-    messageInfo: IMessage;
-}
+import { NotificationConsumer } from "./NotificationContext";
 
 const styles = (theme: Theme) =>
     createStyles({
@@ -24,55 +15,52 @@ const styles = (theme: Theme) =>
         }
     });
 
-class Notification extends React.Component<
-    WithStyles<typeof styles>,
-    INotificationState
+    interface IMessage {
+        message: string;
+        key: number;
+    }
+
+    interface INotificationState {
+        open: boolean;
+        messageInfo: IMessage;
+        timeOut: number;
+    }
+
+    interface INotificationContextState extends INotificationState{
+        handleClick(message: string): null;
+        handleClose(event: React.MouseEvent<HTMLElement>): null;
+        handleExited(): void;
+    }
+
+class SnackContext extends React.Component<
+    WithStyles<typeof styles>
 > {
-    public state: Readonly<INotificationState> = {
-        messageInfo: { message: "", key: 1},
-        open: false
-    };
-    
-    private queue: IMessage[] = [];
-    
-    public handleClick = (message: string) => {
-        this.queue.push({
-            key: new Date().getTime(),
-            message
-        });
-        if (this.state.open) {
-            this.setState({ open: true });
-        }
-    };
-
-    public handleClose = (event: React.MouseEvent<HTMLElement>) => {
-        this.setState({ open: false });
-    };
-
     public render() {
-        const { messageInfo } = this.state;
         const { classes } = this.props;
         return (
             <div>
+                <NotificationConsumer>
+                    {(value: INotificationContextState|null) => value && (
                 <Snackbar
-                    key={messageInfo.key}
+                    key={value.messageInfo.key}
                     anchorOrigin={{
                         horizontal: "left",
                         vertical: "bottom"
                     }}
-                    open={this.state.open}
+                    open={value.open}
                     autoHideDuration={3000}
-                    onClose={this.handleClose}
-                    onExited={this.handleExited}
+                    onClose={value.handleClose}
+                    onExited={value.handleExited}
                     ContentProps={{
                         "aria-describedby": "message-id"
                     }}
+                    message={<span id="message-id">{value.messageInfo.message}</span>}
                     action={[
                         <Button
                             key="undo"
                             color="secondary"
                             size="small"
-                            onClick={this.handleClose}
+                            onClick={value.handleClose}
                         >
                             CLOSE
                         </Button>,
@@ -80,28 +68,18 @@ class Notification extends React.Component<
                             key="close"
                             aria-label="Close"
                             color="inherit"
-                            onClick={this.handleClose}
+                            onClick={value.handleClose}
                             className={classes.close}
                         >
                             <CloseIcon />
                         </IconButton>
                     ]}
                 />
+                    )}
+                </NotificationConsumer>
             </div>
         );
     }
-
-    private processQueue = () => {
-        if (this.queue.length > 0) {
-            this.setState({
-                open: true
-            });
-        }
-    };
-
-    private handleExited = () => {
-        this.processQueue();
-    };
 }
 
-export default withStyles(styles)(Notification);
+export default withStyles(styles)(SnackContext);

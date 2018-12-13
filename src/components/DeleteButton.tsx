@@ -9,9 +9,9 @@ interface IDeleteButtonProps {
 }
 
 const DeleteButton: React.SFC<IDeleteButtonProps> = props => {
-    const handleDelete = (e: React.MouseEvent<HTMLInputElement>) =>{
+    const handleDelete = (e: React.MouseEvent<HTMLInputElement>) => {
         e.preventDefault();
-        props.deleteRecord(props.fileID)
+        props.deleteRecord(props.fileID);
     };
     return (
         <Button onClick={handleDelete} color="secondary">
