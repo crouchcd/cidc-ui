@@ -6,5 +6,6 @@ const customWindow: ICustomWindow = window;
 
 export {
     currentUrl,
+    ICustomWindow,
     customWindow
 }

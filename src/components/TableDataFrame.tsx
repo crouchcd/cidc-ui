@@ -1,13 +1,9 @@
 import * as React from "react";
 import { getUploaded, IDataResult, recordDelete } from "../api/api";
+import { ICustomWindow } from "../initialize";
 import { INotificationContextState } from "./NotificationContext";
 import { UploadStatus } from "./UploadStatus";
 import withNotificationContext from "./WithNotificationContext";
-
-interface ICustomWindow extends Window {
-    initialData?: string;
-}
-const customWindow: ICustomWindow = window;
 
 interface IState {
     data: {
@@ -15,6 +11,11 @@ interface IState {
     };
 }
 
+const customWindow: ICustomWindow = window;
+
+/**
+ * Stateful "smart component" that wraps the upload status presentational component.
+ */
 class TableDataFrame extends React.Component<
     { notificationContext?: INotificationContextState },
     IState
@@ -36,6 +37,11 @@ class TableDataFrame extends React.Component<
                     item => item._id !== id
                 );
                 this.setState({ data: { _items: newState } });
+            }
+            else if (this.props.notificationContext) {
+                this.props.notificationContext.handleClick(
+                    "Record delete failed"
+                )
             }
         });
     }

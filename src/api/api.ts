@@ -38,6 +38,10 @@ interface IChildResult {
     validation_errors: IValidationError[];
 }
 
+/**
+ * Maps children to groups under their resource collections.
+ * @param children 
+ */
 const mapChildren = (children: IDataChild[]): { [key: string]: string[] } => {
     const map = {};
     children.forEach(child => {
@@ -47,6 +51,11 @@ const mapChildren = (children: IDataChild[]): { [key: string]: string[] } => {
     return map;
 };
 
+/**
+ * Function handling the actual patching of the records.
+ * @param uriHelper APIHelper object handling the requests
+ * @param opts Request options
+ */
 async function patchVisibility(
     uriHelper: IAPIHelper,
     opts: IAPIHelperOptions
@@ -65,6 +74,10 @@ async function patchVisibility(
     return false;
 }
 
+/**
+ * Patches a record's visibility to 0, hiding it and deleting its children.
+ * @param recordID 
+ */
 async function recordDelete(recordID: string): Promise<boolean> {
     const uriHelper = createAPIHelper({
         baseURL: currentUrl
@@ -86,6 +99,11 @@ async function recordDelete(recordID: string): Promise<boolean> {
     });
 }
 
+/**
+ * Function that queries a collection for all a user's records,
+ * also fetches details about their children.
+ * @param opts Request options.
+ */
 async function getUploaded(
     opts: IAPIHelperOptions
 ): Promise<Array<IDataResult & IAPIDefaultFields> | undefined> {
