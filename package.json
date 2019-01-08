@@ -4,16 +4,21 @@
   "private": true,
   "dependencies": {
     "@material-ui/core": "^3.4.0",
+    "@material-ui/icons": "^3.0.1",
     "@types/react-router": "^4.4.1",
+    "@types/react-router-dom": "^4.3.1",
     "@types/react-virtualized": "^9.18.7",
     "@types/request": "^2.48.1",
     "@types/request-promise-native": "^1.0.15",
     "husky": "^1.1.3",
     "lint-staged": "^8.0.4",
     "prettier": "^1.15.1",
-    "react": "^16.6.0",
-    "react-dom": "^16.6.0",
-    "react-scripts-ts": "3.1.0",
+    "react": "16.7.0-alpha.0",
+    "react-dom": "16.7.0-alpha.0",
+    "react-markdown": "^4.0.4",
+    "react-router": "^4.3.1",
+    "react-router-dom": "^4.3.1",
+    "react-scripts": "^2.1.3",
     "request-promise-native": "^1.0.5"
   },
   "lint-staged": {
@@ -24,17 +29,25 @@
   },
   "scripts": {
     "precommit": "lint-staged",
-    "start": "react-scripts-ts start",
-    "build": "react-scripts-ts build",
-    "build-upload": "react-scripts-ts build ; ./google-deploy.sh",
-    "test": "react-scripts-ts test --env=jsdom",
-    "eject": "react-scripts-ts eject"
+    "start": "react-scripts start",
+    "start-dev": "REACT_APP_NODE_ENV='dev' react-scripts start",
+    "build": "react-scripts build",
+    "build-upload": "react-scripts build ; ./google-deploy.sh",
+    "test": "REACT_APP_NODE_ENV='dev' react-scripts test --env=jsdom",
+    "test-cover": "REACT_APP_NODE_ENV='dev' react-scripts test --env=jsdom --coverage",
+    "eject": "react-scripts eject"
   },
   "devDependencies": {
     "@types/jest": "^23.3.9",
     "@types/node": "^10.12.2",
-    "@types/react": "^16.4.18",
-    "@types/react-dom": "^16.0.9",
+    "@types/react": "^16.7.18",
+    "@types/react-dom": "^16.0.11",
     "typescript": "^3.1.6"
-  }
+  },
+  "browserslist": [
+    ">0.2%",
+    "not dead",
+    "not ie <= 11",
+    "not op_mini all"
+  ]
 }
