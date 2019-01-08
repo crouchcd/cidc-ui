@@ -16,7 +16,7 @@ const DEFAULT_STATE = {
     handleClick: (message: string) => {
         // notempty
     },
-    handleClose: (event: React.MouseEvent<HTMLElement>) => {
+    handleClose: (event: React.SyntheticEvent<HTMLElement>) => {
         // not empty
     },
     handleExited: () => {
@@ -27,9 +27,9 @@ const DEFAULT_STATE = {
     timeOut: 2000
 };
 
-interface INotificationContextState extends INotificationState {
+export interface INotificationContextState extends INotificationState {
     handleClick(message: string): void;
-    handleClose(event: React.MouseEvent<HTMLElement>, reason: any): void;
+    handleClose(event: React.SyntheticEvent<HTMLElement>): void;
     handleExited(): void;
 }
 
@@ -62,12 +62,8 @@ class NotificationProvider extends React.Component {
     };
 
     public handleClose = (
-        event: React.MouseEvent<HTMLElement>,
-        reason: any
+        event: React.SyntheticEvent<HTMLElement>
     ) => {
-        if (reason === "clickaway") {
-            return;
-        }
         this.setState({ open: false });
     };
 
@@ -103,4 +99,4 @@ class NotificationProvider extends React.Component {
 }
 
 export const NotificationConsumer = NotificationContext.Consumer;
-export { NotificationProvider, NotificationContext, INotificationContextState };
+export { NotificationProvider, NotificationContext };

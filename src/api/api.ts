@@ -9,13 +9,13 @@ import {
     makeRequest
 } from "./utilities";
 
-interface IDataChild {
+export interface IDataChild {
     _id: string;
     resource: string;
     validation_errors?: IValidationError[];
 }
 
-interface IDataResult {
+export interface IDataResult {
     _id: string;
     analysis_id?: string;
     children: IDataChild[];
@@ -32,10 +32,14 @@ interface IDataResultItems {
     _items: Array<IDataResult & IAPIDefaultFields>;
 }
 
-interface IChildResult {
+export interface IChildResult {
     _id: string;
     record_id: string;
     validation_errors: IValidationError[];
+}
+
+interface IMapThing {
+    [key: string]: string[];
 }
 
 /**
@@ -43,10 +47,10 @@ interface IChildResult {
  * @param children 
  */
 const mapChildren = (children: IDataChild[]): { [key: string]: string[] } => {
-    const map = {};
+    const map:IMapThing = {};
     children.forEach(child => {
         const { _id, resource } = child;
-        resource in map ? map[resource].append(_id) : (map[resource] = [_id]);
+        resource in map ? map[resource].push(_id) : (map[resource] = [_id]);
     });
     return map;
 };
@@ -114,7 +118,7 @@ async function getUploaded(
         return;
     }
 
-    let collectionMapper = {};
+    let collectionMapper:IMapThing = {};
     dataResults._items.forEach(result => {
         if (result.children) {
             collectionMapper = mapChildren(result.children);
@@ -177,4 +181,4 @@ async function getUploaded(
     return dataResults._items;
 }
 
-export { makeRequest, recordDelete, getUploaded, IDataChild, IDataResult };
+export { makeRequest, recordDelete, getUploaded };
