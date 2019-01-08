@@ -19,6 +19,10 @@ const renderChildren = (childArray: IDataChild[]) => {
     return renderArray;
 };
 
+/**
+ * Presentational component for the status of user uploaded files.
+ * @param props Object of the IUploadStatusProps shape.
+ */
 const UploadStatus: React.SFC<IUploadStatusProps> = props => {
     if (props._items) {
         return (

@@ -11,9 +11,10 @@ export default function withNotificationContext<
   ): React.SFC<R> {
   return function BoundComponent(props: R) {
     return (
-      <NotificationConsumer>
-        {value => <Component {...props} notificationContext={value} />}
+      <NotificationConsumer> 
+        {value => <Component {...props} notificationContext={value} />} 
       </NotificationConsumer>
     );
   };
 }
+// look into this error. This wrapper works exactly as it should, but I can't make heads nor tails of the type problem here.

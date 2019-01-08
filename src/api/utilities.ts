@@ -1,4 +1,3 @@
-// import currentUrl from "../initialize";
 import { UriOptions } from "request";
 import * as request from "request-promise-native";
 

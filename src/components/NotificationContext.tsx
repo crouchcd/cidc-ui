@@ -48,12 +48,16 @@ class NotificationProvider extends React.Component {
     }
 
     public handleClick = (message: string) => {
+        // tslint:disable-next-line:no-console
+        console.log("Message pushed: ", message)
         this.queue.push({
             key: new Date().getTime(),
             message
         });
-        if (!this.state.open) {
-            this.setState({ open: true });
+        if (this.state.open) {
+            this.setState({ open: false });
+        } else {
+            this.processQueue();
         }
     };
 
@@ -85,7 +89,7 @@ class NotificationProvider extends React.Component {
         );
     };
     public processQueue = () => {
-        if (this.queue.length > 0) {
+        if (this.queue.length > 0 && this.queue[0].message !== "") {
             this.setState({
                 messageInfo: this.queue.shift(),
                 open: true
