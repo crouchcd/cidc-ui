@@ -7,7 +7,7 @@ import * as React from "react";
 import { IDataChild, IDataResult } from "../api/api";
 import DeleteButton from "./DeleteButton";
 
-interface IUploadStatusProps {
+export interface IUploadStatusProps {
     _items: IDataResult[] | undefined;
     deleteFunction(fileID: string): void;
 }
@@ -78,4 +78,4 @@ const UploadStatus: React.SFC<IUploadStatusProps> = props => {
     }
 };
 
-export { UploadStatus, IUploadStatusProps };
+export { UploadStatus };

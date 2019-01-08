@@ -1,7 +1,8 @@
 import { UriOptions } from "request";
-import * as request from "request-promise-native";
+import request from "request-promise-native";
+import { string } from "prop-types";
 
-interface IAPIHelperOptions {
+export interface IAPIHelperOptions {
     endpoint: string;
     etag?: string;
     itemID?: string;
@@ -10,7 +11,7 @@ interface IAPIHelperOptions {
     body?: { [key: string]: string };
 }
 
-interface IAPIHelper {
+export interface IAPIHelper {
     baseURL: string;
     delete<T>(opts: IAPIHelperOptions): Promise<T | undefined>;
     get<T>(opts: IAPIHelperOptions): Promise<T | undefined>;
@@ -28,11 +29,20 @@ async function makeRequest<T>(
     return await request(options);
 }
 
+interface IAPIOptions {
+    body: { [key: string]: string } | undefined;
+    headers: { [key: string]: string };
+    json: boolean
+    method: string,
+    qs: {[key: string]: string} | undefined;
+    uri: string;
+}
+
 const generateOptions = (
     opts: IAPIHelperOptions,
     method: string,
     baseURL: string
-) => {
+): IAPIOptions => {
     return {
         body: opts.body,
         headers: {
@@ -58,7 +68,7 @@ const createAPIHelper = ({ baseURL }: { baseURL: string }): IAPIHelper => {
         );
     };
     const patch = <T>(opts: IAPIHelperOptions): Promise<T | undefined> => {
-        const optid = generateOptions(opts, "POST", baseURL);
+        const optid:IAPIOptions = generateOptions(opts, "POST", baseURL);
         optid.headers["X-HTTP-METHOD-OVERRIDE"] = "PATCH";
         if (opts.etag) {
             optid.headers["If-Match"] = opts.etag;
@@ -87,7 +97,5 @@ const createAPIHelper = ({ baseURL }: { baseURL: string }): IAPIHelper => {
 export {
     createAPIHelper,
     generateOptions,
-    IAPIHelper,
-    IAPIHelperOptions,
     makeRequest
 };

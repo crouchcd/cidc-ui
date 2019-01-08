@@ -27,8 +27,8 @@ const styles = (theme: Theme) =>
     }
 
     interface INotificationContextState extends INotificationState{
-        handleClick(message: string): null;
-        handleClose(event: React.MouseEvent<HTMLElement>): null;
+        handleClick(message: string): void;
+        handleClose(event: React.MouseEvent<HTMLElement>): void;
         handleExited(): void;
     }
 
@@ -49,7 +49,7 @@ class SnackContext extends React.Component<
                     }}
                     open={value.open}
                     autoHideDuration={3000}
-                    onClose={value.handleClose}
+                    onClose={value.handleClose as (event: React.SyntheticEvent<HTMLElement>) => {}}
                     onExited={value.handleExited}
                     ContentProps={{
                         "aria-describedby": "message-id"
