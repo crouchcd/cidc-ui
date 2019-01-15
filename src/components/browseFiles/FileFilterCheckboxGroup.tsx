@@ -1,7 +1,7 @@
-import * as React from 'react';
+import { FormControlLabel, FormGroup, Toolbar, Typography } from '@material-ui/core';
 import Checkbox from '@material-ui/core/Checkbox';
-import { FormGroup, FormControlLabel, Toolbar, Typography } from '@material-ui/core';
 import autobind from 'autobind-decorator';
+import * as React from 'react';
 
 export interface IFileFilterCheckboxGroupProps {
     title: string;
@@ -10,11 +10,6 @@ export interface IFileFilterCheckboxGroupProps {
 }
 
 export default class FileFilterCheckboxGroup extends React.Component<IFileFilterCheckboxGroupProps, {}> {
-
-    @autobind
-    private handleChange(event: React.ChangeEvent<HTMLInputElement>) {
-        this.props.onChange(event.target.value);
-    }
 
     public render() {
         return (
@@ -36,5 +31,10 @@ export default class FileFilterCheckboxGroup extends React.Component<IFileFilter
                 </div>
             </div>
         );
+    }
+
+    @autobind
+    private handleChange(event: React.ChangeEvent<HTMLInputElement>) {
+        this.props.onChange(event.target.value);
     }
 }

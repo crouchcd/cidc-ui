@@ -1,6 +1,6 @@
 import * as React from "react";
-import BrowseFilesPage from "./components/browseFiles/BrowseFilesPage";
 import "./App.css";
+import BrowseFilesPage from "./components/browseFiles/BrowseFilesPage";
 
 class App extends React.Component {
     public render() {

@@ -13,6 +13,7 @@
     "@types/request": "^2.48.1",
     "@types/request-promise-native": "^1.0.15",
     "autobind-decorator": "^2.4.0",
+    "enhanced-resolve": "^4.1.0",
     "filesize": "^4.0.0",
     "husky": "^1.1.3",
     "lint-staged": "^8.0.4",
@@ -23,7 +24,7 @@
     "react-markdown": "^4.0.4",
     "react-router": "^4.3.1",
     "react-router-dom": "^4.3.1",
-    "react-scripts": "^2.1.3",
+    "react-scripts-ts": "^3.1.0",
     "request-promise-native": "^1.0.5"
   },
   "lint-staged": {
@@ -34,25 +35,23 @@
   },
   "scripts": {
     "precommit": "lint-staged",
-    "start": "react-scripts start",
-    "start-dev": "REACT_APP_NODE_ENV='dev' react-scripts start",
-    "build": "react-scripts build",
-    "build-upload": "react-scripts build ; ./google-deploy.sh",
-    "test": "REACT_APP_NODE_ENV='dev' react-scripts test --env=jsdom",
-    "test-cover": "REACT_APP_NODE_ENV='dev' react-scripts test --env=jsdom --coverage",
-    "eject": "react-scripts eject"
+    "start": "react-scripts-ts start",
+    "start-dev": "REACT_APP_NODE_ENV='dev' react-scripts-ts start",
+    "build": "react-scripts-ts build",
+    "build-upload": "react-scripts-ts build ; ./google-deploy.sh",
+    "test": "REACT_APP_NODE_ENV='dev' react-scripts-ts test --env=jsdom",
+    "test-cover": "REACT_APP_NODE_ENV='dev' react-scripts-ts test --env=jsdom --coverage",
+    "eject": "react-scripts-ts eject"
   },
   "devDependencies": {
     "@types/jest": "^23.3.9",
     "@types/node": "^10.12.2",
     "@types/react": "^16.7.18",
     "@types/react-dom": "^16.0.11",
-    "babel-core": "^6.26.3",
     "typescript": "^3.1.6"
   },
   "browserslist": [
     ">0.2%",
-    "not dead",
     "not ie <= 11",
     "not op_mini all"
   ]

@@ -1,53 +1,53 @@
-import { filterFiles, changeOption } from "./BrowseFilesUtil";
+import { changeOption, filterFiles } from "./BrowseFilesUtil";
 
 const files = [
     {
+        "dataFormat": "FASTQ",
+        "experimentalStrategy": "WES",
         "name": "cimac-6521-001.fa",
-        "trialId": "DFCI-1234",
-        "experimentalStrategy": "WES",
         "numberOfCases": 1,
-        "dataFormat": "FASTQ",
-        "size": 234
+        "size": 234,
+        "trialId": "DFCI-1234",
     },
     {
+        "dataFormat": "FASTQ",
+        "experimentalStrategy": "WES",
         "name": "cimac-6521-002.fa",
-        "trialId": "DFCI-1234",
-        "experimentalStrategy": "WES",
         "numberOfCases": 1,
-        "dataFormat": "FASTQ",
-        "size": 21
+        "size": 21,
+        "trialId": "DFCI-1234",
     },
     {
+        "dataFormat": "FASTQ",
+        "experimentalStrategy": "WES",
         "name": "cimac-6521-003.fa",
-        "trialId": "DFCI-1234",
-        "experimentalStrategy": "WES",
         "numberOfCases": 1,
-        "dataFormat": "FASTQ",
-        "size": 22345
+        "size": 22345,
+        "trialId": "DFCI-1234",
     },
     {
+        "dataFormat": "FASTQ",
+        "experimentalStrategy": "WES",
         "name": "cimac-6521-004.fa",
+        "numberOfCases": 1,
+        "size": 12345545,
         "trialId": "DFCI-1234",
-        "experimentalStrategy": "WES",
-        "numberOfCases": 1,
-        "dataFormat": "FASTQ",
-        "size": 12345545
     },
     {
-        "name": "cimac-6521.vcf",
-        "trialId": "DFCI-9999",
-        "experimentalStrategy": "WES",
-        "numberOfCases": 1,
         "dataFormat": "VCF",
-        "size": 7654645
+        "experimentalStrategy": "WES",
+        "name": "cimac-6521.vcf",
+        "numberOfCases": 1,
+        "size": 7654645,
+        "trialId": "DFCI-9999",
     },
     {
-        "name": "dfci-9999.maf",
-        "trialId": "DFCI-9999",
-        "experimentalStrategy": "WES",
-        "numberOfCases": 276,
         "dataFormat": "MAF",
-        "size": 1234567
+        "experimentalStrategy": "WES",
+        "name": "dfci-9999.maf",
+        "numberOfCases": 276,
+        "size": 1234567,
+        "trialId": "DFCI-9999",
     }
 ]
 

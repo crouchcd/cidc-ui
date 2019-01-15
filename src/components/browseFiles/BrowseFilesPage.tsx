@@ -1,13 +1,13 @@
-import * as React from 'react';
-import FileTable from "./FileTable";
-import { File } from "../../model/File";
-import mockFiles from "./mockFiles.json";
 import { Grid, TextField } from '@material-ui/core';
-import FileFilter from "./FileFilter";
-import _ from 'lodash';
 import autobind from 'autobind-decorator';
+import _ from 'lodash';
+import * as React from 'react';
+import { File } from "../../model/File";
 import "./BrowseFiles.css";
-import { filterFiles, changeOption } from "./BrowseFilesUtil";
+import { changeOption, filterFiles } from "./BrowseFilesUtil";
+import FileFilter from "./FileFilter";
+import FileTable from "./FileTable";
+import mockFiles from "./mockFiles.json";
 
 export interface IBrowseFilesPageState {
     files: File[];
@@ -19,12 +19,12 @@ export interface IBrowseFilesPageState {
 
 export default class BrowseFilesPage extends React.Component<{}, IBrowseFilesPageState> {
 
-    state = {
-        files: [] as File[],
-        selectedTrialIds: [] as string[],
-        selectedExperimentalStrategies: [] as string[],
-        selectedDataFormats: [] as string[],
-        searchFilter: ""
+    state: IBrowseFilesPageState = {
+        files: [],
+        searchFilter: "",
+        selectedDataFormats: [],
+        selectedExperimentalStrategies: [],
+        selectedTrialIds: [],
     }
 
     componentDidMount() {
@@ -56,11 +56,12 @@ export default class BrowseFilesPage extends React.Component<{}, IBrowseFilesPag
         this.setState({ searchFilter: event.target.value });
     }
 
+    // tslint:disable-next-line:member-ordering
     public render() {
         return (
             <div className="Browse-files-page">
-                <Grid container spacing={32}>
-                    <Grid item xs={3}>
+                <Grid container={true} spacing={32}>
+                    <Grid item={true} xs={3}>
                         <FileFilter trialIds={_.uniq(_.map(this.state.files, "trialId"))}
                             experimentalStrategies={_.uniq(_.map(this.state.files, "experimentalStrategy"))}
                             dataFormats={_.uniq(_.map(this.state.files, "dataFormat"))}
@@ -68,7 +69,7 @@ export default class BrowseFilesPage extends React.Component<{}, IBrowseFilesPag
                             onExperimentalStrategyChange={this.handleExperimentalStrategyChange}
                             onDataFormatChange={this.handleDataFormatChange} />
                     </Grid>
-                    <Grid item xs={9}>
+                    <Grid item={true} xs={9}>
                         <div className="File-search-border">
                             <TextField label="Search by file name" type="search" margin="normal" variant="outlined"
                                 value={this.state.searchFilter} className="File-search" InputProps={{
