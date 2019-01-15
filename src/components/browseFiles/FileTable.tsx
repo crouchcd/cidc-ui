@@ -25,18 +25,16 @@ export interface IFileTableState {
     rowsPerPage: number;
     page: number;
     sortBy: string;
-    sortDirection: SortDirection;
+    sortDirection: "asc" | "desc";
 }
-
-export type SortDirection = "asc" | "desc";
 
 export default class FileTable extends React.Component<IFileTableProps, IFileTableState> {
 
-    state = {
+    state: IFileTableState = {
         page: 0,
         rowsPerPage: 10,
         sortBy: NAME_KEY,
-        sortDirection: "asc" as SortDirection
+        sortDirection: "asc"
     }
 
     public render() {

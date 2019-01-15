@@ -51,8 +51,25 @@ const files = [
     }
 ]
 
-
 test("Returns the same file list if nothing is filtered", () => {
-
     expect(filterFiles(files, [], [], [], "")).toEqual(files);
+});
+
+test("Filters it correctly", () => {
+    expect(filterFiles(files, ["DFCI-9999"], ["WES"], ["MAF", "VCF"], "dfci")).toEqual([{
+        "dataFormat": "MAF",
+        "experimentalStrategy": "WES",
+        "name": "dfci-9999.maf",
+        "numberOfCases": 276,
+        "size": 1234567,
+        "trialId": "DFCI-9999",
+    }]);
+});
+
+test("Adds option to options list if it's not there", () => {
+    expect(changeOption(["DFCI-9999"], "DFCI-1234")).toEqual(["DFCI-9999", "DFCI-1234"]);
+});
+
+test("Removes option from options list if it's already there", () => {
+    expect(changeOption(["DFCI-9999", "DFCI-1234"], "DFCI-1234")).toEqual(["DFCI-9999"]);
 });
