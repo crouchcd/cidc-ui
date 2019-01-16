@@ -73,9 +73,9 @@ export default class BrowseFilesPage extends React.Component<{}, IBrowseFilesPag
                     <Grid container={true} spacing={32}>
                         <Grid item={true} xs={3}>
                             {this.state.files.length > 0 &&
-                                <FileFilter trialIds={_.uniq(_.map(this.state.files, "trialId"))}
-                                    experimentalStrategies={_.uniq(_.map(this.state.files, "experimentalStrategy"))}
-                                    dataFormats={_.uniq(_.map(this.state.files, "dataFormat"))}
+                                <FileFilter trialIds={_.uniq(_.map(this.state.files, "trial_name"))}
+                                    experimentalStrategies={_.uniq(_.map(this.state.files, "experimental_strategy"))}
+                                    dataFormats={_.uniq(_.map(this.state.files, "data_format"))}
                                     onTrialIdChange={this.handleTrialIdChange}
                                     onExperimentalStrategyChange={this.handleExperimentalStrategyChange}
                                     onDataFormatChange={this.handleDataFormatChange} />

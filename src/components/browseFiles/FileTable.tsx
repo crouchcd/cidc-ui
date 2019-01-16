@@ -10,12 +10,12 @@ import _ from 'lodash';
 import * as React from 'react';
 import { File } from "../../model/File";
 
-const NAME_KEY = "name";
-const TRIAL_ID_KEY = "trialId";
-const EXPERIMENTAL_STRATEGY_KEY = "experimentalStrategy";
-const NUMBER_OF_CASES_KEY = "numberOfCases";
-const DATA_FORMAT_KEY = "dataFormat";
-const SIZE_KEY = "size";
+const NAME_KEY = "file_name";
+const TRIAL_ID_KEY = "trial_name";
+const EXPERIMENTAL_STRATEGY_KEY = "experimental_strategy";
+const NUMBER_OF_CASES_KEY = "number_of_samples";
+const DATA_FORMAT_KEY = "data_format";
+const SIZE_KEY = "file_size";
 
 export interface IFileTableProps {
     files: File[];
@@ -72,7 +72,7 @@ export default class FileTable extends React.Component<IFileTableProps, IFileTab
                                     direction={this.state.sortDirection}
                                     // tslint:disable-next-line:jsx-no-lambda
                                     onClick={() => this.handleChangeSorting(NUMBER_OF_CASES_KEY)}>
-                                    # of Cases
+                                    # of Samples
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell>
