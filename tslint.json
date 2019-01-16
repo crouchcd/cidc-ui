@@ -9,6 +9,9 @@
     ]
   },
   "rules": {
-    "member-access": false
+    "member-access": false,
+    "ordered-imports": [false],
+    "object-literal-sort-keys": false,
+    "no-console": false
   }
 }

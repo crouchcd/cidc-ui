@@ -98,13 +98,13 @@ export default class FileTable extends React.Component<IFileTableProps, IFileTab
                             this.state.page * this.state.rowsPerPage,
                             this.state.page * this.state.rowsPerPage + this.state.rowsPerPage).map(file => {
                                 return (
-                                    <TableRow key={file.name}>
-                                        <TableCell>{file.name}</TableCell>
-                                        <TableCell>{file.trialId}</TableCell>
-                                        <TableCell>{file.experimentalStrategy}</TableCell>
-                                        <TableCell>{file.numberOfCases}</TableCell>
-                                        <TableCell>{file.dataFormat}</TableCell>
-                                        <TableCell>{filesize(file.size)}</TableCell>
+                                    <TableRow key={file._id}>
+                                        <TableCell>{file.file_name}</TableCell>
+                                        <TableCell>{file.trial_name}</TableCell>
+                                        <TableCell>{file.experimental_strategy}</TableCell>
+                                        <TableCell>{file.number_of_samples}</TableCell>
+                                        <TableCell>{file.data_format}</TableCell>
+                                        <TableCell>{filesize(file.file_size)}</TableCell>
                                     </TableRow>
                                 );
                             })

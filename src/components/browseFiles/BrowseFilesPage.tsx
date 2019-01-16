@@ -7,20 +7,23 @@ import "./BrowseFiles.css";
 import { changeOption, filterFiles } from "./BrowseFilesUtil";
 import FileFilter from "./FileFilter";
 import FileTable from "./FileTable";
-import mockFiles from "./mockFiles.json";
+import { ICustomWindow } from "../../initialize";
+import { getUploaded } from "../../api/api";
 
 export interface IBrowseFilesPageState {
-    files: File[];
+    files: File[] | undefined;
     selectedTrialIds: string[];
     selectedExperimentalStrategies: string[];
     selectedDataFormats: string[];
     searchFilter: string;
 }
 
+const customWindow: ICustomWindow = window;
+
 export default class BrowseFilesPage extends React.Component<{}, IBrowseFilesPageState> {
 
     state: IBrowseFilesPageState = {
-        files: [],
+        files: undefined,
         searchFilter: "",
         selectedDataFormats: [],
         selectedExperimentalStrategies: [],
@@ -28,8 +31,14 @@ export default class BrowseFilesPage extends React.Component<{}, IBrowseFilesPag
     }
 
     componentDidMount() {
-        this.setState({
-            files: mockFiles
+        const options = {
+            endpoint: "data",
+            json: true,
+            method: "GET",
+            token: customWindow.initialData
+        };
+        getUploaded(options).then(results => {
+            this.setState({ files: results });
         });
     }
 
@@ -60,28 +69,32 @@ export default class BrowseFilesPage extends React.Component<{}, IBrowseFilesPag
     public render() {
         return (
             <div className="Browse-files-page">
-                <Grid container={true} spacing={32}>
-                    <Grid item={true} xs={3}>
-                        <FileFilter trialIds={_.uniq(_.map(this.state.files, "trialId"))}
-                            experimentalStrategies={_.uniq(_.map(this.state.files, "experimentalStrategy"))}
-                            dataFormats={_.uniq(_.map(this.state.files, "dataFormat"))}
-                            onTrialIdChange={this.handleTrialIdChange}
-                            onExperimentalStrategyChange={this.handleExperimentalStrategyChange}
-                            onDataFormatChange={this.handleDataFormatChange} />
+                {this.state.files &&
+                    <Grid container={true} spacing={32}>
+                        <Grid item={true} xs={3}>
+                            {this.state.files.length > 0 &&
+                                <FileFilter trialIds={_.uniq(_.map(this.state.files, "trialId"))}
+                                    experimentalStrategies={_.uniq(_.map(this.state.files, "experimentalStrategy"))}
+                                    dataFormats={_.uniq(_.map(this.state.files, "dataFormat"))}
+                                    onTrialIdChange={this.handleTrialIdChange}
+                                    onExperimentalStrategyChange={this.handleExperimentalStrategyChange}
+                                    onDataFormatChange={this.handleDataFormatChange} />
+                            }
+                        </Grid>
+                        <Grid item={true} xs={9}>
+                            <div className="File-search-border">
+                                <TextField label="Search by file name" type="search" margin="normal" variant="outlined"
+                                    value={this.state.searchFilter} className="File-search" InputProps={{
+                                        className: "File-search-input",
+                                    }} InputLabelProps={{
+                                        className: "File-search-label"
+                                    }} onChange={this.handleSearchFilterChange} />
+                            </div>
+                            <FileTable files={filterFiles(this.state.files, this.state.selectedTrialIds,
+                                this.state.selectedExperimentalStrategies, this.state.selectedDataFormats, this.state.searchFilter)} />
+                        </Grid>
                     </Grid>
-                    <Grid item={true} xs={9}>
-                        <div className="File-search-border">
-                            <TextField label="Search by file name" type="search" margin="normal" variant="outlined"
-                                value={this.state.searchFilter} className="File-search" InputProps={{
-                                    className: "File-search-input",
-                                }} InputLabelProps={{
-                                    className: "File-search-label"
-                                }} onChange={this.handleSearchFilterChange} />
-                        </div>
-                        <FileTable files={filterFiles(this.state.files, this.state.selectedTrialIds,
-                            this.state.selectedExperimentalStrategies, this.state.selectedDataFormats, this.state.searchFilter)} />
-                    </Grid>
-                </Grid>
+                }
             </div>
         );
     }

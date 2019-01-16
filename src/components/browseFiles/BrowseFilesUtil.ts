@@ -9,16 +9,16 @@ export function filterFiles(files: File[], selectedTrialIds: string[], selectedE
         let isDataFormatMatch = true;
         let isSearchFilterMatch = true;
         if (selectedTrialIds.length > 0) {
-            isTrialIdMatch = selectedTrialIds.includes(file.trialId);
+            isTrialIdMatch = selectedTrialIds.includes(file.trial_name);
         }
         if (selectedExperimentalStrategies.length > 0) {
-            isExperimentalStrategyMatch = selectedExperimentalStrategies.includes(file.experimentalStrategy);
+            isExperimentalStrategyMatch = selectedExperimentalStrategies.includes(file.experimental_strategy);
         }
         if (selectedDataFormats.length > 0) {
-            isDataFormatMatch = selectedDataFormats.includes(file.dataFormat);
+            isDataFormatMatch = selectedDataFormats.includes(file.data_format);
         }
         if (searchFilter.length > 0) {
-            isSearchFilterMatch = file.name.toLowerCase().includes(searchFilter.toLowerCase());
+            isSearchFilterMatch = file.file_name.toLowerCase().includes(searchFilter.toLowerCase());
         }
         return isTrialIdMatch && isExperimentalStrategyMatch && isDataFormatMatch && isSearchFilterMatch;
     });
