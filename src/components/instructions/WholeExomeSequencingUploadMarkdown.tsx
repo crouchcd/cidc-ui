@@ -18,19 +18,17 @@ After installation you'll need to authenticate the SDK with the following comman
 $ gcloud auth application-default login
 ~~~~
 
-## Whole Exome Sequencing (WES) File Type
+## File formats for Whole Exome Sequencing (WES) uploads:
 
-Our WES upload process expects the upload of a metadata file. 
+To upload the WES data, create a directory with a metadata file and the fastq files. 
 
-The directory where the metadata file is located should also contain all the Fastq files which needs to be uploaded.
-
-Meta Data file is a csv file and requires following columns:
+The metadata file is a csv file and requires the following columns:
 
 |COLUMN NAME|DESCRIPTION|
 |-----------|-----------|
 |**SAMPLE_ID**| Unique identifier for the sample|
-|**TRIAL_ID**| Trial identifier (Example: DFCI_9999)|
 |**PATIENT_ID**| Unique identifier for the patient|
+|**TRIAL_ID**| Trial identifier (Example: DFCI_9999)|
 |**TIMEPOINT**| Time associated with the sample acquisition|
 |**TIMEPOINT_UNIT**| Unit associated with the timepoint data|
 |**FASTQ_NORMAL_1**| Filename for fastq pair 1 from normal|
@@ -39,6 +37,10 @@ Meta Data file is a csv file and requires following columns:
 |**FASTQ_TUMOR_2**| Filename for fastq pair 2 from tumor|
 |**BATCH_ID**| Sequencing batch identifier for the sample|
 |**INSTRUMENT_MODEL**| Sequencing platform used for the assay|
+|**READ_LENGTH**| Length of sequencing reads|
+|**INSERT_SIZE**|Insert size of the library used for paired end sequencing|
+
+Click [here](https://docs.google.com/spreadsheets/d/1ThQj_5xNXX4-e5_2kB0LT0jQDCwtnrXKng859oOWLLw) to see an example of a metadata file.
 
 ## Uploading Files
 
@@ -65,7 +67,7 @@ Select a trial:
 [3] - DFCI-9999
 ~~~~
 
-Select the number that corresponds to "DFCI-9999"
+Select the number that corresponds to your trial of interest, for example DFCI-9999.
 
 ~~~~
 Pick an upload method:
@@ -78,7 +80,9 @@ Enter 1 to select "Upload using a metadata file."
 Please enter the metadata file path: path/to/your/metadata
 ~~~~
 
-The process should then automatically upload the files found in the metadata, assuming your file is formatted correctly.
+Enter the path to your metadata file.
+
+The process will then use the metadata file to upload the fastq files.
 `;
 
 export default class WholeExomeSequencingUploadMarkdown extends React.Component<{}, {}> {
