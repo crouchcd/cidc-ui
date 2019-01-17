@@ -10,13 +10,13 @@ class App extends React.Component {
         return (
             <Router>
                 <Switch>
-                    <Route path='/browse-files'
+                    <Route path='/portal/browse-files'
                         exact={true}
                         component={BrowseFilesPage} />
-                    <Route path='/wes-pipeline'
+                    <Route path='/portal/wes-pipeline'
                         exact={true}
                         component={WholeExomeSequencingPipelineMarkdown} />
-                    <Route path='/wes-upload'
+                    <Route path='/portal/wes-upload'
                         exact={true}
                         component={WholeExomeSequencingUploadMarkdown} />
                 </Switch>
