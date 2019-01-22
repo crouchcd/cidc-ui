@@ -38,13 +38,13 @@ spec:
             }
         }
     }
-    stage("Build bundle") {
-        steps {
-            container('node') {
-                sh 'npm run build'
-            }
-        }
-    }
+    // stage("Build bundle") {
+    //     steps {
+    //         container('node') {
+    //             sh 'npm run build'
+    //         }
+    //     }
+    // }
     // stage("Remove hashes and deploy (master)") {
     //     when {
     //         branch 'master'
