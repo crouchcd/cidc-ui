@@ -33,7 +33,7 @@ spec:
     stage("Run Jest Tests") {
         steps {
             container('node') {
-                sh 'npm run test'
+                sh 'npm run test-cover'
                 sh 'curl -s https://codecov.io/bash | bash -s - -t ${CODECOV_TOKEN}'
             }
         }
