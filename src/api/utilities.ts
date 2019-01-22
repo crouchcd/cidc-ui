@@ -1,6 +1,5 @@
 import { UriOptions } from "request";
 import request from "request-promise-native";
-import { string } from "prop-types";
 
 export interface IAPIHelperOptions {
     endpoint: string;
