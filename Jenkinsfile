@@ -33,7 +33,7 @@ spec:
     stage("Run Jest Tests") {
         steps {
             container('node') {
-                sh 'npm run tests'
+                sh 'npm run test'
                 sh 'curl -s https://codecov.io/bash | bash -s - -t ${CODECOV_TOKEN}'
             }
         }
@@ -45,15 +45,15 @@ spec:
             }
         }
     }
-    stage("Remove hashes and deploy (master)") {
-        when {
-            branch 'master'
-        }
-        steps {
-            container('node') {
-                sh 'bash google-deploy.sh'
-            }
-        }
-    }
+    // stage("Remove hashes and deploy (master)") {
+    //     when {
+    //         branch 'master'
+    //     }
+    //     steps {
+    //         container('node') {
+    //             sh 'bash google-deploy.sh'
+    //         }
+    //     }
+    // }
   }
 }
