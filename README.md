@@ -1,4 +1,8 @@
-![codecov](https://codecov.io/gh/dfci/front-end-cidc/branch/master/graph/badge.svg)
+| Branch | Coverage |
+| --- | --- |
+| Master | [![codecov](https://codecov.io/gh/dfci/front-end-cidc/branch/master/graph/badge.svg)](https://codecov.io/gh/dfci/front-end-cidc/branch/master/) |
+| Staging | [![codecov](https://codecov.io/gh/dfci/front-end-cidc/branch/master/graph/badge.svg)](https://codecov.io/gh/dfci/front-end-cidc/branch/staging/) |
+
 ## CIDC Front End Readme
 
 
