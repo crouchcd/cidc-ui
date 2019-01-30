@@ -14,12 +14,12 @@ spec:
     command:
     - cat
     tty: true
-    - name: docker
+  - name: docker
     image: docker:latest
     command:
     - cat
     tty: true
-    - name: gcloud
+  - name: gcloud
     image: gcr.io/cidc-dfci/gcloud-helm:latest
     command:
     - cat
