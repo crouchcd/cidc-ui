@@ -2,7 +2,12 @@
     min-width: 1200px !important;
 }
 
-.markdown-width {
+.Markdown-width {
     width: 880px;
     margin: auto;
+}
+
+.Content {
+    margin: auto;
+    width: 90%;
 }

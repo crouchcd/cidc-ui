@@ -14,6 +14,23 @@ spec:
     command:
     - cat
     tty: true
+  - name: docker
+    image: docker:latest
+    command:
+    - cat
+    tty: true
+  - name: gcloud
+    image: gcr.io/cidc-dfci/gcloud-helm:latest
+    command:
+    - cat
+    tty: true
+    volumeMounts:
+    - mountPath: /var/run/docker.sock
+      name: docker-volume
+  volumes:
+  - name: docker-volume
+    hostPath: 
+      path: /var/run/docker.sock
 """
     }
   }
@@ -38,22 +55,54 @@ spec:
             }
         }
     }
-    // stage("Build bundle") {
-    //     steps {
-    //         container('node') {
-    //             sh 'npm run build'
-    //         }
-    //     }
-    // }
-    // stage("Remove hashes and deploy (master)") {
-    //     when {
-    //         branch 'master'
-    //     }
-    //     steps {
-    //         container('node') {
-    //             sh 'bash google-deploy.sh'
-    //         }
-    //     }
-    // }
+    stage("Build bundle") {
+        steps {
+            container('node') {
+                sh 'npm run build'
+                sh 'bash copybuild.sh'
+            }
+        }
+    }
+    stage("Docker push (staging)") {
+        when {
+            branch 'staging'
+        }
+        steps {
+            container('docker') {
+                docker 'tag nginx-website gcr.io/cidc-dfci/nginx-website:staging'
+                docker 'push gcr.io/cidc-dfci/nginx-website:staging'
+            }
+        }
+    }
+    stage("Docker push (master)") {
+        when {
+            branch 'master'
+        }
+        steps {
+            container('docker') {
+                docker 'tag nginx-website gcr.io/cidc-dfci/nginx-website:production'
+                docker 'push gcr.io/cidc-dfci/nginx-website:production'
+            }
+        }
+    }
+    stage('Deploy (staging)') {
+      when {
+        branch 'staging'
+      }
+      steps {
+        container('gcloud') {
+          sh 'gcloud container clusters get-credentials cidc-cluster-staging --zone us-east1-c --project cidc-dfci'
+          sh 'helm init --client-only'
+          sh 'cat ${CA_CERT_PEM} > $(helm home)/ca.pem'
+          sh 'cat ${HELM_CERT_PEM} > $(helm home)/cert.pem'
+          sh 'cat ${HELM_KEY_PEM} > $(helm home)/key.pem'
+          sh 'helm repo add cidc "http://${CIDC_CHARTMUSEUM_SERVICE_HOST}:${CIDC_CHARTMUSEUM_SERVICE_PORT}" '
+          sh 'sleep 10'
+          sh 'helm upgrade ingestion-api cidc/nginx --version=0.1.0-staging --set imageSHA=$(gcloud container images list-tags --format="get(digest)" --filter="tags:staging" gcr.io/cidc-dfci/nginx) --set image.tag=staging --tls'
+          sh 'sleep 10'
+          sh "kubectl wait pod -l app.kubernetes.io/name=nginx --for=condition=Ready --timeout=180s"
+        }
+      }
+    }
   }
 }

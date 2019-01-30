@@ -1,8 +1,7 @@
 | Branch | Coverage |
 | --- | --- |
-| Master | [![codecov](https://codecov.io/gh/dfci/front-end-cidc/branch/master/graph/badge.svg)](https://codecov.io/gh/dfci/front-end-cidc/branch/master/) |
-| Staging | [![codecov](https://codecov.io/gh/dfci/front-end-cidc/branch/master/graph/badge.svg)](https://codecov.io/gh/dfci/front-end-cidc/branch/staging/) |
-
+| Master | [![codecov](https://codecov.io/gh/CIMAC-CIDC/cidc-front-end/branch/master/graph/badge.svg)](https://codecov.io/gh/CIMAC-CIDC/cidc-front-end/branch/master/) |
+| Staging | [![codecov](https://codecov.io/gh/CIMAC-CIDC/cidc-front-end/branch/staging/graph/badge.svg)](https://codecov.io/gh/CIMAC-CIDC/cidc-front-end/branch/staging/) |
 ## CIDC Front End Readme
 
 
@@ -14,16 +13,22 @@ Clone the project, and run `npm install`
 
 To create a new deployment bundle, run `npm run build`
 
-To format and deploy the bundle to the google bucket run the bash script: `bash google-deploy.sh`
-
-This script will remove the build-hashes from the build files (this is an interim solution that avoids having to rebuild the back-end docker image every time the front-end is updated), and then upload the files to the google bucket. You must be authorized on our google bucket for this command to work correctly.
 
 ### Test:
 
 To run unit tests, run: `npm run test`. This should generate code coverage files and an `lcov.info` file that is compatible with most code-coverage highlighting plugins.
 
+### Deploy
+The contents of the "build" folder can be used with virtually any hosting solution. The one used for this project is an NGINX instance running on kubernetes. To build the image for this service:
+
+Run the the script `copybuild.sh` in the root of the project directory. This should create and upload a Docker image for the service, as well as use helm to upgrade or install the existing deployment. For people not using the CIDC development settings the steps will be the following:
+
+From the `/build` directory, run
+
+~~~~
+docker build -f ../nginx/Dockerfile .
+~~~~
+
+Which will create an image of an NGINX server with the build files hosted on it. You may then run the image on whatever setup you are currently using. See the helm chart used for kubernetes [here](https://github.com/CIMAC-CIDC/tree/master/kubernetes/helm/nginx)
 ### Developer mode:
-
 To test React components without trying to contact the back-end, start the application in "dev mode", with `npm run start-dev`
-
-the file `App.tsx` has a conditional that will load either the APP or some testing components depending on the ENV detected. To test components, simply replace the return value of the `mockReturn` function with the components you wish to test. 

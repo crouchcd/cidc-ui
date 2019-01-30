@@ -1,0 +1,15 @@
+.Header-tabs {
+    margin-bottom: 20px;
+    background-color: #643bc6;
+    color: white;
+}
+
+.Logo {
+    height: 60px;
+    padding: 5px;
+    background-color: white;
+}
+
+.Header-tab-label {
+    font-size: 16px;
+}

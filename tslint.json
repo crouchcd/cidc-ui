@@ -4,12 +4,12 @@
     "exclude": [
       "config/**/*.js",
       "node_modules/**/*.ts",
-      "coverage/lcov-report/*.js",
-      "src/components/browseFiles/mockFiles.json"
+      "coverage/lcov-report/*.js"
     ]
   },
   "rules": {
     "member-access": false,
+    "member-ordering": false,
     "ordered-imports": [false],
     "object-literal-sort-keys": false,
     "no-console": false

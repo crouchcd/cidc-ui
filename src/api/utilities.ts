@@ -1,6 +1,8 @@
 import { UriOptions } from "request";
 import request from "request-promise-native";
 
+const currentUrl: string = window.location.origin + '/api';
+
 export interface IAPIHelperOptions {
     endpoint: string;
     etag?: string;
@@ -11,17 +13,12 @@ export interface IAPIHelperOptions {
 }
 
 export interface IAPIHelper {
-    baseURL: string;
     delete<T>(opts: IAPIHelperOptions): Promise<T | undefined>;
     get<T>(opts: IAPIHelperOptions): Promise<T | undefined>;
     patch<T>(opts: IAPIHelperOptions): Promise<T | undefined>;
     post<T>(opts: IAPIHelperOptions): Promise<T | undefined>;
 }
 
-/**
- * Async implementation of basic HTTP type requests.
- * @param options Standard HTTP request type options.
- */
 async function makeRequest<T>(
     options: UriOptions & request.RequestPromiseOptions
 ): Promise<T | undefined> {
@@ -39,8 +36,7 @@ interface IAPIOptions {
 
 const generateOptions = (
     opts: IAPIHelperOptions,
-    method: string,
-    baseURL: string
+    method: string
 ): IAPIOptions => {
     return {
         body: opts.body,
@@ -50,24 +46,20 @@ const generateOptions = (
         json: true,
         method,
         qs: opts.parameters,
-        uri: `${baseURL}/${opts.endpoint}${
+        uri: `${currentUrl}/${opts.endpoint}${
             opts.itemID ? `/${opts.itemID}` : ""
         }`
     };
 };
 
-/**
- * Factory function menat to emulate my SmartFetch class in python.
- * @param baseURL pass an object of the type { baseURL: your-url-here }
- */
-const createAPIHelper = ({ baseURL }: { baseURL: string }): IAPIHelper => {
+const createAPIHelper = (): IAPIHelper => {
     const get = <T>(opts: IAPIHelperOptions): Promise<T | undefined> => {
         return makeRequest<T | undefined>(
-            generateOptions(opts, "GET", baseURL)
+            generateOptions(opts, "GET")
         );
     };
     const patch = <T>(opts: IAPIHelperOptions): Promise<T | undefined> => {
-        const optid:IAPIOptions = generateOptions(opts, "POST", baseURL);
+        const optid:IAPIOptions = generateOptions(opts, "POST");
         optid.headers["X-HTTP-METHOD-OVERRIDE"] = "PATCH";
         if (opts.etag) {
             optid.headers["If-Match"] = opts.etag;
@@ -76,16 +68,15 @@ const createAPIHelper = ({ baseURL }: { baseURL: string }): IAPIHelper => {
     };
     const post = <T>(opts: IAPIHelperOptions): Promise<T | undefined> => {
         return makeRequest<T | undefined>(
-            generateOptions(opts, "POST", baseURL)
+            generateOptions(opts, "POST")
         );
     };
     const delF = <T>(opts: IAPIHelperOptions): Promise<T | undefined> => {
         return makeRequest<T | undefined>(
-            generateOptions(opts, "DELETE", baseURL)
+            generateOptions(opts, "DELETE")
         );
     };
     return Object.freeze({
-        baseURL,
         delete: delF,
         get,
         patch,
@@ -94,7 +85,5 @@ const createAPIHelper = ({ baseURL }: { baseURL: string }): IAPIHelper => {
 };
 
 export {
-    createAPIHelper,
-    generateOptions,
-    makeRequest
+    createAPIHelper
 };

@@ -1,4 +1,4 @@
-import { Grid, TextField } from '@material-ui/core';
+import { Grid, TextField, CircularProgress, Typography } from '@material-ui/core';
 import autobind from 'autobind-decorator';
 import _ from 'lodash';
 import * as React from 'react';
@@ -7,23 +7,22 @@ import "./BrowseFiles.css";
 import { changeOption, filterFiles } from "./BrowseFilesUtil";
 import FileFilter from "./FileFilter";
 import FileTable from "./FileTable";
-import { ICustomWindow } from "../../initialize";
-import { getUploaded } from "../../api/api";
+import { getData } from "../../api/api";
 
 export interface IBrowseFilesPageState {
     files: File[] | undefined;
+    error: string | undefined;
     selectedTrialIds: string[];
     selectedExperimentalStrategies: string[];
     selectedDataFormats: string[];
     searchFilter: string;
 }
 
-const customWindow: ICustomWindow = window;
-
-export default class BrowseFilesPage extends React.Component<{}, IBrowseFilesPageState> {
+export default class BrowseFilesPage extends React.Component<any, IBrowseFilesPageState> {
 
     state: IBrowseFilesPageState = {
         files: undefined,
+        error: undefined,
         searchFilter: "",
         selectedDataFormats: [],
         selectedExperimentalStrategies: [],
@@ -31,15 +30,25 @@ export default class BrowseFilesPage extends React.Component<{}, IBrowseFilesPag
     }
 
     componentDidMount() {
-        const options = {
-            endpoint: "data",
-            json: true,
-            method: "GET",
-            token: customWindow.initialData
-        };
-        getUploaded(options).then(results => {
-            this.setState({ files: results });
-        });
+        if (this.props.token) {
+            this.getFiles();
+        }
+    }
+
+    componentDidUpdate(prevProps: any) {
+        if (this.props.token !== prevProps.token) {
+            this.getFiles();
+        }
+    }
+
+    @autobind
+    private getFiles() {
+        getData(this.props.token)
+            .then(results => {
+                this.setState({ files: results });
+            }).catch(error => {
+                this.setState({ error: error.message })
+            });
     }
 
     @autobind
@@ -65,21 +74,38 @@ export default class BrowseFilesPage extends React.Component<{}, IBrowseFilesPag
         this.setState({ searchFilter: event.target.value });
     }
 
-    // tslint:disable-next-line:member-ordering
     public render() {
+
+        if (!this.props.auth.checkAuth(this.props.location.pathname)) {
+            return;
+        }
+
         return (
             <div className="Browse-files-page">
-                {this.state.files &&
+                {this.state.error &&
+                    <div className="Browse-files-progress">
+                        <Typography style={{ fontSize: 18 }}>{this.state.error}</Typography>
+                    </div>
+                }
+                {!this.state.error && !this.state.files &&
+                    <div className="Browse-files-progress">
+                        <CircularProgress />
+                    </div>
+                }
+                {!this.state.error && this.state.files && this.state.files.length === 0 &&
+                    <div className="Browse-files-progress">
+                        <Typography style={{ fontSize: 18 }}>No files found</Typography>
+                    </div>
+                }
+                {!this.state.error && this.state.files && this.state.files.length > 0 &&
                     <Grid container={true} spacing={32}>
                         <Grid item={true} xs={3}>
-                            {this.state.files.length > 0 &&
-                                <FileFilter trialIds={_.uniq(_.map(this.state.files, "trial_name"))}
-                                    experimentalStrategies={_.uniq(_.map(this.state.files, "experimental_strategy"))}
-                                    dataFormats={_.uniq(_.map(this.state.files, "data_format"))}
-                                    onTrialIdChange={this.handleTrialIdChange}
-                                    onExperimentalStrategyChange={this.handleExperimentalStrategyChange}
-                                    onDataFormatChange={this.handleDataFormatChange} />
-                            }
+                            <FileFilter trialIds={_.uniq(_.map(this.state.files, "trial_name"))}
+                                experimentalStrategies={_.uniq(_.map(this.state.files, "experimental_strategy"))}
+                                dataFormats={_.uniq(_.map(this.state.files, "data_format"))}
+                                onTrialIdChange={this.handleTrialIdChange}
+                                onExperimentalStrategyChange={this.handleExperimentalStrategyChange}
+                                onDataFormatChange={this.handleDataFormatChange} />
                         </Grid>
                         <Grid item={true} xs={9}>
                             <div className="File-search-border">
@@ -90,7 +116,7 @@ export default class BrowseFilesPage extends React.Component<{}, IBrowseFilesPag
                                         className: "File-search-label"
                                     }} onChange={this.handleSearchFilterChange} />
                             </div>
-                            <FileTable files={filterFiles(this.state.files, this.state.selectedTrialIds,
+                            <FileTable history={this.props.history} files={filterFiles(this.state.files, this.state.selectedTrialIds,
                                 this.state.selectedExperimentalStrategies, this.state.selectedDataFormats, this.state.searchFilter)} />
                         </Grid>
                     </Grid>

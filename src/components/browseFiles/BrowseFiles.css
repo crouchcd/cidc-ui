@@ -53,3 +53,7 @@
 .File-search-border fieldset {
     border-radius: 0;
 }
+
+.Browse-files-progress {
+    text-align: center;
+}

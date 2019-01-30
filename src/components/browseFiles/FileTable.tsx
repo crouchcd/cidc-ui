@@ -19,6 +19,7 @@ const SIZE_KEY = "file_size";
 
 export interface IFileTableProps {
     files: File[];
+    history: any;
 }
 
 export interface IFileTableState {
@@ -35,6 +36,26 @@ export default class FileTable extends React.Component<IFileTableProps, IFileTab
         rowsPerPage: 10,
         sortBy: NAME_KEY,
         sortDirection: "asc"
+    }
+
+    @autobind
+    private handleChangePage(event: React.MouseEvent<HTMLButtonElement> | null, page: number) {
+        this.setState({ page });
+    }
+
+    @autobind
+    private handleClick(fileId: string) {
+        this.props.history.push("/file-details/" + fileId);
+    }
+
+    @autobind
+    private handleChangeRowsPerPage(event: React.ChangeEvent<HTMLInputElement>) {
+        this.setState({ rowsPerPage: Number(event.target.value) });
+    }
+
+    private handleChangeSorting(sortBy: string) {
+        const isAsc = this.state.sortBy === sortBy && this.state.sortDirection === 'asc';
+        this.setState({ sortBy, sortDirection: isAsc ? 'desc' : 'asc' });
     }
 
     public render() {
@@ -98,7 +119,9 @@ export default class FileTable extends React.Component<IFileTableProps, IFileTab
                             this.state.page * this.state.rowsPerPage,
                             this.state.page * this.state.rowsPerPage + this.state.rowsPerPage).map(file => {
                                 return (
-                                    <TableRow key={file._id}>
+                                    <TableRow key={file._id} hover={true} 
+                                    // tslint:disable-next-line:jsx-no-lambda
+                                    onClick={() => this.handleClick(file._id)}>
                                         <TableCell>{file.file_name}</TableCell>
                                         <TableCell>{file.trial_name}</TableCell>
                                         <TableCell>{file.experimental_strategy}</TableCell>
@@ -122,20 +145,5 @@ export default class FileTable extends React.Component<IFileTableProps, IFileTab
                 />
             </div>
         );
-    }
-
-    @autobind
-    private handleChangePage(event: React.MouseEvent<HTMLButtonElement> | null, page: number) {
-        this.setState({ page });
-    }
-
-    @autobind
-    private handleChangeRowsPerPage(event: React.ChangeEvent<HTMLInputElement>) {
-        this.setState({ rowsPerPage: Number(event.target.value) });
-    }
-
-    private handleChangeSorting(sortBy: string) {
-        const isAsc = this.state.sortBy === sortBy && this.state.sortDirection === 'asc';
-        this.setState({ sortBy, sortDirection: isAsc ? 'desc' : 'asc' });
     }
 }
