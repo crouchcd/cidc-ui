@@ -13,6 +13,7 @@ import CliInstructions from "./components/transferData/CliInstructions";
 import PipelinesPage from "./components/pipelines/PipelinesPage";
 import PrivacyAndSecurityPage from "./components/privacyAndSecurity/PrivacyAndSecurityPage";
 import UserAccountPage from "./components/userAccount/UserAccountPage";
+import Unauthorized from "./auth/Unauthorized";
 import Auth from './auth/Auth';
 import history from './auth/History';
 import autobind from "autobind-decorator";
@@ -80,6 +81,9 @@ class App extends React.Component<any, any> {
                         <Route path='/file-details/:fileId'
                             // tslint:disable-next-line:jsx-no-lambda
                             render={(props) => <FileDetailsPage auth={this.auth} {...props} />} />
+                        <Route path='/unauthorized'
+                            // tslint:disable-next-line:jsx-no-lambda
+                            render={(props) => <Unauthorized auth={this.auth} {...props} />} />
                         <Route path="/callback"
                             // tslint:disable-next-line:jsx-no-lambda
                             render={(props) => {

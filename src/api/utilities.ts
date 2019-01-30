@@ -1,7 +1,7 @@
 import { UriOptions } from "request";
 import request from "request-promise-native";
 
-const currentUrl: string = window.location.origin + '/api';
+const currentUrl: string = 'https://stagingportal.cimac-network.org' + '/api';
 
 export interface IAPIHelperOptions {
     endpoint: string;

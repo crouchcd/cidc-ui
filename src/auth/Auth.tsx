@@ -1,8 +1,7 @@
 import auth0, { Auth0DecodedHash, Auth0UserProfile } from 'auth0-js';
 import history from './History';
 import autobind from 'autobind-decorator';
-
-const nonce: string = "1234";
+import { getAccountInfo } from "../api/api";
 
 export default class Auth {
     private accessToken: string;
@@ -27,14 +26,23 @@ export default class Auth {
 
     @autobind
     login() {
-        this.auth0.authorize({nonce});
+        this.auth0.authorize();
     }
 
     @autobind
     handleAuthentication() {
-        this.auth0.parseHash({nonce}, (err, authResult) => {
+        this.auth0.parseHash((err, authResult) => {
             if (authResult && authResult.accessToken && authResult.idToken) {
-                this.setSession(authResult, '/');
+                getAccountInfo(authResult.idToken)
+                .then(results => {
+                    if (results[0].role !== "registrant") {
+                        this.setSession(authResult, '/');
+                    } else {
+                        history.replace('/unauthorized');
+                    }
+                }).catch(error => {
+                    history.replace('/unauthorized');
+                });
             } else if (err) {
                 history.replace('/');
             }
@@ -78,7 +86,7 @@ export default class Auth {
 
     @autobind
     renewSession(returnPath: string) {
-        this.auth0.checkSession({nonce}, (err, authResult) => {
+        this.auth0.checkSession({}, (err, authResult) => {
             if (authResult && authResult.accessToken && authResult.idToken) {
                 this.setSession(authResult, returnPath);
             } else if (err) {
