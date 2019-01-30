@@ -63,7 +63,7 @@ spec:
             }
         }
     }
-    stage("Deploy (staging)") {
+    stage("Docker push (staging)") {
         when {
             branch 'staging'
         }
@@ -74,7 +74,7 @@ spec:
             }
         }
     }
-    stage("Deploy (master)") {
+    stage("Docker push (master)") {
         when {
             branch 'master'
         }
