@@ -77,7 +77,7 @@ export default class BrowseFilesPage extends React.Component<any, IBrowseFilesPa
     public render() {
 
         if (!this.props.auth.checkAuth(this.props.location.pathname)) {
-            return;
+            return null;
         }
 
         return (

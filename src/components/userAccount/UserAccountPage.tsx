@@ -54,7 +54,7 @@ export default class UserAccountPage extends React.Component<any, IUserAccountPa
     public render() {
 
         if(!this.props.auth.checkAuth(this.props.location.pathname)) {
-            return;
+            return null;
         }
 
         return (

@@ -36,7 +36,7 @@ export default class CliInstructions extends React.Component<any, ICliInstructio
     public render() {
 
         if(!this.props.auth.checkAuth(this.props.location.pathname)) {
-            return;
+            return null;
         }
 
         return (

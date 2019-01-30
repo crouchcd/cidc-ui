@@ -2,6 +2,8 @@ import auth0, { Auth0DecodedHash, Auth0UserProfile } from 'auth0-js';
 import history from './History';
 import autobind from 'autobind-decorator';
 
+const nonce: string = "1234";
+
 export default class Auth {
     private accessToken: string;
     private idToken: string;
@@ -25,12 +27,12 @@ export default class Auth {
 
     @autobind
     login() {
-        this.auth0.authorize();
+        this.auth0.authorize({nonce});
     }
 
     @autobind
     handleAuthentication() {
-        this.auth0.parseHash((err, authResult) => {
+        this.auth0.parseHash({nonce}, (err, authResult) => {
             if (authResult && authResult.accessToken && authResult.idToken) {
                 this.setSession(authResult, '/');
             } else if (err) {
@@ -76,7 +78,7 @@ export default class Auth {
 
     @autobind
     renewSession(returnPath: string) {
-        this.auth0.checkSession({}, (err, authResult) => {
+        this.auth0.checkSession({nonce}, (err, authResult) => {
             if (authResult && authResult.accessToken && authResult.idToken) {
                 this.setSession(authResult, returnPath);
             } else if (err) {
