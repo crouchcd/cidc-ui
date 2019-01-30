@@ -3,15 +3,15 @@ import ReactMarkdown from "react-markdown";
 import 'github-markdown-css/github-markdown.css';
 import {MARKDOWN_FOLDER_PATH} from "../../util/Constants";
 
-export interface IWholeExomeSequencingPipelineMarkdownState {
+export interface IWholeExomeSequencingUploadMarkdownState {
     markdown: string;
 }
 
-const MARKDOWN_FILE_NAME: string = "cidc-documentation/master/assays/wes.md";
+const MARKDOWN_FILE_NAME: string = "cidc-documentation/master/assays/wes-upload-doc.md";
 
-export default class WholeExomeSequencingPipelineMarkdown extends React.Component<any, IWholeExomeSequencingPipelineMarkdownState> {
+export default class WholeExomeSequencingUploadMarkdown extends React.Component<any, IWholeExomeSequencingUploadMarkdownState> {
 
-    state: IWholeExomeSequencingPipelineMarkdownState = {
+    state: IWholeExomeSequencingUploadMarkdownState = {
         markdown: ""
     }
 

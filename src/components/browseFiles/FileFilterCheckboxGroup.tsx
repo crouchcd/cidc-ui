@@ -11,6 +11,11 @@ export interface IFileFilterCheckboxGroupProps {
 
 export default class FileFilterCheckboxGroup extends React.Component<IFileFilterCheckboxGroupProps, {}> {
 
+    @autobind
+    private handleChange(event: React.ChangeEvent<HTMLInputElement>) {
+        this.props.onChange(event.target.value);
+    }
+
     public render() {
         return (
             <div>
@@ -31,10 +36,5 @@ export default class FileFilterCheckboxGroup extends React.Component<IFileFilter
                 </div>
             </div>
         );
-    }
-
-    @autobind
-    private handleChange(event: React.ChangeEvent<HTMLInputElement>) {
-        this.props.onChange(event.target.value);
     }
 }

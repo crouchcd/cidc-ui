@@ -1,32 +1,59 @@
-import { currentUrl } from "../initialize";
-import {
-    createAPIHelper,
-    IAPIHelperOptions,
-    makeRequest
-} from "./utilities";
+import { createAPIHelper } from "./utilities";
 import { File } from "../model/File";
+import { AccountInfo } from "../model/AccountInfo";
+import { Trial } from "../model/Trial";
 
-export interface IDataResult {
-    _id: string;
-    file_name: string;
-    trial_name: string;
-    experimental_strategy: string;
-    number_of_samples: number;
-    data_format: string;
-    file_size: number;
-}
+const apiHelper = createAPIHelper();
 
-async function getUploaded(
-    opts: IAPIHelperOptions
-): Promise<File[] | undefined> {
-    const apiHelper = createAPIHelper({ baseURL: currentUrl });
-    const dataResults = await apiHelper.get<{_items: File[]}>(opts);
+async function getData(token: string): Promise<File[] | undefined> {
+    const options = {
+        endpoint: "data",
+        json: true,
+        method: "GET",
+        token
+    };
+    
+    const result = await apiHelper.get<{ _items: File[] }>(options);
 
-    if (!dataResults) {
+    if (!result) {
         return;
     }
 
-    return dataResults._items;
+    return result._items;
 }
 
-export { makeRequest, getUploaded };
+async function getAccountInfo(token: string): Promise<AccountInfo[] | undefined> {
+    const options = {
+        endpoint: "accounts_info",
+        json: true,
+        method: "GET",
+        token
+    };
+
+    const result = await apiHelper.get<{ _items: AccountInfo[] }>(options);
+
+    if (!result) {
+        return;
+    }
+
+    return result._items;
+}
+
+async function getTrials(token: string): Promise<Trial[] | undefined> {
+    const options = {
+        endpoint: "trials",
+        json: true,
+        method: "GET",
+        token
+    };
+    
+    const result = await apiHelper.get<{ _items: Trial[] }>(options);
+
+    if (!result) {
+        return;
+    }
+
+    return result._items;
+}
+
+export { getData, getAccountInfo, getTrials };

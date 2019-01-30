@@ -1,0 +1,1 @@
+export const MARKDOWN_FOLDER_PATH: string = "https://raw.githubusercontent.com/CIMAC-CIDC/";
