@@ -62,12 +62,12 @@ export default class FileDetailsPage extends React.Component<any, IFileDetailsPa
                 {!this.state.error && this.state.file &&
                     <Grid container={true} spacing={40}>
                         <Grid item={true} xs={6}>
-                            <Grid container={true} spacing={32}>
+                            <Grid container={true} alignItems="flex-start" justify="space-between" direction="row" spacing={32}>
                                 <Grid item={true} xs={7}>
                                     <Typography variant="h5" gutterBottom={true}>Core File Properties:</Typography>
                                 </Grid>
-                                <Grid item={true} xs={5}>
-                                    <Button variant="contained" color="primary" href={this.state.file.gs_uri}>
+                                <Grid item={true}>
+                                    <Button variant="contained" color="primary" href={this.state.file.gs_uri} style={{height: 30}}>
                                         Download
                                     </Button>
                                 </Grid>
