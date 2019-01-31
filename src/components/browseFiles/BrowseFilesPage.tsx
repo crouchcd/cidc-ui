@@ -7,7 +7,7 @@ import "./BrowseFiles.css";
 import { changeOption, filterFiles } from "./BrowseFilesUtil";
 import FileFilter from "./FileFilter";
 import FileTable from "./FileTable";
-import { getData } from "../../api/api";
+import { getFiles } from "../../api/api";
 
 export interface IBrowseFilesPageState {
     files: File[] | undefined;
@@ -43,7 +43,7 @@ export default class BrowseFilesPage extends React.Component<any, IBrowseFilesPa
 
     @autobind
     private getFiles() {
-        getData(this.props.token)
+        getFiles(this.props.token)
             .then(results => {
                 this.setState({ files: results });
             }).catch(error => {

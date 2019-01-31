@@ -80,7 +80,7 @@ class App extends React.Component<any, any> {
                             render={(props) => <UserAccountPage auth={this.auth} token={this.state.token} {...props} />} />
                         <Route path='/file-details/:fileId'
                             // tslint:disable-next-line:jsx-no-lambda
-                            render={(props) => <FileDetailsPage auth={this.auth} {...props} />} />
+                            render={(props) => <FileDetailsPage auth={this.auth} token={this.state.token} {...props} />} />
                         <Route path='/unauthorized'
                             // tslint:disable-next-line:jsx-no-lambda
                             render={(props) => <Unauthorized auth={this.auth} {...props} />} />

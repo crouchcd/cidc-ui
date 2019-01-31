@@ -9,6 +9,7 @@ const files = [
         "number_of_samples": 1,
         "file_size": 234,
         "trial_name": "DFCI-1234",
+        "date_created": "2019-01-17T21:27:53.175496"
     },
     {
         "_id": "2",
@@ -18,6 +19,7 @@ const files = [
         "number_of_samples": 1,
         "file_size": 21,
         "trial_name": "DFCI-1234",
+        "date_created": "2019-01-17T21:27:53.175496"
     },
     {
         "_id": "3",
@@ -27,6 +29,7 @@ const files = [
         "number_of_samples": 1,
         "file_size": 22345,
         "trial_name": "DFCI-1234",
+        "date_created": "2019-01-17T21:27:53.175496"
     },
     {
         "_id": "4",
@@ -36,6 +39,7 @@ const files = [
         "number_of_samples": 1,
         "file_size": 12345545,
         "trial_name": "DFCI-1234",
+        "date_created": "2019-01-17T21:27:53.175496"
     },
     {
         "_id": "5",
@@ -45,6 +49,7 @@ const files = [
         "number_of_samples": 1,
         "file_size": 7654645,
         "trial_name": "DFCI-9999",
+        "date_created": "2019-01-17T21:27:53.175496"
     },
     {
         "_id": "6",
@@ -54,6 +59,7 @@ const files = [
         "number_of_samples": 276,
         "file_size": 1234567,
         "trial_name": "DFCI-9999",
+        "date_created": "2019-01-17T21:27:53.175496"
     }
 ]
 

@@ -7,4 +7,5 @@ export interface File {
     number_of_samples: number;
     data_format: string;
     file_size: number;
+    date_created: string;
 }

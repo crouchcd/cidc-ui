@@ -5,7 +5,7 @@ import { Trial } from "../model/Trial";
 
 const apiHelper = createAPIHelper();
 
-async function getData(token: string): Promise<File[] | undefined> {
+async function getFiles(token: string): Promise<File[] | undefined> {
     const options = {
         endpoint: "data",
         json: true,
@@ -20,6 +20,24 @@ async function getData(token: string): Promise<File[] | undefined> {
     }
 
     return result._items;
+}
+
+async function getSingleFile(token: string, itemID: string): Promise<File | undefined> {
+    const options = {
+        endpoint: "data",
+        json: true,
+        method: "GET",
+        itemID,
+        token
+    };
+    
+    const result = await apiHelper.get<File>(options);
+
+    if (!result) {
+        return;
+    }
+
+    return result;
 }
 
 async function getAccountInfo(token: string): Promise<AccountInfo[] | undefined> {
@@ -56,4 +74,4 @@ async function getTrials(token: string): Promise<Trial[] | undefined> {
     return result._items;
 }
 
-export { getData, getAccountInfo, getTrials };
+export { getFiles, getSingleFile, getAccountInfo, getTrials };
