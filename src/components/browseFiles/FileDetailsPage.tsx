@@ -2,7 +2,7 @@ import * as React from 'react';
 import autobind from 'autobind-decorator';
 import { getSingleFile } from "../../api/api";
 import { File } from "../../model/File";
-import { Table, TableHead, TableRow, TableCell, TableBody, Typography, CircularProgress } from '@material-ui/core';
+import { Table, TableHead, TableRow, TableCell, TableBody, Typography, CircularProgress, Grid, Button } from '@material-ui/core';
 import filesize from 'filesize';
 
 export interface IFileDetailsPageState {
@@ -59,48 +59,62 @@ export default class FileDetailsPage extends React.Component<any, IFileDetailsPa
                     </div>
                 }
                 {!this.state.error && this.state.file &&
-                    <Table>
-                        <TableHead>
-                            <TableRow>
-                                <TableCell>Attribute Name</TableCell>
-                                <TableCell>Value</TableCell>
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            <TableRow>
-                                <TableCell>File Name</TableCell>
-                                <TableCell>{this.state.file.file_name}</TableCell>
-                            </TableRow>
-                            <TableRow>
-                                <TableCell>File ID</TableCell>
-                                <TableCell>{this.state.file._id}</TableCell>
-                            </TableRow>
-                            <TableRow>
-                                <TableCell>Trial Name</TableCell>
-                                <TableCell>{this.state.file.trial_name}</TableCell>
-                            </TableRow>
-                            <TableRow>
-                                <TableCell>Experimental Strategy</TableCell>
-                                <TableCell>{this.state.file.experimental_strategy}</TableCell>
-                            </TableRow>
-                            <TableRow>
-                                <TableCell>Number of Samples</TableCell>
-                                <TableCell>{this.state.file.number_of_samples}</TableCell>
-                            </TableRow>
-                            <TableRow>
-                                <TableCell>Data Format</TableCell>
-                                <TableCell>{this.state.file.data_format}</TableCell>
-                            </TableRow>
-                            <TableRow>
-                                <TableCell>File Size</TableCell>
-                                <TableCell>{filesize(this.state.file.file_size)}</TableCell>
-                            </TableRow>
-                            <TableRow>
-                                <TableCell>Data Upload Timestamp</TableCell>
-                                <TableCell>{this.state.file.date_created}</TableCell>
-                            </TableRow>
-                        </TableBody>
-                    </Table>
+                    <Grid container={true} spacing={32}>
+                        <Grid item={true} xs={5}>
+                            <Grid container={true} spacing={32}>
+                                <Grid item={true} xs={7}>
+                                    <Typography variant="h5" gutterBottom={true}>Core File Properties:</Typography>
+                                </Grid>
+                                <Grid item={true} xs={5}>
+                                    <Button variant="contained" color="primary" href={this.state.file.gs_uri}>
+                                        Download
+                                    </Button>
+                                </Grid>
+                            </Grid>
+                            <Table>
+                                <TableHead>
+                                    <TableRow>
+                                        <TableCell>Attribute Name</TableCell>
+                                        <TableCell>Value</TableCell>
+                                    </TableRow>
+                                </TableHead>
+                                <TableBody>
+                                    <TableRow>
+                                        <TableCell>File Name</TableCell>
+                                        <TableCell>{this.state.file.file_name}</TableCell>
+                                    </TableRow>
+                                    <TableRow>
+                                        <TableCell>File ID</TableCell>
+                                        <TableCell>{this.state.file._id}</TableCell>
+                                    </TableRow>
+                                    <TableRow>
+                                        <TableCell>Trial Name</TableCell>
+                                        <TableCell>{this.state.file.trial_name}</TableCell>
+                                    </TableRow>
+                                    <TableRow>
+                                        <TableCell>Experimental Strategy</TableCell>
+                                        <TableCell>{this.state.file.experimental_strategy}</TableCell>
+                                    </TableRow>
+                                    <TableRow>
+                                        <TableCell>Number of Samples</TableCell>
+                                        <TableCell>{this.state.file.number_of_samples}</TableCell>
+                                    </TableRow>
+                                    <TableRow>
+                                        <TableCell>Data Format</TableCell>
+                                        <TableCell>{this.state.file.data_format}</TableCell>
+                                    </TableRow>
+                                    <TableRow>
+                                        <TableCell>File Size</TableCell>
+                                        <TableCell>{filesize(this.state.file.file_size)}</TableCell>
+                                    </TableRow>
+                                    <TableRow>
+                                        <TableCell>Data Upload Timestamp</TableCell>
+                                        <TableCell>{this.state.file.date_created}</TableCell>
+                                    </TableRow>
+                                </TableBody>
+                            </Table>
+                        </Grid>
+                    </Grid>
                 }
             </div>
         );

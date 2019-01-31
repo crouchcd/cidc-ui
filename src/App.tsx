@@ -17,6 +17,9 @@ import Unauthorized from "./auth/Unauthorized";
 import Auth from './auth/Auth';
 import history from './auth/History';
 import autobind from "autobind-decorator";
+import IdleTimer from 'react-idle-timer';
+
+const IDLE_TIMEOUT: number = 1000 * 60 * 15;
 
 class App extends React.Component<any, any> {
 
@@ -44,11 +47,17 @@ class App extends React.Component<any, any> {
         this.setState({ token });
     }
 
+    @autobind
+    handleIdle() {
+        this.auth.logout();
+    }
+
     public render() {
 
         return (
             <Router history={history}>
                 <div className="App">
+                    <IdleTimer ref={() => null} onIdle={this.handleIdle} timeout={IDLE_TIMEOUT} />
                     <Header auth={this.auth} email={this.state.email} />
                     <Switch>
                         <Route path='/' exact={true}

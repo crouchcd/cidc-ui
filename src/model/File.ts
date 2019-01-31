@@ -8,4 +8,5 @@ export interface File {
     data_format: string;
     file_size: number;
     date_created: string;
+    gs_uri: string;
 }
