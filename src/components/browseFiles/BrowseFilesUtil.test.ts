@@ -76,6 +76,7 @@ test("Filters it correctly", () => {
         "number_of_samples": 276,
         "file_size": 1234567,
         "trial_name": "DFCI-9999",
+        "date_created": "2019-01-17T21:27:53.175496"
     }]);
 });
 
