@@ -1,3 +1,5 @@
+import { FastqProperties } from "./FastqProperties";
+
 // tslint:disable-next-line:interface-name
 export interface File {
     _id: string;
@@ -9,4 +11,5 @@ export interface File {
     file_size: number;
     date_created: string;
     gs_uri: string;
+    fastq_properties: FastqProperties;
 }
