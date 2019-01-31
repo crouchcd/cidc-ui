@@ -2,18 +2,21 @@ import auth0, { Auth0DecodedHash, Auth0UserProfile } from 'auth0-js';
 import history from './History';
 import autobind from 'autobind-decorator';
 import { getAccountInfo } from "../api/api";
+import nanoid from 'nanoid';
 
 export default class Auth {
     private accessToken: string;
     private idToken: string;
     private expiresAt: number;
     private userinfo: Auth0UserProfile;
+    private nonce: string;
     private handleEmailUpdate: (email: string) => void;
     private handleTokenUpdate: (token: string) => void;
 
     constructor(handleEmailUpdate: (email: string) => void, handleTokenUpdate: (token: string) => void) {
         this.handleEmailUpdate = handleEmailUpdate;
         this.handleTokenUpdate = handleTokenUpdate;
+        this.nonce = nanoid();
     }
 
     auth0 = new auth0.WebAuth({
@@ -26,7 +29,7 @@ export default class Auth {
 
     @autobind
     login() {
-        this.auth0.authorize();
+        this.auth0.authorize({nonce: this.nonce});
     }
 
     @autobind
