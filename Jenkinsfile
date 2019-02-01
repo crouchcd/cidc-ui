@@ -8,12 +8,8 @@ pipeline {
 apiVersion: v1
 kind: Pod
 spec:
-  - name: gcloud
-    image: gcr.io/cidc-dfci/gcloud-helm:latest
-    command:
-    - cat
-    tty: true
- - name: docker-node
+  containers:
+  - name: docker-node
     image: gcr.io/cidc-dfci/docker-node:latest
     command:
     - cat
@@ -21,6 +17,11 @@ spec:
     volumeMounts:
     - mountPath: /var/run/docker.sock
       name: docker-volume
+  - name: gcloud
+    image: gcr.io/cidc-dfci/gcloud-helm:latest
+    command:
+    - cat
+    tty: true
   volumes:
   - name: docker-volume
     hostPath: 
@@ -53,7 +54,7 @@ spec:
         steps {
             container('docker-node') {
                 sh 'npm run build'
-                sh 'bash copybuild.sh'
+                sh '(cd build/ && docker build -t nginx-website -f ../nginx/Dockerfile .)'
             }
         }
     }
