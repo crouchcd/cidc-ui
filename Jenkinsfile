@@ -77,8 +77,8 @@ spec:
         }
         steps {
             container('dockernpm') {
-                'docker tag nginx-website gcr.io/cidc-dfci/nginx-website:production'
-                'docker push gcr.io/cidc-dfci/nginx-website:production'
+                sh 'docker tag nginx-website gcr.io/cidc-dfci/nginx-website:production'
+                sh 'docker push gcr.io/cidc-dfci/nginx-website:production'
             }
         }
     }
