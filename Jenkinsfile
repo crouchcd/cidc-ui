@@ -9,7 +9,7 @@ apiVersion: v1
 kind: Pod
 spec:
   containers:
-  - name: docker-node
+  - name: dockernpm
     image: gcr.io/cidc-dfci/docker-node:latest
     command:
     - cat
@@ -36,7 +36,7 @@ spec:
   stages {
     stage('Checkout SCM') {
       steps {
-        container('docker-node') {
+        container('dockernpm') {
           checkout scm
           sh 'npm install'
         }
@@ -44,7 +44,7 @@ spec:
     }
     stage("Run Jest Tests") {
         steps {
-            container('docker-node') {
+            container('dockernpm') {
                 sh 'npm run test-cover'
                 sh 'curl -s https://codecov.io/bash | bash -s - -t ${CODECOV_TOKEN}'
             }
@@ -52,9 +52,11 @@ spec:
     }
     stage("Build bundle") {
         steps {
-            container('docker-node') {
+            container('dockernpm') {
                 sh 'npm run build'
-                sh '(cd build/ && docker build -t nginx-website -f ../nginx/Dockerfile .)'
+                dir('build') {
+                    sh 'docker build -t nginx-website -f ../nginx/Dockerfile .'
+                }
             }
         }
     }
@@ -63,7 +65,7 @@ spec:
             branch 'staging'
         }
         steps {
-            container('docker-node') {
+            container('dockernpm') {
                 docker 'tag nginx-website gcr.io/cidc-dfci/nginx-website:staging'
                 docker 'push gcr.io/cidc-dfci/nginx-website:staging'
             }
@@ -74,7 +76,7 @@ spec:
             branch 'master'
         }
         steps {
-            container('docker-node') {
+            container('dockernpm') {
                 docker 'tag nginx-website gcr.io/cidc-dfci/nginx-website:production'
                 docker 'push gcr.io/cidc-dfci/nginx-website:production'
             }
