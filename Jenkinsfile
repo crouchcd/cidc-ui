@@ -9,24 +9,19 @@ apiVersion: v1
 kind: Pod
 spec:
   containers:
-  - name: node
-    image: node:10.14.0-jessie
-    command:
-    - cat
-    tty: true
-  - name: docker
-    image: docker:latest
-    command:
-    - cat
-    tty: true
-  - name: gcloud
-    image: gcr.io/cidc-dfci/gcloud-helm:latest
+  - name: docker-node
+    image: gcr.io/cidc-dfci/docker-node:latest
     command:
     - cat
     tty: true
     volumeMounts:
     - mountPath: /var/run/docker.sock
       name: docker-volume
+  - name: gcloud
+    image: gcr.io/cidc-dfci/gcloud-helm:latest
+    command:
+    - cat
+    tty: true
   volumes:
   - name: docker-volume
     hostPath: 
@@ -49,7 +44,7 @@ spec:
     }
     stage("Run Jest Tests") {
         steps {
-            container('node') {
+            container('docker-node') {
                 sh 'npm run test-cover'
                 sh 'curl -s https://codecov.io/bash | bash -s - -t ${CODECOV_TOKEN}'
             }
@@ -57,9 +52,10 @@ spec:
     }
     stage("Build bundle") {
         steps {
-            container('node') {
+            container('docker-node') {
+                sh 'npm install'
                 sh 'npm run build'
-                sh 'bash copybuild.sh'
+                sh '(cd build/ && docker build -t nginx-website -f ../nginx/Dockerfile .)'
             }
         }
     }
@@ -68,7 +64,7 @@ spec:
             branch 'staging'
         }
         steps {
-            container('docker') {
+            container('docker-node') {
                 docker 'tag nginx-website gcr.io/cidc-dfci/nginx-website:staging'
                 docker 'push gcr.io/cidc-dfci/nginx-website:staging'
             }
@@ -79,7 +75,7 @@ spec:
             branch 'master'
         }
         steps {
-            container('docker') {
+            container('docker-node') {
                 docker 'tag nginx-website gcr.io/cidc-dfci/nginx-website:production'
                 docker 'push gcr.io/cidc-dfci/nginx-website:production'
             }
