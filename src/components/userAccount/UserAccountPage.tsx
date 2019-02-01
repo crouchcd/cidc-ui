@@ -40,7 +40,7 @@ export default class UserAccountPage extends React.Component<any, IUserAccountPa
         .then(results => {
             this.setState({ accountInfo: results![0] });
         }).catch(error => {
-            this.setState({ accountInfoError: error.message })
+            this.setState({ accountInfoError: error.message });
         });
 
         getTrials(this.props.token)
@@ -54,7 +54,7 @@ export default class UserAccountPage extends React.Component<any, IUserAccountPa
     public render() {
 
         if(!this.props.auth.checkAuth(this.props.location.pathname)) {
-            return;
+            return null;
         }
 
         return (

@@ -7,7 +7,7 @@ export default class TransferDataPage extends React.Component<any, {}> {
     public render() {
 
         if(!this.props.auth.checkAuth(this.props.location.pathname)) {
-            return;
+            return null;
         }
 
         return (
