@@ -60,6 +60,13 @@ spec:
             }
         }
     }
+    stage('Docker login') {
+      steps {
+        container('docker') {
+          sh 'cat ${GOOGLE_APPLICATION_CREDENTIALS} | docker login -u _json_key --password-stdin https://gcr.io'
+        }
+      }
+    }
     stage("Docker push (staging)") {
         when {
             branch 'staging'
