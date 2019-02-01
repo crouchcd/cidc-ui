@@ -75,8 +75,12 @@ export default class FileDetailsPage extends React.Component<any, IFileDetailsPa
                             <FileDetailsTable file={this.state.file}/>
                         </Grid>
                         <Grid item={true} xs={6}>
-                            <Typography variant="h5" gutterBottom={true}>FASTQ Specific Properties:</Typography>
-                            <FastqDetailsTable fastqProperties={this.state.file.fastq_properties}/>
+                            {this.state.file.fastq_properties &&
+                            <>
+                                <Typography variant="h5" gutterBottom={true}>FASTQ Specific Properties:</Typography>
+                                <FastqDetailsTable fastqProperties={this.state.file.fastq_properties}/>
+                            </>
+                            }
                         </Grid>
                     </Grid>
                 }
