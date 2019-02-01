@@ -36,7 +36,7 @@ spec:
   stages {
     stage('Checkout SCM') {
       steps {
-        container('node') {
+        container('docker-node') {
           checkout scm
           sh 'npm install'
         }
@@ -53,7 +53,6 @@ spec:
     stage("Build bundle") {
         steps {
             container('docker-node') {
-                sh 'npm install'
                 sh 'npm run build'
                 sh '(cd build/ && docker build -t nginx-website -f ../nginx/Dockerfile .)'
             }
