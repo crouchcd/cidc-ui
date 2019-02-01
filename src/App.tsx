@@ -13,9 +13,13 @@ import CliInstructions from "./components/transferData/CliInstructions";
 import PipelinesPage from "./components/pipelines/PipelinesPage";
 import PrivacyAndSecurityPage from "./components/privacyAndSecurity/PrivacyAndSecurityPage";
 import UserAccountPage from "./components/userAccount/UserAccountPage";
+import Unauthorized from "./auth/Unauthorized";
 import Auth from './auth/Auth';
 import history from './auth/History';
 import autobind from "autobind-decorator";
+import IdleTimer from 'react-idle-timer';
+
+const IDLE_TIMEOUT: number = 1000 * 60 * 15;
 
 class App extends React.Component<any, any> {
 
@@ -43,11 +47,17 @@ class App extends React.Component<any, any> {
         this.setState({ token });
     }
 
+    @autobind
+    handleIdle() {
+        this.auth.logout();
+    }
+
     public render() {
 
         return (
             <Router history={history}>
                 <div className="App">
+                    <IdleTimer ref={() => null} onIdle={this.handleIdle} timeout={IDLE_TIMEOUT} />
                     <Header auth={this.auth} email={this.state.email} />
                     <Switch>
                         <Route path='/' exact={true}
@@ -79,7 +89,10 @@ class App extends React.Component<any, any> {
                             render={(props) => <UserAccountPage auth={this.auth} token={this.state.token} {...props} />} />
                         <Route path='/file-details/:fileId'
                             // tslint:disable-next-line:jsx-no-lambda
-                            render={(props) => <FileDetailsPage auth={this.auth} {...props} />} />
+                            render={(props) => <FileDetailsPage auth={this.auth} token={this.state.token} {...props} />} />
+                        <Route path='/unauthorized'
+                            // tslint:disable-next-line:jsx-no-lambda
+                            render={(props) => <Unauthorized auth={this.auth} {...props} />} />
                         <Route path="/callback"
                             // tslint:disable-next-line:jsx-no-lambda
                             render={(props) => {

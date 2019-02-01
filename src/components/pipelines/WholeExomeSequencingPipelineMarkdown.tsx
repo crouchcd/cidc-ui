@@ -25,7 +25,7 @@ export default class WholeExomeSequencingPipelineMarkdown extends React.Componen
     public render() {
 
         if(!this.props.auth.checkAuth(this.props.location.pathname)) {
-            return;
+            return null;
         }
 
         return (
