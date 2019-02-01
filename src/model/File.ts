@@ -11,5 +11,6 @@ export interface File {
     file_size: number;
     date_created: string;
     gs_uri: string;
+    download_link: string;
     fastq_properties: FastqProperties;
 }

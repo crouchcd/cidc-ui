@@ -11,6 +11,7 @@ const files = [
         "trial_name": "DFCI-1234",
         "date_created": "2019-01-17T21:27:53.175496",
         "gs_uri": "test_uri",
+        "download_link": "download_url",
         "fastq_properties": null
     },
     {
@@ -23,6 +24,7 @@ const files = [
         "trial_name": "DFCI-1234",
         "date_created": "2019-01-17T21:27:53.175496",
         "gs_uri": "test_uri",
+        "download_link": "download_url",
         "fastq_properties": null
     },
     {
@@ -35,6 +37,7 @@ const files = [
         "trial_name": "DFCI-1234",
         "date_created": "2019-01-17T21:27:53.175496",
         "gs_uri": "test_uri",
+        "download_link": "download_url",
         "fastq_properties": null
     },
     {
@@ -47,6 +50,7 @@ const files = [
         "trial_name": "DFCI-1234",
         "date_created": "2019-01-17T21:27:53.175496",
         "gs_uri": "test_uri",
+        "download_link": "download_url",
         "fastq_properties": null
     },
     {
@@ -59,6 +63,7 @@ const files = [
         "trial_name": "DFCI-9999",
         "date_created": "2019-01-17T21:27:53.175496",
         "gs_uri": "test_uri",
+        "download_link": "download_url",
         "fastq_properties": null
     },
     {
@@ -71,6 +76,7 @@ const files = [
         "trial_name": "DFCI-9999",
         "date_created": "2019-01-17T21:27:53.175496",
         "gs_uri": "test_uri",
+        "download_link": "download_url",
         "fastq_properties": null
     }
 ]
@@ -90,6 +96,7 @@ test("Filters it correctly", () => {
         "trial_name": "DFCI-9999",
         "date_created": "2019-01-17T21:27:53.175496",
         "gs_uri": "test_uri",
+        "download_link": "download_url",
         "fastq_properties": null
     }]);
 });

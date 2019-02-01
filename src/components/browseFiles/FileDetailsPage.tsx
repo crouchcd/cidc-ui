@@ -67,7 +67,7 @@ export default class FileDetailsPage extends React.Component<any, IFileDetailsPa
                                     <Typography variant="h5" gutterBottom={true}>Core File Properties:</Typography>
                                 </Grid>
                                 <Grid item={true}>
-                                    <Button variant="contained" color="primary" href={this.state.file.gs_uri} style={{height: 30}}>
+                                    <Button variant="contained" color="primary" href={this.state.file.download_link} style={{height: 30}}>
                                         Download
                                     </Button>
                                 </Grid>
