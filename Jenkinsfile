@@ -50,7 +50,7 @@ spec:
             }
         }
     }
-    stage("Build bundle") {
+    stage("Docker build") {
         steps {
             container('docker-node') {
                 sh 'npm run build'
