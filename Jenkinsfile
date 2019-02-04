@@ -62,7 +62,7 @@ spec:
     }
     stage('Docker login') {
       steps {
-        container('docker') {
+        container('dockernpm') {
           sh 'cat ${GOOGLE_APPLICATION_CREDENTIALS} | docker login -u _json_key --password-stdin https://gcr.io'
         }
       }
