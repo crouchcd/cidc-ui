@@ -8,12 +8,8 @@ pipeline {
 apiVersion: v1
 kind: Pod
 spec:
-  - name: gcloud
-    image: gcr.io/cidc-dfci/gcloud-helm:latest
-    command:
-    - cat
-    tty: true
- - name: docker-node
+  containers:
+  - name: dockernpm
     image: gcr.io/cidc-dfci/docker-node:latest
     command:
     - cat
@@ -21,6 +17,11 @@ spec:
     volumeMounts:
     - mountPath: /var/run/docker.sock
       name: docker-volume
+  - name: gcloud
+    image: gcr.io/cidc-dfci/gcloud-helm:latest
+    command:
+    - cat
+    tty: true
   volumes:
   - name: docker-volume
     hostPath: 
@@ -35,7 +36,7 @@ spec:
   stages {
     stage('Checkout SCM') {
       steps {
-        container('docker-node') {
+        container('dockernpm') {
           checkout scm
           sh 'npm install'
         }
@@ -43,7 +44,7 @@ spec:
     }
     stage("Run Jest Tests") {
         steps {
-            container('docker-node') {
+            container('dockernpm') {
                 sh 'npm run test-cover'
                 sh 'curl -s https://codecov.io/bash | bash -s - -t ${CODECOV_TOKEN}'
             }
@@ -51,20 +52,29 @@ spec:
     }
     stage("Docker build") {
         steps {
-            container('docker-node') {
+            container('dockernpm') {
                 sh 'npm run build'
-                sh 'bash copybuild.sh'
+                dir('build') {
+                    sh 'docker build -t nginx-website -f ../nginx/Dockerfile .'
+                }
             }
         }
+    }
+    stage('Docker login') {
+      steps {
+        container('dockernpm') {
+          sh 'cat ${GOOGLE_APPLICATION_CREDENTIALS} | docker login -u _json_key --password-stdin https://gcr.io'
+        }
+      }
     }
     stage("Docker push (staging)") {
         when {
             branch 'staging'
         }
         steps {
-            container('docker-node') {
-                docker 'tag nginx-website gcr.io/cidc-dfci/nginx-website:staging'
-                docker 'push gcr.io/cidc-dfci/nginx-website:staging'
+            container('dockernpm') {
+                sh 'docker tag nginx-website gcr.io/cidc-dfci/nginx-website:staging'
+                sh 'docker push gcr.io/cidc-dfci/nginx-website:staging'
             }
         }
     }
@@ -73,9 +83,9 @@ spec:
             branch 'master'
         }
         steps {
-            container('docker-node') {
-                docker 'tag nginx-website gcr.io/cidc-dfci/nginx-website:production'
-                docker 'push gcr.io/cidc-dfci/nginx-website:production'
+            container('dockernpm') {
+                sh 'docker tag nginx-website gcr.io/cidc-dfci/nginx-website:production'
+                sh 'docker push gcr.io/cidc-dfci/nginx-website:production'
             }
         }
     }
