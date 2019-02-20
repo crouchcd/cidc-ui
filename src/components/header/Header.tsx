@@ -30,6 +30,10 @@ class Header extends React.Component<any, {}> {
             selectedTab = "/browse-files";
         }
 
+        if (!this.props.auth.checkAuth(this.props.location.pathname)) {
+            return null;
+        }
+
         return (
             <div>
                 <img src={logo} className="Logo" />
