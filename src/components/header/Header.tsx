@@ -45,6 +45,7 @@ class Header extends React.Component<any, {}> {
                     <Tab
                         disableRipple={true}
                         value="/"
+                        style={{ minWidth: 100 }}
                         label={<span className="Header-tab-label">Home</span>}
                     />
                     <Tab
@@ -68,6 +69,7 @@ class Header extends React.Component<any, {}> {
                     <Tab
                         disableRipple={true}
                         value="/pipelines"
+                        style={{ minWidth: 100 }}
                         label={
                             <span className="Header-tab-label">Pipelines</span>
                         }
@@ -93,6 +95,7 @@ class Header extends React.Component<any, {}> {
                     <Tab
                         disableRipple={true}
                         value="/logout"
+                        style={{ minWidth: 100 }}
                         label={<span className="Header-tab-label">Logout</span>}
                     />
                 </Tabs>
