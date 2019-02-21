@@ -46,11 +46,11 @@ export default class Auth {
                         if (results[0].role !== "registrant") {
                             this.setSession(authResult, "/");
                         } else {
-                            history.replace("/unauthorized");
+                            history.replace("/register");
                         }
                     })
                     .catch(error => {
-                        history.replace("/unauthorized");
+                        history.replace("/register");
                     });
             } else if (err) {
                 history.replace("/");

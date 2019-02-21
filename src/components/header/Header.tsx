@@ -28,6 +28,8 @@ class Header extends React.Component<any, {}> {
             return null;
         } else if (selectedTab.startsWith("/file-details")) {
             selectedTab = "/browse-files";
+        } else if (selectedTab === "/register") {
+            return null;
         }
 
         if (!this.props.auth.checkAuth(this.props.location.pathname)) {
