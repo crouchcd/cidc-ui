@@ -43,8 +43,12 @@ export default class Auth {
             if (authResult && authResult.accessToken && authResult.idToken) {
                 getAccountInfo(authResult.idToken)
                     .then(results => {
-                        if (results[0].role !== "registrant") {
-                            this.setSession(authResult, "/");
+                        if (results[0].organization) {
+                            if (results[0].role !== "registrant") {
+                                this.setSession(authResult, "/");
+                            } else {
+                                history.replace("/register?unactivated=true");
+                            }
                         } else {
                             history.replace("/register");
                         }
