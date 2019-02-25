@@ -171,7 +171,7 @@ export default class FileTable extends React.Component<
                                 this.state.page * this.state.rowsPerPage +
                                     this.state.rowsPerPage
                             )
-                            .map(file => {
+                            .map((file: File) => {
                                 return (
                                     <TableRow
                                         key={file._id}
