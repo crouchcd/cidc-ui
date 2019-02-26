@@ -45,19 +45,28 @@ export default class UserAccountPage extends React.Component<
     @autobind
     private getUserData() {
         getAccountInfo(this.props.token)
-            .then(results => {
-                this.setState({ accountInfo: results![0] });
+            .then(accountResults => {
+                getTrials(this.props.token)
+                    .then(trialResults => {
+                        const userTrials: Trial[] = [];
+                        trialResults.forEach(trial => {
+                            if (
+                                trial.collaborators.includes(
+                                    accountResults![0].username
+                                )
+                            ) {
+                                userTrials.push(trial);
+                            }
+                        });
+                        this.setState({ trials: userTrials });
+                    })
+                    .catch(error => {
+                        this.setState({ trialsError: error.message });
+                    });
+                this.setState({ accountInfo: accountResults![0] });
             })
             .catch(error => {
                 this.setState({ accountInfoError: error.message });
-            });
-
-        getTrials(this.props.token)
-            .then(results => {
-                this.setState({ trials: results });
-            })
-            .catch(error => {
-                this.setState({ trialsError: error.message });
             });
     }
 

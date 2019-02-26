@@ -6,14 +6,7 @@ import {
     Table,
     TableBody,
     TableRow,
-    TableCell,
     TablePagination,
-    Button,
-    FormControl,
-    InputLabel,
-    Select,
-    OutlinedInput,
-    MenuItem,
     CircularProgress
 } from "@material-ui/core";
 import { getAllAccounts } from "../../api/api";
@@ -79,6 +72,7 @@ export default class AdminMenu extends React.Component<any, {}> {
                                             return (
                                                 <TableRow key={account._id}>
                                                     <UserTableRow
+                                                        token={this.props.token}
                                                         account={account}
                                                     />
                                                 </TableRow>

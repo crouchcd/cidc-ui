@@ -4,21 +4,28 @@ import {
     Button,
     FormControl,
     Select,
-    MenuItem
+    MenuItem,
+    Dialog,
+    DialogContent,
+    DialogContentText,
+    DialogActions
 } from "@material-ui/core";
 import autobind from "autobind-decorator";
 import DeleteIcon from "@material-ui/icons/Delete";
 import EditIcon from "@material-ui/icons/Edit";
 import SaveIcon from "@material-ui/icons/Save";
+import UserTrialsDialog from "./UserTrialsDialog";
 
 export default class AdminMenu extends React.Component<any, {}> {
     state = {
         role: this.props.account.role,
-        saveDisabled: true
+        saveDisabled: true,
+        trialsDialogOpen: false,
+        deleteDialogOpen: false
     };
 
-    private handleDelete() {
-        console.log("delete " + this.props.account._id);
+    private openDeleteDialog() {
+        this.setState({ deleteDialogOpen: true });
     }
 
     private handleSave() {
@@ -26,7 +33,7 @@ export default class AdminMenu extends React.Component<any, {}> {
     }
 
     private openTrials() {
-        console.log("save " + this.props.account._id);
+        this.setState({ trialsDialogOpen: true });
     }
 
     @autobind
@@ -34,19 +41,38 @@ export default class AdminMenu extends React.Component<any, {}> {
         this.setState({ role: event.target.value, saveDisabled: false });
     }
 
+    @autobind
+    private handleTrialCancel() {
+        this.setState({ trialsDialogOpen: false });
+    }
+
+    @autobind
+    private handleDeleteCancel() {
+        this.setState({ deleteDialogOpen: false });
+    }
+
+    @autobind
+    private handleDeleteUser() {
+        this.props.onDeleteUser();
+    }
+
     public render() {
         return (
             <>
-                <TableCell style={{ fontSize: 16 }}>
+                <TableCell style={{ fontSize: 18 }}>
                     {this.props.account.email}
                 </TableCell>
-                <TableCell>
+                <TableCell align="right">
                     <FormControl style={{ minWidth: 120, marginRight: 20 }}>
                         <Select
                             value={this.state.role}
                             onChange={this.handleRoleChange}
                         >
-                            <MenuItem value="registrant">Registrant</MenuItem>
+                            {this.props.account.role === "registrant" && (
+                                <MenuItem value="registrant">
+                                    Registrant
+                                </MenuItem>
+                            )}
                             <MenuItem value="reader">Reader</MenuItem>
                             <MenuItem value="uploader">Uploader</MenuItem>
                             <MenuItem value="lead">Lead</MenuItem>
@@ -66,7 +92,7 @@ export default class AdminMenu extends React.Component<any, {}> {
                         <SaveIcon style={{ marginLeft: 10 }} />
                     </Button>
                 </TableCell>
-                <TableCell>
+                <TableCell align="right">
                     <Button
                         variant="outlined"
                         color="primary"
@@ -76,17 +102,48 @@ export default class AdminMenu extends React.Component<any, {}> {
                         View / Edit Trials
                         <EditIcon style={{ marginLeft: 10 }} />
                     </Button>
+                    <UserTrialsDialog
+                        open={this.state.trialsDialogOpen}
+                        account={this.props.account}
+                        token={this.props.token}
+                        onCancel={this.handleTrialCancel}
+                    />
                 </TableCell>
                 <TableCell align="right">
                     <Button
                         variant="outlined"
                         color="secondary"
                         // tslint:disable-next-line:jsx-no-lambda
-                        onClick={() => this.handleDelete()}
+                        onClick={() => this.openDeleteDialog()}
                     >
                         Delete
                         <DeleteIcon style={{ marginLeft: 10 }} />
                     </Button>
+                    <Dialog
+                        open={this.state.deleteDialogOpen}
+                        onClose={this.handleDeleteCancel}
+                    >
+                        <DialogContent>
+                            <DialogContentText>
+                                Are you sure you want to delete the account of{" "}
+                                {this.props.account.email}?
+                            </DialogContentText>
+                        </DialogContent>
+                        <DialogActions>
+                            <Button
+                                onClick={this.handleDeleteCancel}
+                                color="primary"
+                            >
+                                Cancel
+                            </Button>
+                            <Button
+                                onClick={this.handleDeleteUser}
+                                color="primary"
+                            >
+                                Delete
+                            </Button>
+                        </DialogActions>
+                    </Dialog>
                 </TableCell>
             </>
         );

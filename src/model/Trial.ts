@@ -2,4 +2,5 @@
 export interface Trial {
     _id: string;
     trial_name: string;
+    collaborators: string[];
 }

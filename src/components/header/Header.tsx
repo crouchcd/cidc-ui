@@ -88,6 +88,7 @@ class Header extends React.Component<any, {}> {
                     <Tab
                         disableRipple={true}
                         value="/user-account"
+                        style={{ minWidth: 300 }}
                         label={
                             <span className="Header-tab-label">
                                 {this.props.email}

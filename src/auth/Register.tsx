@@ -12,7 +12,7 @@ import {
 } from "@material-ui/core";
 import autobind from "autobind-decorator";
 import "./Register.css";
-import { getAccountInfo, registerUser } from "../api/api";
+import { getAccountInfo, updateUser } from "../api/api";
 import queryString from "query-string";
 
 export default class Register extends React.Component<any, {}> {
@@ -115,7 +115,7 @@ export default class Register extends React.Component<any, {}> {
                 organization: this.state.organization
             };
 
-            registerUser(
+            updateUser(
                 this.state.token,
                 this.state.accountId,
                 this.state.etag,

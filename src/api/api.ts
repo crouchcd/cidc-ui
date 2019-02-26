@@ -73,7 +73,7 @@ async function getTrials(token: string): Promise<Trial[] | undefined> {
     return result._items;
 }
 
-async function registerUser(
+async function updateUser(
     token: string,
     itemID: string,
     etag: string,
@@ -118,6 +118,6 @@ export {
     getSingleFile,
     getAccountInfo,
     getTrials,
-    registerUser,
+    updateUser,
     getAllAccounts
 };
