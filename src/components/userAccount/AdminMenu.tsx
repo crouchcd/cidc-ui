@@ -7,7 +7,8 @@ import {
     TableBody,
     TableRow,
     TablePagination,
-    CircularProgress
+    CircularProgress,
+    TextField
 } from "@material-ui/core";
 import { getAllAccounts } from "../../api/api";
 import autobind from "autobind-decorator";
@@ -18,12 +19,20 @@ export default class AdminMenu extends React.Component<any, {}> {
     state = {
         accounts: undefined,
         page: 0,
-        rowsPerPage: 10
+        rowsPerPage: 10,
+        searchFilter: ""
     };
 
     componentDidMount() {
+        this.reloadUsers();
+    }
+
+    @autobind
+    private reloadUsers() {
         getAllAccounts(this.props.token).then(results => {
-            this.setState({ accounts: results });
+            this.setState({
+                accounts: results.filter(account => account.role !== "system")
+            });
         });
     }
 
@@ -42,7 +51,36 @@ export default class AdminMenu extends React.Component<any, {}> {
         this.setState({ rowsPerPage: Number(event.target.value) });
     }
 
+    @autobind
+    private handleSearchFilterChange(
+        event: React.ChangeEvent<HTMLInputElement>
+    ) {
+        this.setState({ searchFilter: event.target.value });
+    }
+
+    private filterAccounts(
+        accounts: Account[],
+        searchFilter: string
+    ): Account[] {
+        if (!accounts) {
+            return undefined;
+        }
+
+        return accounts.filter((account: Account) => {
+            if (searchFilter.length > 0) {
+                return account.email
+                    .toLowerCase()
+                    .includes(searchFilter.toLowerCase());
+            }
+            return true;
+        });
+    }
+
     public render() {
+        const accounts = this.filterAccounts(
+            this.state.accounts,
+            this.state.searchFilter
+        );
         return (
             <div style={{ marginTop: 20 }}>
                 <Paper className="User-account-paper">
@@ -51,16 +89,33 @@ export default class AdminMenu extends React.Component<any, {}> {
                             Admin Tasks
                         </Typography>
                     </Toolbar>
-                    {!this.state.accounts && (
+                    {!accounts && (
                         <div className="User-account-progress">
                             <CircularProgress />
                         </div>
                     )}
-                    {this.state.accounts && (
+                    {accounts && (
                         <div>
+                            <div className="Email-search">
+                                <TextField
+                                    label="Search by email"
+                                    type="search"
+                                    margin="normal"
+                                    variant="outlined"
+                                    value={this.state.searchFilter}
+                                    className="File-search"
+                                    InputProps={{
+                                        className: "File-search-input"
+                                    }}
+                                    InputLabelProps={{
+                                        className: "File-search-label"
+                                    }}
+                                    onChange={this.handleSearchFilterChange}
+                                />
+                            </div>
                             <Table>
                                 <TableBody>
-                                    {this.state.accounts
+                                    {accounts
                                         .slice(
                                             this.state.page *
                                                 this.state.rowsPerPage,
@@ -74,6 +129,9 @@ export default class AdminMenu extends React.Component<any, {}> {
                                                     <UserTableRow
                                                         token={this.props.token}
                                                         account={account}
+                                                        reloadUsers={
+                                                            this.reloadUsers
+                                                        }
                                                     />
                                                 </TableRow>
                                             );
@@ -83,7 +141,7 @@ export default class AdminMenu extends React.Component<any, {}> {
                             <TablePagination
                                 component="div"
                                 rowsPerPageOptions={[5, 10, 25]}
-                                count={this.state.accounts.length}
+                                count={accounts.length}
                                 rowsPerPage={this.state.rowsPerPage}
                                 page={this.state.page}
                                 onChangePage={this.handleChangePage}

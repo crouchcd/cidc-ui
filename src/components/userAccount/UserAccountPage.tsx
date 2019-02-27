@@ -52,7 +52,7 @@ export default class UserAccountPage extends React.Component<
                         trialResults.forEach(trial => {
                             if (
                                 trial.collaborators.includes(
-                                    accountResults![0].username
+                                    accountResults![0].email
                                 )
                             ) {
                                 userTrials.push(trial);
