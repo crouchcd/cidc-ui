@@ -22,3 +22,16 @@
     text-align: center;
     padding: 20px;
 }
+
+.Admin-row-text {
+    font-size: 14px !important;
+}
+
+.Email-search fieldset {
+    border-radius: 0;
+}
+
+.Email-search {
+    padding-left: 20px;
+    padding-top: 20px;
+}

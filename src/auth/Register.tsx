@@ -12,8 +12,9 @@ import {
 } from "@material-ui/core";
 import autobind from "autobind-decorator";
 import "./Register.css";
-import { getAccountInfo, registerUser } from "../api/api";
+import { getAccountInfo, updateUser } from "../api/api";
 import queryString from "query-string";
+import { ORGANIZATION_NAME_MAP } from "../util/Constants";
 
 export default class Register extends React.Component<any, {}> {
     state = {
@@ -115,7 +116,7 @@ export default class Register extends React.Component<any, {}> {
                 organization: this.state.organization
             };
 
-            registerUser(
+            updateUser(
                 this.state.token,
                 this.state.accountId,
                 this.state.etag,
@@ -214,19 +215,19 @@ export default class Register extends React.Component<any, {}> {
                                         Please select
                                     </MenuItem>
                                     <MenuItem value="DFCI">
-                                        Dana-Farber Cancer Institute
+                                        {ORGANIZATION_NAME_MAP.DFCI}
                                     </MenuItem>
                                     <MenuItem value="ICAHN">
-                                        Icahn School of Medicine at Mount Sinai
+                                        {ORGANIZATION_NAME_MAP.ICAHN}
                                     </MenuItem>
                                     <MenuItem value="STANFORD">
-                                        Stanford Cancer Institute
+                                        {ORGANIZATION_NAME_MAP.STANFORD}
                                     </MenuItem>
                                     <MenuItem value="MD">
-                                        MD Anderson Cancer Center
+                                        {ORGANIZATION_NAME_MAP.MD}
                                     </MenuItem>
                                     <MenuItem value="CIDC">
-                                        Cancer Immunologic Data Commons (CIDC)
+                                        {ORGANIZATION_NAME_MAP.CIDC}
                                     </MenuItem>
                                 </Select>
                             </FormControl>

@@ -73,7 +73,7 @@ async function getTrials(token: string): Promise<Trial[] | undefined> {
     return result._items;
 }
 
-async function registerUser(
+async function updateUser(
     token: string,
     itemID: string,
     etag: string,
@@ -113,11 +113,84 @@ async function getAllAccounts(token: string): Promise<Account[] | undefined> {
     return result._items;
 }
 
+async function updateRole(
+    token: string,
+    itemID: string,
+    etag: string,
+    role: string
+): Promise<Account | undefined> {
+    const options = {
+        endpoint: "accounts",
+        json: true,
+        token,
+        body: { role },
+        itemID,
+        etag
+    };
+
+    const result = await apiHelper.patch<Account>(options);
+
+    if (!result) {
+        return;
+    }
+
+    return result;
+}
+
+async function deleteUser(
+    token: string,
+    itemID: string,
+    etag: string
+): Promise<Account | undefined> {
+    const options = {
+        endpoint: "accounts",
+        json: true,
+        token,
+        itemID,
+        etag
+    };
+
+    const result = await apiHelper.delete<Account>(options);
+
+    if (!result) {
+        return;
+    }
+
+    return result;
+}
+
+async function updateTrial(
+    token: string,
+    itemID: string,
+    etag: string,
+    collaborators: any
+): Promise<Trial | undefined> {
+    const options = {
+        endpoint: "trials",
+        json: true,
+        token,
+        body: { collaborators },
+        itemID,
+        etag
+    };
+
+    const result = await apiHelper.patch<Trial>(options);
+
+    if (!result) {
+        return;
+    }
+
+    return result;
+}
+
 export {
     getFiles,
     getSingleFile,
     getAccountInfo,
     getTrials,
-    registerUser,
-    getAllAccounts
+    updateUser,
+    getAllAccounts,
+    updateRole,
+    deleteUser,
+    updateTrial
 };
