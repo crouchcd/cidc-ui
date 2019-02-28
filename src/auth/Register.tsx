@@ -41,22 +41,42 @@ export default class Register extends React.Component<any, {}> {
 
         this.props.auth.auth0.checkSession({}, (error, authResult) => {
             this.setState({ token: authResult.idToken });
-            getAccountInfo(authResult.idToken).then(results => {
-                if (results[0].organization) {
-                    this.props.history.replace("/");
-                } else {
-                    this.props.auth.auth0.client.userInfo(
-                        authResult.accessToken,
-                        (err, userinfo) => {
-                            this.setState({
-                                userinfo,
-                                accountId: results[0]._id,
-                                etag: results[0]._etag
-                            });
+            getAccountInfo(authResult.idToken)
+                .then(results => {
+                    if (results[0].organization) {
+                        this.props.history.replace("/");
+                    } else {
+                        this.props.auth.auth0.client.userInfo(
+                            authResult.accessToken,
+                            (err, userinfo) => {
+                                this.setState({
+                                    userinfo,
+                                    accountId: results[0]._id,
+                                    etag: results[0]._etag
+                                });
+                            }
+                        );
+                    }
+                })
+                .catch(async er => {
+                    await this.sleep(1000);
+                    getAccountInfo(authResult.idToken).then(results => {
+                        if (results[0].organization) {
+                            this.props.history.replace("/");
+                        } else {
+                            this.props.auth.auth0.client.userInfo(
+                                authResult.accessToken,
+                                (err, userinfo) => {
+                                    this.setState({
+                                        userinfo,
+                                        accountId: results[0]._id,
+                                        etag: results[0]._etag
+                                    });
+                                }
+                            );
                         }
-                    );
-                }
-            });
+                    });
+                });
         });
     }
 
@@ -125,6 +145,10 @@ export default class Register extends React.Component<any, {}> {
                 this.setState({ unactivated: true });
             });
         }
+    }
+
+    sleep(ms: number) {
+        return new Promise(resolve => setTimeout(resolve, ms));
     }
 
     public render() {

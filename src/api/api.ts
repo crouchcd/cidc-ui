@@ -2,6 +2,7 @@ import { createAPIHelper } from "./utilities";
 import { File } from "../model/File";
 import { Account } from "../model/Account";
 import { Trial } from "../model/Trial";
+import { Analysis } from "../model/Analysis";
 
 const apiHelper = createAPIHelper();
 
@@ -183,6 +184,22 @@ async function updateTrial(
     return result;
 }
 
+async function getAnalyses(token: string): Promise<Analysis[] | undefined> {
+    const options = {
+        endpoint: "analysis",
+        json: true,
+        token
+    };
+
+    const result = await apiHelper.get<{ _items: Analysis[] }>(options);
+
+    if (!result) {
+        return;
+    }
+
+    return result._items;
+}
+
 export {
     getFiles,
     getSingleFile,
@@ -192,5 +209,6 @@ export {
     getAllAccounts,
     updateRole,
     deleteUser,
-    updateTrial
+    updateTrial,
+    getAnalyses
 };

@@ -92,7 +92,11 @@ class App extends React.Component<any, any> {
                             path="/pipelines"
                             // tslint:disable-next-line:jsx-no-lambda
                             render={props => (
-                                <PipelinesPage auth={this.auth} {...props} />
+                                <PipelinesPage
+                                    auth={this.auth}
+                                    token={this.state.token}
+                                    {...props}
+                                />
                             )}
                         />
                         <Route
