@@ -110,10 +110,9 @@ export default class UserAccountPage extends React.Component<
                                         color="secondary"
                                         paragraph={true}
                                     >
-                                        {
-                                            this.state.accountInfo
-                                                .registration_submit_date
-                                        }
+                                        {new Date(
+                                            this.state.accountInfo.registration_submit_date
+                                        ).toDateString()}
                                     </Typography>
                                 </div>
                             )}
