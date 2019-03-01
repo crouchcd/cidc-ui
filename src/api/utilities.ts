@@ -1,7 +1,7 @@
 import { UriOptions } from "request";
 import request from "request-promise-native";
 
-const currentUrl: string = window.location.origin + '/api';
+const currentUrl: string = window.location.origin + "/api";
 
 export interface IAPIHelperOptions {
     endpoint: string;
@@ -28,9 +28,9 @@ async function makeRequest<T>(
 interface IAPIOptions {
     body: { [key: string]: string } | undefined;
     headers: { [key: string]: string };
-    json: boolean
-    method: string,
-    qs: {[key: string]: string} | undefined;
+    json: boolean;
+    method: string;
+    qs: { [key: string]: string } | undefined;
     uri: string;
 }
 
@@ -54,12 +54,10 @@ const generateOptions = (
 
 const createAPIHelper = (): IAPIHelper => {
     const get = <T>(opts: IAPIHelperOptions): Promise<T | undefined> => {
-        return makeRequest<T | undefined>(
-            generateOptions(opts, "GET")
-        );
+        return makeRequest<T | undefined>(generateOptions(opts, "GET"));
     };
     const patch = <T>(opts: IAPIHelperOptions): Promise<T | undefined> => {
-        const optid:IAPIOptions = generateOptions(opts, "POST");
+        const optid: IAPIOptions = generateOptions(opts, "POST");
         optid.headers["X-HTTP-METHOD-OVERRIDE"] = "PATCH";
         if (opts.etag) {
             optid.headers["If-Match"] = opts.etag;
@@ -67,14 +65,14 @@ const createAPIHelper = (): IAPIHelper => {
         return makeRequest<T | undefined>(optid);
     };
     const post = <T>(opts: IAPIHelperOptions): Promise<T | undefined> => {
-        return makeRequest<T | undefined>(
-            generateOptions(opts, "POST")
-        );
+        return makeRequest<T | undefined>(generateOptions(opts, "POST"));
     };
     const delF = <T>(opts: IAPIHelperOptions): Promise<T | undefined> => {
-        return makeRequest<T | undefined>(
-            generateOptions(opts, "DELETE")
-        );
+        const optid: IAPIOptions = generateOptions(opts, "DELETE");
+        if (opts.etag) {
+            optid.headers["If-Match"] = opts.etag;
+        }
+        return makeRequest<T | undefined>(optid);
     };
     return Object.freeze({
         delete: delF,
@@ -84,6 +82,4 @@ const createAPIHelper = (): IAPIHelper => {
     });
 };
 
-export {
-    createAPIHelper
-};
+export { createAPIHelper };
