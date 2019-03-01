@@ -176,9 +176,11 @@ export default class AnalysisTable extends React.Component<
                                             ).toDateString()}
                                         </TableCell>
                                         <TableCell className="Analysis-table-row-cell">
-                                            {new Date(
-                                                analysis.end_date
-                                            ).toDateString()}
+                                            {analysis.end_date
+                                                ? new Date(
+                                                      analysis.end_date
+                                                  ).toDateString()
+                                                : ""}
                                         </TableCell>
                                         <TableCell className="Analysis-table-row-cell">
                                             {analysis.status}
