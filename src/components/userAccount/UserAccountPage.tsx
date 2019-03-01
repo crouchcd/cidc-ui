@@ -6,13 +6,14 @@ import {
     CircularProgress
 } from "@material-ui/core";
 import "./UserAccount.css";
-import { AccountInfo } from "../../model/AccountInfo";
+import { Account } from "../../model/Account";
 import { Trial } from "../../model/Trial";
 import { getAccountInfo, getTrials } from "../../api/api";
 import autobind from "autobind-decorator";
+import AdminMenu from "./AdminMenu";
 
 export interface IUserAccountPageState {
-    accountInfo: AccountInfo | undefined;
+    accountInfo: Account | undefined;
     trials: Trial[] | undefined;
     accountInfoError: string | undefined;
     trialsError: string | undefined;
@@ -44,19 +45,28 @@ export default class UserAccountPage extends React.Component<
     @autobind
     private getUserData() {
         getAccountInfo(this.props.token)
-            .then(results => {
-                this.setState({ accountInfo: results![0] });
+            .then(accountResults => {
+                getTrials(this.props.token)
+                    .then(trialResults => {
+                        const userTrials: Trial[] = [];
+                        trialResults.forEach(trial => {
+                            if (
+                                trial.collaborators.includes(
+                                    accountResults![0].email
+                                )
+                            ) {
+                                userTrials.push(trial);
+                            }
+                        });
+                        this.setState({ trials: userTrials });
+                    })
+                    .catch(error => {
+                        this.setState({ trialsError: error.message });
+                    });
+                this.setState({ accountInfo: accountResults![0] });
             })
             .catch(error => {
                 this.setState({ accountInfoError: error.message });
-            });
-
-        getTrials(this.props.token)
-            .then(results => {
-                this.setState({ trials: results });
-            })
-            .catch(error => {
-                this.setState({ trialsError: error.message });
             });
     }
 
@@ -100,10 +110,9 @@ export default class UserAccountPage extends React.Component<
                                         color="secondary"
                                         paragraph={true}
                                     >
-                                        {
-                                            this.state.accountInfo
-                                                .registration_submit_date
-                                        }
+                                        {new Date(
+                                            this.state.accountInfo.registration_submit_date
+                                        ).toDateString()}
                                     </Typography>
                                 </div>
                             )}
@@ -143,6 +152,11 @@ export default class UserAccountPage extends React.Component<
                         )}
                     </div>
                 </Paper>
+                {!this.state.accountInfoError &&
+                    this.state.accountInfo &&
+                    this.state.accountInfo.role === "admin" && (
+                        <AdminMenu token={this.props.token} />
+                    )}
             </div>
         );
     }

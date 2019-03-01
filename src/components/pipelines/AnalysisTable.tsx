@@ -5,38 +5,37 @@ import TableCell from "@material-ui/core/TableCell";
 import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 import autobind from "autobind-decorator";
-import filesize from "filesize";
 import _ from "lodash";
 import * as React from "react";
-import { File } from "../../model/File";
+import { Analysis } from "../../model/Analysis";
 
-const NAME_KEY = "file_name";
+const ID_KEY = "_id";
 const TRIAL_ID_KEY = "trial_name";
 const EXPERIMENTAL_STRATEGY_KEY = "experimental_strategy";
-const NUMBER_OF_CASES_KEY = "number_of_samples";
-const DATA_FORMAT_KEY = "data_format";
-const SIZE_KEY = "file_size";
+const START_DATE_KEY = "start_date";
+const END_DATE_KEY = "end_date";
+const STATUS_KEY = "status";
 
-export interface IFileTableProps {
-    files: File[];
+export interface IAnalysisTableProps {
+    analyses: Analysis[];
     history: any;
 }
 
-export interface IFileTableState {
+export interface IAnalysisTableState {
     rowsPerPage: number;
     page: number;
     sortBy: string;
     sortDirection: "asc" | "desc";
 }
 
-export default class FileTable extends React.Component<
-    IFileTableProps,
-    IFileTableState
+export default class AnalysisTable extends React.Component<
+    IAnalysisTableProps,
+    IAnalysisTableState
 > {
-    state: IFileTableState = {
+    state: IAnalysisTableState = {
         page: 0,
         rowsPerPage: 10,
-        sortBy: NAME_KEY,
+        sortBy: ID_KEY,
         sortDirection: "asc"
     };
 
@@ -46,11 +45,6 @@ export default class FileTable extends React.Component<
         page: number
     ) {
         this.setState({ page });
-    }
-
-    @autobind
-    private handleClick(fileId: string) {
-        this.props.history.push("/file-details/" + fileId);
     }
 
     @autobind
@@ -68,23 +62,23 @@ export default class FileTable extends React.Component<
 
     public render() {
         return (
-            <div className="File-table">
+            <div className="Analysis-table">
                 <Table>
                     <TableHead>
                         <TableRow>
-                            <TableCell className="File-table-header-cell">
+                            <TableCell className="Analysis-table-header-cell">
                                 <TableSortLabel
-                                    active={this.state.sortBy === NAME_KEY}
+                                    active={this.state.sortBy === ID_KEY}
                                     direction={this.state.sortDirection}
                                     // tslint:disable-next-line:jsx-no-lambda
                                     onClick={() =>
-                                        this.handleChangeSorting(NAME_KEY)
+                                        this.handleChangeSorting(ID_KEY)
                                     }
                                 >
-                                    File Name
+                                    Pipeline ID
                                 </TableSortLabel>
                             </TableCell>
-                            <TableCell className="File-table-header-cell">
+                            <TableCell className="Analysis-table-header-cell">
                                 <TableSortLabel
                                     active={this.state.sortBy === TRIAL_ID_KEY}
                                     direction={this.state.sortDirection}
@@ -96,7 +90,7 @@ export default class FileTable extends React.Component<
                                     Trial ID
                                 </TableSortLabel>
                             </TableCell>
-                            <TableCell className="File-table-header-cell">
+                            <TableCell className="Analysis-table-header-cell">
                                 <TableSortLabel
                                     active={
                                         this.state.sortBy ===
@@ -113,56 +107,49 @@ export default class FileTable extends React.Component<
                                     Experimental Strategy
                                 </TableSortLabel>
                             </TableCell>
-                            <TableCell className="File-table-header-cell">
+                            <TableCell className="Analysis-table-header-cell">
                                 <TableSortLabel
                                     active={
-                                        this.state.sortBy ===
-                                        NUMBER_OF_CASES_KEY
+                                        this.state.sortBy === START_DATE_KEY
                                     }
                                     direction={this.state.sortDirection}
                                     // tslint:disable-next-line:jsx-no-lambda
                                     onClick={() =>
-                                        this.handleChangeSorting(
-                                            NUMBER_OF_CASES_KEY
-                                        )
+                                        this.handleChangeSorting(START_DATE_KEY)
                                     }
                                 >
-                                    # of Samples
+                                    Time Started
                                 </TableSortLabel>
                             </TableCell>
-                            <TableCell className="File-table-header-cell">
+                            <TableCell className="Analysis-table-header-cell">
                                 <TableSortLabel
-                                    active={
-                                        this.state.sortBy === DATA_FORMAT_KEY
-                                    }
+                                    active={this.state.sortBy === END_DATE_KEY}
                                     direction={this.state.sortDirection}
                                     // tslint:disable-next-line:jsx-no-lambda
                                     onClick={() =>
-                                        this.handleChangeSorting(
-                                            DATA_FORMAT_KEY
-                                        )
+                                        this.handleChangeSorting(END_DATE_KEY)
                                     }
                                 >
-                                    Data Format
+                                    Time Completed
                                 </TableSortLabel>
                             </TableCell>
-                            <TableCell className="File-table-header-cell">
+                            <TableCell className="Analysis-table-header-cell">
                                 <TableSortLabel
-                                    active={this.state.sortBy === SIZE_KEY}
+                                    active={this.state.sortBy === STATUS_KEY}
                                     direction={this.state.sortDirection}
                                     // tslint:disable-next-line:jsx-no-lambda
                                     onClick={() =>
-                                        this.handleChangeSorting(SIZE_KEY)
+                                        this.handleChangeSorting(STATUS_KEY)
                                     }
                                 >
-                                    File Size
+                                    Status
                                 </TableSortLabel>
                             </TableCell>
                         </TableRow>
                     </TableHead>
-                    <TableBody className="File-table-body">
+                    <TableBody>
                         {_.orderBy(
-                            this.props.files,
+                            this.props.analyses,
                             this.state.sortBy,
                             this.state.sortDirection
                         )
@@ -171,33 +158,30 @@ export default class FileTable extends React.Component<
                                 this.state.page * this.state.rowsPerPage +
                                     this.state.rowsPerPage
                             )
-                            .map((file: File) => {
+                            .map((analysis: Analysis) => {
                                 return (
-                                    <TableRow
-                                        key={file._id}
-                                        hover={true}
-                                        // tslint:disable-next-line:jsx-no-lambda
-                                        onClick={() =>
-                                            this.handleClick(file._id)
-                                        }
-                                    >
-                                        <TableCell className="File-table-row-cell">
-                                            {file.file_name}
+                                    <TableRow key={analysis._id}>
+                                        <TableCell className="Analysis-table-row-cell">
+                                            {analysis._id}
                                         </TableCell>
-                                        <TableCell className="File-table-row-cell">
-                                            {file.trial_name}
+                                        <TableCell className="Analysis-table-row-cell">
+                                            {analysis.trial_name}
                                         </TableCell>
-                                        <TableCell className="File-table-row-cell">
-                                            {file.experimental_strategy}
+                                        <TableCell className="Analysis-table-row-cell">
+                                            {analysis.experimental_strategy}
                                         </TableCell>
-                                        <TableCell className="File-table-row-cell">
-                                            {file.number_of_samples}
+                                        <TableCell className="Analysis-table-row-cell">
+                                            {new Date(
+                                                analysis.start_date
+                                            ).toDateString()}
                                         </TableCell>
-                                        <TableCell className="File-table-row-cell">
-                                            {file.data_format}
+                                        <TableCell className="Analysis-table-row-cell">
+                                            {new Date(
+                                                analysis.end_date
+                                            ).toDateString()}
                                         </TableCell>
-                                        <TableCell className="File-table-row-cell">
-                                            {filesize(file.file_size)}
+                                        <TableCell className="Analysis-table-row-cell">
+                                            {analysis.status}
                                         </TableCell>
                                     </TableRow>
                                 );
@@ -207,7 +191,7 @@ export default class FileTable extends React.Component<
                 <TablePagination
                     component="div"
                     rowsPerPageOptions={[5, 10, 25]}
-                    count={this.props.files.length}
+                    count={this.props.analyses.length}
                     rowsPerPage={this.state.rowsPerPage}
                     page={this.state.page}
                     onChangePage={this.handleChangePage}

@@ -8,14 +8,14 @@ import Checkbox from "@material-ui/core/Checkbox";
 import autobind from "autobind-decorator";
 import * as React from "react";
 
-export interface IFileFilterCheckboxGroupProps {
+export interface IAnalysisFilterCheckboxGroupProps {
     title: string;
     options: string[];
     onChange: (option: string) => void;
 }
 
-export default class FileFilterCheckboxGroup extends React.Component<
-    IFileFilterCheckboxGroupProps,
+export default class AnalysisFilterCheckboxGroup extends React.Component<
+    IAnalysisFilterCheckboxGroupProps,
     {}
 > {
     @autobind
@@ -26,12 +26,12 @@ export default class FileFilterCheckboxGroup extends React.Component<
     public render() {
         return (
             <div>
-                <Toolbar className="File-filter-toolbar">
-                    <Typography className="File-filter-toolbar-text">
+                <Toolbar className="Analysis-filter-toolbar">
+                    <Typography className="Analysis-filter-toolbar-text">
                         {this.props.title}
                     </Typography>
                 </Toolbar>
-                <div className="File-filter-checkboxes">
+                <div className="Analysis-filter-checkboxes">
                     <FormGroup>
                         {this.props.options.map((dataFormat: string) => {
                             return (
@@ -42,7 +42,7 @@ export default class FileFilterCheckboxGroup extends React.Component<
                                         <Checkbox
                                             value={dataFormat}
                                             onChange={this.handleChange}
-                                            className="File-filter-checkbox"
+                                            className="Analysis-filter-checkbox"
                                         />
                                     }
                                 />

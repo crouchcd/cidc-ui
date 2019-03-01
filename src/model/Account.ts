@@ -1,6 +1,7 @@
 // tslint:disable-next-line:interface-name
-export interface AccountInfo {
+export interface Account {
     _id: string;
+    _etag: string;
     username: string;
     email: string;
     role: string;

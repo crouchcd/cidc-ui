@@ -28,6 +28,8 @@ class Header extends React.Component<any, {}> {
             return null;
         } else if (selectedTab.startsWith("/file-details")) {
             selectedTab = "/browse-files";
+        } else if (selectedTab === "/register") {
+            return null;
         }
 
         if (!this.props.auth.checkAuth(this.props.location.pathname)) {
@@ -86,6 +88,7 @@ class Header extends React.Component<any, {}> {
                     <Tab
                         disableRipple={true}
                         value="/user-account"
+                        style={{ minWidth: 300 }}
                         label={
                             <span className="Header-tab-label">
                                 {this.props.email}
