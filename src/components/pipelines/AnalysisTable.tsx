@@ -8,6 +8,7 @@ import autobind from "autobind-decorator";
 import _ from "lodash";
 import * as React from "react";
 import { Analysis } from "../../model/Analysis";
+import { LOCALE, dateOptions } from "../../util/Constants";
 
 const ID_KEY = "_id";
 const TRIAL_ID_KEY = "trial_name";
@@ -173,13 +174,19 @@ export default class AnalysisTable extends React.Component<
                                         <TableCell className="Analysis-table-row-cell">
                                             {new Date(
                                                 analysis.start_date
-                                            ).toDateString()}
+                                            ).toLocaleString(
+                                                LOCALE,
+                                                dateOptions
+                                            )}
                                         </TableCell>
                                         <TableCell className="Analysis-table-row-cell">
                                             {analysis.end_date
                                                 ? new Date(
                                                       analysis.end_date
-                                                  ).toDateString()
+                                                  ).toLocaleString(
+                                                      LOCALE,
+                                                      dateOptions
+                                                  )
                                                 : ""}
                                         </TableCell>
                                         <TableCell className="Analysis-table-row-cell">
