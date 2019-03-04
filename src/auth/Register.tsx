@@ -8,7 +8,8 @@ import {
     Select,
     OutlinedInput,
     MenuItem,
-    Typography
+    Typography,
+    CircularProgress
 } from "@material-ui/core";
 import autobind from "autobind-decorator";
 import "./Register.css";
@@ -39,44 +40,25 @@ export default class Register extends React.Component<any, {}> {
             return;
         }
 
-        this.props.auth.auth0.checkSession({}, (error, authResult) => {
+        this.props.auth.auth0.checkSession({}, async (error, authResult) => {
             this.setState({ token: authResult.idToken });
-            getAccountInfo(authResult.idToken)
-                .then(results => {
-                    if (results[0].organization) {
-                        this.props.history.replace("/");
-                    } else {
-                        this.props.auth.auth0.client.userInfo(
-                            authResult.accessToken,
-                            (err, userinfo) => {
-                                this.setState({
-                                    userinfo,
-                                    accountId: results[0]._id,
-                                    etag: results[0]._etag
-                                });
-                            }
-                        );
-                    }
-                })
-                .catch(async er => {
-                    await this.sleep(1000);
-                    getAccountInfo(authResult.idToken).then(results => {
-                        if (results[0].organization) {
-                            this.props.history.replace("/");
-                        } else {
-                            this.props.auth.auth0.client.userInfo(
-                                authResult.accessToken,
-                                (err, userinfo) => {
-                                    this.setState({
-                                        userinfo,
-                                        accountId: results[0]._id,
-                                        etag: results[0]._etag
-                                    });
-                                }
-                            );
+            await this.sleep(1000);
+            getAccountInfo(authResult.idToken).then(results => {
+                if (results[0].organization) {
+                    this.props.history.replace("/");
+                } else {
+                    this.props.auth.auth0.client.userInfo(
+                        authResult.accessToken,
+                        (err, userinfo) => {
+                            this.setState({
+                                userinfo,
+                                accountId: results[0]._id,
+                                etag: results[0]._etag
+                            });
                         }
-                    });
-                });
+                    );
+                }
+            });
         });
     }
 
@@ -154,23 +136,33 @@ export default class Register extends React.Component<any, {}> {
     public render() {
         if (this.state.unactivated) {
             return (
-                <Typography
-                    style={{
-                        fontSize: 20,
-                        width: "70%",
-                        margin: "auto",
-                        paddingTop: 25
-                    }}
-                >
-                    Thank for you registering for the CIMAC-CIDC Data Portal. We
-                    will email you when your authorization request has been
-                    completed.
-                </Typography>
+                <>
+                    <div className="Register-header">Registration</div>
+                    <Typography
+                        style={{
+                            fontSize: 20,
+                            width: "70%",
+                            margin: "auto",
+                            paddingTop: 25
+                        }}
+                    >
+                        Thank for you registering for the CIMAC-CIDC Data
+                        Portal. We will email you when your authorization
+                        request has been completed.
+                    </Typography>
+                </>
             );
         }
 
         if (!this.state.userinfo.email) {
-            return null;
+            return (
+                <>
+                    <div className="Register-header">Registration</div>
+                    <div className="Register-progress">
+                        <CircularProgress />
+                    </div>
+                </>
+            );
         }
 
         return (
@@ -241,6 +233,9 @@ export default class Register extends React.Component<any, {}> {
                                     <MenuItem value="DFCI">
                                         {ORGANIZATION_NAME_MAP.DFCI}
                                     </MenuItem>
+                                    <MenuItem value="CIDC">
+                                        {ORGANIZATION_NAME_MAP.CIDC}
+                                    </MenuItem>
                                     <MenuItem value="ICAHN">
                                         {ORGANIZATION_NAME_MAP.ICAHN}
                                     </MenuItem>
@@ -249,9 +244,6 @@ export default class Register extends React.Component<any, {}> {
                                     </MenuItem>
                                     <MenuItem value="MD">
                                         {ORGANIZATION_NAME_MAP.MD}
-                                    </MenuItem>
-                                    <MenuItem value="CIDC">
-                                        {ORGANIZATION_NAME_MAP.CIDC}
                                     </MenuItem>
                                 </Select>
                             </FormControl>

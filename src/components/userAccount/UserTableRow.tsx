@@ -20,7 +20,7 @@ import { ORGANIZATION_NAME_MAP } from "../../util/Constants";
 import "./UserAccount.css";
 import { updateRole, deleteUser } from "../../api/api";
 
-export default class AdminMenu extends React.Component<any, {}> {
+export default class UserTableRow extends React.Component<any, {}> {
     state = {
         role: this.props.account.role,
         saveDisabled: true,
@@ -40,6 +40,7 @@ export default class AdminMenu extends React.Component<any, {}> {
             this.state.role
         ).then(results => {
             this.setState({ saveDisabled: true });
+            this.props.reloadUsers();
         });
     }
 
@@ -123,6 +124,7 @@ export default class AdminMenu extends React.Component<any, {}> {
                         size="small"
                         variant="outlined"
                         color="primary"
+                        disabled={this.props.account.role === "registrant"}
                         // tslint:disable-next-line:jsx-no-lambda
                         onClick={() => this.openTrials()}
                     >
