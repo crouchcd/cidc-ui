@@ -11,6 +11,11 @@ import { Trial } from "../../model/Trial";
 import { getAccountInfo, getTrials } from "../../api/api";
 import autobind from "autobind-decorator";
 import AdminMenu from "./AdminMenu";
+import {
+    LOCALE,
+    dateOptions,
+    ORGANIZATION_NAME_MAP
+} from "../../util/Constants";
 
 export interface IUserAccountPageState {
     accountInfo: Account | undefined;
@@ -112,7 +117,22 @@ export default class UserAccountPage extends React.Component<
                                     >
                                         {new Date(
                                             this.state.accountInfo.registration_submit_date
-                                        ).toDateString()}
+                                        ).toLocaleString(LOCALE, dateOptions)}
+                                    </Typography>
+                                    <Typography variant="h5">
+                                        Organization:
+                                    </Typography>
+                                    <Typography
+                                        variant="h6"
+                                        color="secondary"
+                                        paragraph={true}
+                                    >
+                                        {
+                                            ORGANIZATION_NAME_MAP[
+                                                this.state.accountInfo
+                                                    .organization
+                                            ]
+                                        }
                                     </Typography>
                                 </div>
                             )}
