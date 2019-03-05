@@ -74,22 +74,18 @@ async function getTrials(token: string): Promise<Trial[] | undefined> {
     return result._items;
 }
 
-async function updateUser(
+async function createUser(
     token: string,
-    itemID: string,
-    etag: string,
     newUser: any
 ): Promise<Account | undefined> {
     const options = {
-        endpoint: "accounts_update",
+        endpoint: "accounts_create",
         json: true,
         token,
-        body: newUser,
-        itemID,
-        etag
+        body: newUser
     };
 
-    const result = await apiHelper.patch<Account>(options);
+    const result = await apiHelper.post<Account>(options);
 
     if (!result) {
         return;
@@ -205,7 +201,7 @@ export {
     getSingleFile,
     getAccountInfo,
     getTrials,
-    updateUser,
+    createUser,
     getAllAccounts,
     updateRole,
     deleteUser,
