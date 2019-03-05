@@ -96,11 +96,6 @@ export default class UserTableRow extends React.Component<any, {}> {
                             value={this.state.role}
                             onChange={this.handleRoleChange}
                         >
-                            {this.props.account.role === "registrant" && (
-                                <MenuItem value="registrant">
-                                    Registrant
-                                </MenuItem>
-                            )}
                             <MenuItem value="reader">Reader</MenuItem>
                             <MenuItem value="uploader">Uploader</MenuItem>
                             <MenuItem value="lead">Lead</MenuItem>
@@ -124,7 +119,7 @@ export default class UserTableRow extends React.Component<any, {}> {
                         size="small"
                         variant="outlined"
                         color="primary"
-                        disabled={this.props.account.role === "registrant"}
+                        disabled={!this.props.account.registered}
                         // tslint:disable-next-line:jsx-no-lambda
                         onClick={() => this.openTrials()}
                     >

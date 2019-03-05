@@ -31,9 +31,7 @@ export default class AdminMenu extends React.Component<any, {}> {
     private reloadUsers() {
         getAllAccounts(this.props.token).then(results => {
             this.setState({
-                accounts: results.filter(
-                    account => account.role !== "system" && account.organization
-                )
+                accounts: results.filter(account => account.role !== "system")
             });
         });
     }

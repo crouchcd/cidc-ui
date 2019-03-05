@@ -13,24 +13,20 @@ import {
 } from "@material-ui/core";
 import autobind from "autobind-decorator";
 import "./Register.css";
-import { getAccountInfo, updateUser } from "../api/api";
+import { getAccountInfo, createUser } from "../api/api";
 import queryString from "query-string";
 import { ORGANIZATION_NAME_MAP } from "../util/Constants";
 
 export default class Register extends React.Component<any, {}> {
     state = {
-        userinfo: {
-            given_name: "",
-            family_name: "",
-            email: ""
-        },
+        first_n: "",
+        last_n: "",
+        email: "",
         organization: "EMPTY",
         firstNameError: false,
         lastNameError: false,
         organizationError: false,
         token: undefined,
-        accountId: undefined,
-        etag: undefined,
         unactivated: false
     };
 
@@ -42,41 +38,32 @@ export default class Register extends React.Component<any, {}> {
 
         this.props.auth.auth0.checkSession({}, async (error, authResult) => {
             this.setState({ token: authResult.idToken });
-            await this.sleep(1000);
-            getAccountInfo(authResult.idToken).then(results => {
-                if (results[0].organization) {
-                    this.props.history.replace("/");
-                } else {
-                    this.props.auth.auth0.client.userInfo(
-                        authResult.accessToken,
-                        (err, userinfo) => {
-                            this.setState({
-                                userinfo,
-                                accountId: results[0]._id,
-                                etag: results[0]._etag
-                            });
-                        }
-                    );
-                }
-            });
+            getAccountInfo(authResult.idToken)
+                .then(results => {
+                    if (results[0].registered) {
+                        this.props.history.replace("/");
+                    } else {
+                        this.setState({ unactivated: true });
+                    }
+                })
+                .catch(err => {
+                    this.setState({
+                        email: authResult.idTokenPayload.email,
+                        first_n: authResult.idTokenPayload.given_name,
+                        last_n: authResult.idTokenPayload.family_name
+                    });
+                });
         });
     }
 
     @autobind
     private handleFirstNameChange(event: React.ChangeEvent<HTMLInputElement>) {
-        this.setState({
-            userinfo: { ...this.state.userinfo, given_name: event.target.value }
-        });
+        this.setState({ first_n: event.target.value });
     }
 
     @autobind
     private handleLastNameChange(event: React.ChangeEvent<HTMLInputElement>) {
-        this.setState({
-            userinfo: {
-                ...this.state.userinfo,
-                family_name: event.target.value
-            }
-        });
+        this.setState({ last_n: event.target.value });
     }
 
     @autobind
@@ -91,13 +78,13 @@ export default class Register extends React.Component<any, {}> {
         let lastNameError: boolean = false;
         let organizationError: boolean = false;
 
-        if (!this.state.userinfo.given_name) {
+        if (!this.state.first_n) {
             firstNameError = true;
         } else {
             firstNameError = false;
         }
 
-        if (!this.state.userinfo.family_name) {
+        if (!this.state.last_n) {
             lastNameError = true;
         } else {
             lastNameError = false;
@@ -113,24 +100,15 @@ export default class Register extends React.Component<any, {}> {
 
         if (!firstNameError && !lastNameError && !organizationError) {
             const newUser = {
-                first_n: this.state.userinfo.given_name,
-                last_n: this.state.userinfo.family_name,
+                first_n: this.state.first_n,
+                last_n: this.state.last_n,
                 organization: this.state.organization
             };
 
-            updateUser(
-                this.state.token,
-                this.state.accountId,
-                this.state.etag,
-                newUser
-            ).then(result => {
+            createUser(this.state.token, newUser).then(result => {
                 this.setState({ unactivated: true });
             });
         }
-    }
-
-    sleep(ms: number) {
-        return new Promise(resolve => setTimeout(resolve, ms));
     }
 
     public render() {
@@ -154,7 +132,7 @@ export default class Register extends React.Component<any, {}> {
             );
         }
 
-        if (!this.state.userinfo.email) {
+        if (!this.state.email) {
             return (
                 <>
                     <div className="Register-header">Registration</div>
@@ -180,7 +158,7 @@ export default class Register extends React.Component<any, {}> {
                             <TextField
                                 label="Email"
                                 style={{ minWidth: 420 }}
-                                value={this.state.userinfo.email}
+                                value={this.state.email}
                                 disabled={true}
                                 fullWidth={true}
                                 margin="normal"
@@ -192,7 +170,7 @@ export default class Register extends React.Component<any, {}> {
                                 label="First Name"
                                 style={{ minWidth: 420 }}
                                 fullWidth={true}
-                                value={this.state.userinfo.given_name}
+                                value={this.state.first_n}
                                 onChange={this.handleFirstNameChange}
                                 margin="normal"
                                 variant="outlined"
@@ -205,7 +183,7 @@ export default class Register extends React.Component<any, {}> {
                                 label="Last Name"
                                 style={{ minWidth: 420 }}
                                 fullWidth={true}
-                                value={this.state.userinfo.family_name}
+                                value={this.state.last_n}
                                 onChange={this.handleLastNameChange}
                                 margin="normal"
                                 variant="outlined"
