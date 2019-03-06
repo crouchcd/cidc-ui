@@ -5,7 +5,7 @@ export interface Account {
     username: string;
     email: string;
     role: string;
-    registered: boolean;
+    approved: boolean;
     last_access: string;
     first_n: string;
     last_n: string;

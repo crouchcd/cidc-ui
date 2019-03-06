@@ -15,7 +15,7 @@ import autobind from "autobind-decorator";
 import DeleteIcon from "@material-ui/icons/Delete";
 import EditIcon from "@material-ui/icons/Edit";
 import UserTrialsDialog from "./UserTrialsDialog";
-import { ORGANIZATION_NAME_MAP } from "../../util/Constants";
+import { ORGANIZATION_NAME_MAP } from "../../util/constants";
 import "./UserAccount.css";
 import { updateRole, deleteUser, getUserEtag } from "../../api/api";
 
@@ -107,7 +107,7 @@ export default class UserTableRow extends React.Component<any, {}> {
                         size="small"
                         variant="outlined"
                         color="primary"
-                        disabled={!this.props.account.registered}
+                        disabled={!this.props.account.approved}
                         // tslint:disable-next-line:jsx-no-lambda
                         onClick={() => this.openTrials()}
                     >

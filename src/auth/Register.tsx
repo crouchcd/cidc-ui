@@ -15,7 +15,7 @@ import autobind from "autobind-decorator";
 import "./Register.css";
 import { getAccountInfo, createUser } from "../api/api";
 import queryString from "query-string";
-import { ORGANIZATION_NAME_MAP } from "../util/Constants";
+import { ORGANIZATION_NAME_MAP } from "../util/constants";
 
 export default class Register extends React.Component<any, {}> {
     state = {
@@ -40,7 +40,7 @@ export default class Register extends React.Component<any, {}> {
             this.setState({ token: authResult.idToken });
             getAccountInfo(authResult.idToken)
                 .then(results => {
-                    if (results[0].registered) {
+                    if (results[0].approved) {
                         this.props.history.replace("/");
                     } else {
                         this.setState({ unactivated: true });

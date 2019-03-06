@@ -1,8 +1,8 @@
 import { createAPIHelper } from "./utilities";
-import { File } from "../model/File";
-import { Account } from "../model/Account";
-import { Trial } from "../model/Trial";
-import { Analysis } from "../model/Analysis";
+import { File } from "../model/file";
+import { Account } from "../model/account";
+import { Trial } from "../model/trial";
+import { Analysis } from "../model/analysis";
 
 const apiHelper = createAPIHelper();
 
@@ -120,7 +120,7 @@ async function updateRole(
         endpoint: "accounts",
         json: true,
         token,
-        body: { role, registered: "true" },
+        body: { role, approved: "true" },
         itemID,
         etag
     };

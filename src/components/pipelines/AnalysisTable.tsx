@@ -7,8 +7,8 @@ import TableRow from "@material-ui/core/TableRow";
 import autobind from "autobind-decorator";
 import _ from "lodash";
 import * as React from "react";
-import { Analysis } from "../../model/Analysis";
-import { LOCALE, dateOptions } from "../../util/Constants";
+import { Analysis } from "../../model/analysis";
+import { LOCALE, dateOptions } from "../../util/constants";
 
 const ID_KEY = "_id";
 const TRIAL_ID_KEY = "trial_name";

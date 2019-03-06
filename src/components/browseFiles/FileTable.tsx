@@ -8,7 +8,7 @@ import autobind from "autobind-decorator";
 import filesize from "filesize";
 import _ from "lodash";
 import * as React from "react";
-import { File } from "../../model/File";
+import { File } from "../../model/file";
 
 const NAME_KEY = "file_name";
 const TRIAL_ID_KEY = "trial_name";

@@ -1,4 +1,4 @@
-import { Analysis } from "../../model/Analysis";
+import { Analysis } from "../../model/analysis";
 
 export function filterAnalyses(
     analyses: Analysis[],

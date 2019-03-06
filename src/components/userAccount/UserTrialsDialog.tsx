@@ -17,7 +17,7 @@ import {
 } from "@material-ui/core";
 import autobind from "autobind-decorator";
 import { getTrials, updateTrial } from "../../api/api";
-import { Trial } from "../../model/Trial";
+import { Trial } from "../../model/trial";
 
 export default class UserTrialsDialog extends React.Component<any, {}> {
     state = {

@@ -12,7 +12,7 @@ import {
 } from "@material-ui/core";
 import { getAllAccounts } from "../../api/api";
 import autobind from "autobind-decorator";
-import { Account } from "../../model/Account";
+import { Account } from "../../model/account";
 import UserTableRow from "./UserTableRow";
 
 export default class AdminMenu extends React.Component<any, {}> {
