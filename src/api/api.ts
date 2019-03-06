@@ -196,6 +196,26 @@ async function getAnalyses(token: string): Promise<Analysis[] | undefined> {
     return result._items;
 }
 
+async function getUserEtag(
+    token: string,
+    itemID: string
+): Promise<string | undefined> {
+    const options = {
+        endpoint: "accounts",
+        json: true,
+        itemID,
+        token
+    };
+
+    const result = await apiHelper.get<{ _etag: string }>(options);
+
+    if (!result) {
+        return;
+    }
+
+    return result._etag;
+}
+
 export {
     getFiles,
     getSingleFile,
@@ -206,5 +226,6 @@ export {
     updateRole,
     deleteUser,
     updateTrial,
-    getAnalyses
+    getAnalyses,
+    getUserEtag
 };
