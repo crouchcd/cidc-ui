@@ -120,7 +120,7 @@ async function updateRole(
         endpoint: "accounts",
         json: true,
         token,
-        body: { role },
+        body: { role, registered: "true" },
         itemID,
         etag
     };
