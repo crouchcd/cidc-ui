@@ -17,7 +17,7 @@ import EditIcon from "@material-ui/icons/Edit";
 import UserTrialsDialog from "./UserTrialsDialog";
 import { ORGANIZATION_NAME_MAP } from "../../util/Constants";
 import "./UserAccount.css";
-import { updateRole, deleteUser } from "../../api/api";
+import { updateRole, deleteUser, getUserEtag } from "../../api/api";
 
 export default class UserTableRow extends React.Component<any, {}> {
     state = {
@@ -38,14 +38,16 @@ export default class UserTableRow extends React.Component<any, {}> {
     @autobind
     private handleRoleChange(event: React.ChangeEvent<HTMLSelectElement>) {
         this.setState({ role: event.target.value, roleDisabled: true });
-        updateRole(
-            this.props.token,
-            this.props.account._id,
-            this.props.account._etag,
-            event.target.value
-        ).then(results => {
-            this.setState({ roleDisabled: false });
-            this.props.reloadUsers();
+        getUserEtag(this.props.token, this.props.account._id).then(results => {
+            updateRole(
+                this.props.token,
+                this.props.account._id,
+                results,
+                event.target.value
+            ).then(result => {
+                this.setState({ roleDisabled: false });
+                this.props.reloadUsers();
+            });
         });
     }
 
@@ -61,12 +63,12 @@ export default class UserTableRow extends React.Component<any, {}> {
 
     @autobind
     private handleDeleteUser() {
-        deleteUser(
-            this.props.token,
-            this.props.account._id,
-            this.props.account._etag
-        ).then(results => {
-            this.props.reloadUsers();
+        getUserEtag(this.props.token, this.props.account._id).then(results => {
+            deleteUser(this.props.token, this.props.account._id, results).then(
+                result => {
+                    this.props.reloadUsers();
+                }
+            );
         });
     }
 
