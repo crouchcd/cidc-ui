@@ -10,7 +10,7 @@ import * as React from "react";
 import "./BrowseAnalyses.css";
 import { changeOption, filterAnalyses } from "./BrowseAnalysesUtil";
 import { getAnalyses } from "../../api/api";
-import { Analysis } from "../../model/Analysis";
+import { Analysis } from "../../model/analysis";
 import AnalysisTable from "./AnalysisTable";
 import AnalysisFilter from "./AnalysisFilter";
 

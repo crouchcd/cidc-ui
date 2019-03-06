@@ -6,8 +6,8 @@ import {
     CircularProgress
 } from "@material-ui/core";
 import "./UserAccount.css";
-import { Account } from "../../model/Account";
-import { Trial } from "../../model/Trial";
+import { Account } from "../../model/account";
+import { Trial } from "../../model/trial";
 import { getAccountInfo, getTrials } from "../../api/api";
 import autobind from "autobind-decorator";
 import AdminMenu from "./AdminMenu";
@@ -15,7 +15,7 @@ import {
     LOCALE,
     dateOptions,
     ORGANIZATION_NAME_MAP
-} from "../../util/Constants";
+} from "../../util/constants";
 
 export interface IUserAccountPageState {
     accountInfo: Account | undefined;

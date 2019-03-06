@@ -6,8 +6,8 @@ import TableRow from "@material-ui/core/TableRow";
 import filesize from "filesize";
 import _ from "lodash";
 import * as React from "react";
-import { File } from "../../model/File";
-import { LOCALE, dateOptions } from "../../util/Constants";
+import { File } from "../../model/file";
+import { LOCALE, dateOptions } from "../../util/constants";
 
 export interface IFileDetailsTableProps {
     file: File;
