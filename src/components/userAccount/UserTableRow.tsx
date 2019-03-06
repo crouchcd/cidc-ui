@@ -42,7 +42,7 @@ export default class UserTableRow extends React.Component<any, {}> {
             this.props.token,
             this.props.account._id,
             this.props.account._etag,
-            this.state.role
+            event.target.value
         ).then(results => {
             this.setState({ roleDisabled: false });
             this.props.reloadUsers();
