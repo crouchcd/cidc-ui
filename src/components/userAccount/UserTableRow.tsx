@@ -14,7 +14,6 @@ import {
 import autobind from "autobind-decorator";
 import DeleteIcon from "@material-ui/icons/Delete";
 import EditIcon from "@material-ui/icons/Edit";
-import SaveIcon from "@material-ui/icons/Save";
 import UserTrialsDialog from "./UserTrialsDialog";
 import { ORGANIZATION_NAME_MAP } from "../../util/Constants";
 import "./UserAccount.css";
@@ -23,7 +22,7 @@ import { updateRole, deleteUser } from "../../api/api";
 export default class UserTableRow extends React.Component<any, {}> {
     state = {
         role: this.props.account.role,
-        saveDisabled: true,
+        roleDisabled: false,
         trialsDialogOpen: false,
         deleteDialogOpen: false
     };
@@ -32,29 +31,22 @@ export default class UserTableRow extends React.Component<any, {}> {
         this.setState({ deleteDialogOpen: true });
     }
 
-    private handleSave() {
-        updateRole(
-            this.props.token,
-            this.props.account._id,
-            this.props.account._etag,
-            this.state.role
-        ).then(results => {
-            this.setState({ saveDisabled: true });
-            this.props.reloadUsers();
-        });
-    }
-
     private openTrials() {
         this.setState({ trialsDialogOpen: true });
     }
 
     @autobind
     private handleRoleChange(event: React.ChangeEvent<HTMLSelectElement>) {
-        let saveDisabled = false;
-        if (event.target.value === this.props.account.role) {
-            saveDisabled = true;
-        }
-        this.setState({ role: event.target.value, saveDisabled });
+        this.setState({ role: event.target.value, roleDisabled: true });
+        updateRole(
+            this.props.token,
+            this.props.account._id,
+            this.props.account._etag,
+            this.state.role
+        ).then(results => {
+            this.setState({ roleDisabled: false });
+            this.props.reloadUsers();
+        });
     }
 
     @autobind
@@ -91,7 +83,10 @@ export default class UserTableRow extends React.Component<any, {}> {
                     {ORGANIZATION_NAME_MAP[this.props.account.organization]}
                 </TableCell>
                 <TableCell>
-                    <FormControl style={{ minWidth: 120, marginRight: 20 }}>
+                    <FormControl
+                        style={{ minWidth: 120, marginRight: 20 }}
+                        disabled={this.state.roleDisabled}
+                    >
                         <Select
                             value={this.state.role}
                             onChange={this.handleRoleChange}
@@ -104,15 +99,6 @@ export default class UserTableRow extends React.Component<any, {}> {
                             <MenuItem value="disabled">Disabled</MenuItem>
                         </Select>
                     </FormControl>
-                    <Fab
-                        size="small"
-                        color="primary"
-                        disabled={this.state.saveDisabled}
-                        // tslint:disable-next-line:jsx-no-lambda
-                        onClick={() => this.handleSave()}
-                    >
-                        <SaveIcon />
-                    </Fab>
                 </TableCell>
                 <TableCell>
                     <Button
