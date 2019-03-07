@@ -116,7 +116,7 @@ export default class UserAccountPage extends React.Component<
                                         paragraph={true}
                                     >
                                         {new Date(
-                                            this.state.accountInfo.registration_submit_date
+                                            this.state.accountInfo.account_create_date
                                         ).toLocaleString(LOCALE, dateOptions)}
                                     </Typography>
                                     <Typography variant="h5">
@@ -175,7 +175,10 @@ export default class UserAccountPage extends React.Component<
                 {!this.state.accountInfoError &&
                     this.state.accountInfo &&
                     this.state.accountInfo.role === "admin" && (
-                        <AdminMenu token={this.props.token} />
+                        <AdminMenu
+                            token={this.props.token}
+                            userId={this.state.accountInfo._id}
+                        />
                     )}
             </div>
         );
