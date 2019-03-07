@@ -23,9 +23,11 @@ export default class Register extends React.Component<any, {}> {
         last_n: "",
         email: "",
         organization: "EMPTY",
+        preferred_contact_email: "",
         firstNameError: false,
         lastNameError: false,
         organizationError: false,
+        preferredContactEmailError: false,
         token: undefined,
         unactivated: false
     };
@@ -50,7 +52,8 @@ export default class Register extends React.Component<any, {}> {
                     this.setState({
                         email: authResult.idTokenPayload.email,
                         first_n: authResult.idTokenPayload.given_name,
-                        last_n: authResult.idTokenPayload.family_name
+                        last_n: authResult.idTokenPayload.family_name,
+                        preferred_contact_email: authResult.idTokenPayload.email
                     });
                 });
         });
@@ -73,36 +76,39 @@ export default class Register extends React.Component<any, {}> {
         this.setState({ organization: event.target.value });
     }
 
+    @autobind
+    private handlePreferredContactEmailChange(
+        event: React.ChangeEvent<HTMLInputElement>
+    ) {
+        this.setState({ preferred_contact_email: event.target.value });
+    }
+
     private handleClick() {
-        let firstNameError: boolean = false;
-        let lastNameError: boolean = false;
-        let organizationError: boolean = false;
+        const firstNameError: boolean = !this.state.first_n;
+        const lastNameError: boolean = !this.state.last_n;
+        const organizationError: boolean =
+            !this.state.organization || this.state.organization === "EMPTY";
+        const preferredContactEmailError: boolean = !this.state
+            .preferred_contact_email;
 
-        if (!this.state.first_n) {
-            firstNameError = true;
-        } else {
-            firstNameError = false;
-        }
+        this.setState({
+            firstNameError,
+            lastNameError,
+            organizationError,
+            preferredContactEmailError
+        });
 
-        if (!this.state.last_n) {
-            lastNameError = true;
-        } else {
-            lastNameError = false;
-        }
-
-        if (!this.state.organization || this.state.organization === "EMPTY") {
-            organizationError = true;
-        } else {
-            organizationError = false;
-        }
-
-        this.setState({ firstNameError, lastNameError, organizationError });
-
-        if (!firstNameError && !lastNameError && !organizationError) {
+        if (
+            !firstNameError &&
+            !lastNameError &&
+            !organizationError &&
+            !preferredContactEmailError
+        ) {
             const newUser = {
                 first_n: this.state.first_n,
                 last_n: this.state.last_n,
-                organization: this.state.organization
+                organization: this.state.organization,
+                preferred_contact_email: this.state.preferred_contact_email
             };
 
             createUser(this.state.token, newUser).then(result => {
@@ -156,13 +162,28 @@ export default class Register extends React.Component<any, {}> {
                     <Grid container={true} spacing={16}>
                         <Grid item={true} xs={12}>
                             <TextField
-                                label="Email"
+                                label="Login Email"
                                 style={{ minWidth: 420 }}
                                 value={this.state.email}
                                 disabled={true}
                                 fullWidth={true}
                                 margin="normal"
                                 variant="outlined"
+                            />
+                        </Grid>
+                        <Grid item={true} xs={12}>
+                            <TextField
+                                label="Preferred Contact Email"
+                                style={{ minWidth: 420 }}
+                                value={this.state.preferred_contact_email}
+                                onChange={
+                                    this.handlePreferredContactEmailChange
+                                }
+                                fullWidth={true}
+                                margin="normal"
+                                variant="outlined"
+                                required={true}
+                                error={this.state.preferredContactEmailError}
                             />
                         </Grid>
                         <Grid item={true} xs={12}>
@@ -220,8 +241,8 @@ export default class Register extends React.Component<any, {}> {
                                     <MenuItem value="STANFORD">
                                         {ORGANIZATION_NAME_MAP.STANFORD}
                                     </MenuItem>
-                                    <MenuItem value="MD">
-                                        {ORGANIZATION_NAME_MAP.MD}
+                                    <MenuItem value="ANDERSON">
+                                        {ORGANIZATION_NAME_MAP.ANDERSON}
                                     </MenuItem>
                                 </Select>
                             </FormControl>

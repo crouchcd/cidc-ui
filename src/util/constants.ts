@@ -6,7 +6,7 @@ export const ORGANIZATION_NAME_MAP = {
     CIDC: "Dana-Farber Cancer Institute (CIDC)",
     ICAHN: "Icahn School of Medicine at Mount Sinai (CIMAC)",
     STANFORD: "Stanford Cancer Institute (CIMAC)",
-    MD: "MD Anderson Cancer Center (CIMAC)"
+    ANDERSON: "MD Anderson Cancer Center (CIMAC)"
 };
 
 export const dateOptions = {

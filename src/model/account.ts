@@ -11,5 +11,5 @@ export interface Account {
     last_n: string;
     organization: string;
     position_description: string;
-    registration_submit_date: string;
+    account_create_date: string;
 }
