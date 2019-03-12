@@ -6,4 +6,6 @@ export interface Analysis {
     experimental_strategy: string;
     trial_name: string;
     status: string;
+    files_used: any[];
+    files_generated: any[];
 }

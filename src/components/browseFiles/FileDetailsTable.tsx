@@ -7,7 +7,7 @@ import filesize from "filesize";
 import _ from "lodash";
 import * as React from "react";
 import { File } from "../../model/file";
-import { LOCALE, dateOptions } from "../../util/constants";
+import { LOCALE, DATE_OPTIONS } from "../../util/constants";
 
 export interface IFileDetailsTableProps {
     file: File;
@@ -95,7 +95,7 @@ export default class FileDetailsTable extends React.Component<
                             <TableCell className="File-table-row-cell">
                                 {new Date(
                                     this.props.file.date_created
-                                ).toLocaleString(LOCALE, dateOptions)}
+                                ).toLocaleString(LOCALE, DATE_OPTIONS)}
                             </TableCell>
                         </TableRow>
                     </TableBody>

@@ -8,7 +8,7 @@ import autobind from "autobind-decorator";
 import _ from "lodash";
 import * as React from "react";
 import { Analysis } from "../../model/analysis";
-import { LOCALE, dateOptions } from "../../util/constants";
+import { LOCALE, DATE_OPTIONS } from "../../util/constants";
 
 const ID_KEY = "_id";
 const TRIAL_ID_KEY = "trial_name";
@@ -61,24 +61,17 @@ export default class AnalysisTable extends React.Component<
         this.setState({ sortBy, sortDirection: isAsc ? "desc" : "asc" });
     }
 
+    @autobind
+    private handleClick(analysisId: string) {
+        this.props.history.push("/pipeline-details/" + analysisId);
+    }
+
     public render() {
         return (
             <div className="Analysis-table">
                 <Table>
                     <TableHead>
                         <TableRow>
-                            <TableCell className="Analysis-table-header-cell">
-                                <TableSortLabel
-                                    active={this.state.sortBy === ID_KEY}
-                                    direction={this.state.sortDirection}
-                                    // tslint:disable-next-line:jsx-no-lambda
-                                    onClick={() =>
-                                        this.handleChangeSorting(ID_KEY)
-                                    }
-                                >
-                                    Pipeline ID
-                                </TableSortLabel>
-                            </TableCell>
                             <TableCell className="Analysis-table-header-cell">
                                 <TableSortLabel
                                     active={this.state.sortBy === TRIAL_ID_KEY}
@@ -88,7 +81,7 @@ export default class AnalysisTable extends React.Component<
                                         this.handleChangeSorting(TRIAL_ID_KEY)
                                     }
                                 >
-                                    Trial ID
+                                    Trial Name
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell className="Analysis-table-header-cell">
@@ -148,7 +141,7 @@ export default class AnalysisTable extends React.Component<
                             </TableCell>
                         </TableRow>
                     </TableHead>
-                    <TableBody>
+                    <TableBody className="Analysis-table-body">
                         {_.orderBy(
                             this.props.analyses,
                             this.state.sortBy,
@@ -161,10 +154,14 @@ export default class AnalysisTable extends React.Component<
                             )
                             .map((analysis: Analysis) => {
                                 return (
-                                    <TableRow key={analysis._id}>
-                                        <TableCell className="Analysis-table-row-cell">
-                                            {analysis._id}
-                                        </TableCell>
+                                    <TableRow
+                                        key={analysis._id}
+                                        hover={true}
+                                        // tslint:disable-next-line:jsx-no-lambda
+                                        onClick={() =>
+                                            this.handleClick(analysis._id)
+                                        }
+                                    >
                                         <TableCell className="Analysis-table-row-cell">
                                             {analysis.trial_name}
                                         </TableCell>
@@ -176,7 +173,7 @@ export default class AnalysisTable extends React.Component<
                                                 analysis.start_date
                                             ).toLocaleString(
                                                 LOCALE,
-                                                dateOptions
+                                                DATE_OPTIONS
                                             )}
                                         </TableCell>
                                         <TableCell className="Analysis-table-row-cell">
@@ -185,7 +182,7 @@ export default class AnalysisTable extends React.Component<
                                                       analysis.end_date
                                                   ).toLocaleString(
                                                       LOCALE,
-                                                      dateOptions
+                                                      DATE_OPTIONS
                                                   )
                                                 : ""}
                                         </TableCell>

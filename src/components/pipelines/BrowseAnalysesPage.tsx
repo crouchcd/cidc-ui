@@ -19,7 +19,7 @@ export interface IBrowseAnalysesPageState {
     error: string | undefined;
     selectedTrialIds: string[];
     selectedExperimentalStrategies: string[];
-    searchFilter: string;
+    selectedStatuses: string[];
 }
 
 export default class BrowseAnalysesPage extends React.Component<
@@ -31,7 +31,7 @@ export default class BrowseAnalysesPage extends React.Component<
         error: undefined,
         selectedTrialIds: [],
         selectedExperimentalStrategies: [],
-        searchFilter: ""
+        selectedStatuses: []
     };
 
     componentDidMount() {
@@ -75,10 +75,10 @@ export default class BrowseAnalysesPage extends React.Component<
     }
 
     @autobind
-    private handleSearchFilterChange(
-        event: React.ChangeEvent<HTMLInputElement>
-    ) {
-        this.setState({ searchFilter: event.target.value });
+    private handleStatusChange(status: string) {
+        this.setState({
+            selectedStatuses: changeOption(this.state.selectedStatuses, status)
+        });
     }
 
     public render() {
@@ -124,30 +124,17 @@ export default class BrowseAnalysesPage extends React.Component<
                                             "experimental_strategy"
                                         )
                                     )}
+                                    statuses={_.uniq(
+                                        _.map(this.state.analyses, "status")
+                                    )}
                                     onTrialIdChange={this.handleTrialIdChange}
                                     onExperimentalStrategyChange={
                                         this.handleExperimentalStrategyChange
                                     }
+                                    onStatusChange={this.handleStatusChange}
                                 />
                             </Grid>
                             <Grid item={true} xs={10}>
-                                <div className="Analysis-search-border">
-                                    <TextField
-                                        label="Search by pipeline ID"
-                                        type="search"
-                                        margin="normal"
-                                        variant="outlined"
-                                        value={this.state.searchFilter}
-                                        className="Analysis-search"
-                                        InputProps={{
-                                            className: "Analysis-search-input"
-                                        }}
-                                        InputLabelProps={{
-                                            className: "Analysis-search-label"
-                                        }}
-                                        onChange={this.handleSearchFilterChange}
-                                    />
-                                </div>
                                 <AnalysisTable
                                     history={this.props.history}
                                     analyses={filterAnalyses(
@@ -155,7 +142,7 @@ export default class BrowseAnalysesPage extends React.Component<
                                         this.state.selectedTrialIds,
                                         this.state
                                             .selectedExperimentalStrategies,
-                                        this.state.searchFilter
+                                        this.state.selectedStatuses
                                     )}
                                 />
                             </Grid>
