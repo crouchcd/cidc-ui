@@ -13,7 +13,7 @@ import autobind from "autobind-decorator";
 import AdminMenu from "./AdminMenu";
 import {
     LOCALE,
-    dateOptions,
+    DATE_OPTIONS,
     ORGANIZATION_NAME_MAP
 } from "../../util/constants";
 
@@ -117,7 +117,7 @@ export default class UserAccountPage extends React.Component<
                                     >
                                         {new Date(
                                             this.state.accountInfo.account_create_date
-                                        ).toLocaleString(LOCALE, dateOptions)}
+                                        ).toLocaleString(LOCALE, DATE_OPTIONS)}
                                     </Typography>
                                     <Typography variant="h5">
                                         Organization:

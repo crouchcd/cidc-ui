@@ -9,7 +9,7 @@ export const ORGANIZATION_NAME_MAP = {
     ANDERSON: "MD Anderson Cancer Center (CIMAC)"
 };
 
-export const dateOptions = {
+export const DATE_OPTIONS = {
     year: "numeric",
     month: "short",
     day: "numeric",
@@ -18,3 +18,7 @@ export const dateOptions = {
 };
 
 export const LOCALE = "en-US";
+
+export const EXPERIMENTAL_STRATEGY_MAP = {
+    WES: "/wes-pipeline"
+};

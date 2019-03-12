@@ -36,6 +36,10 @@
     border: 1px solid #cfd0d0;
 }
 
+.Analysis-table-body {
+    cursor: pointer;
+}
+
 .Analysis-table-row-cell {
     font-size: 14px !important;
 }
