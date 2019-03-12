@@ -39,7 +39,7 @@ class Header extends React.Component<any, {}> {
         }
 
         return (
-            <div>
+            <div style={{ backgroundColor: "white" }}>
                 <img src={logo} className="Logo" />
                 <Tabs
                     value={selectedTab}
