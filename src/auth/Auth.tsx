@@ -75,10 +75,15 @@ export default class Auth {
     }
 
     @autobind
+    getExpiresAt() {
+        return this.expiresAt;
+    }
+
+    @autobind
     setSession(authResult: Auth0DecodedHash, returnPath: string) {
         localStorage.setItem("isLoggedIn", "true");
-
-        const expiresAt = authResult.expiresIn * 1000 + new Date().getTime();
+        const expiresAt = authResult.idTokenPayload.exp * 1000;
+        localStorage.setItem("expiresAt", String(expiresAt));
         this.accessToken = authResult.accessToken;
         this.idToken = authResult.idToken;
         this.expiresAt = expiresAt;
