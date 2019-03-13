@@ -41,7 +41,6 @@ export default class Auth {
     handleAuthentication() {
         this.auth0.parseHash((err, authResult) => {
             if (authResult && authResult.accessToken && authResult.idToken) {
-                console.log(authResult.accessToken);
                 getAccountInfo(authResult.idToken)
                     .then(results => {
                         if (results[0].approved) {
@@ -117,6 +116,7 @@ export default class Auth {
         this.userinfo = null;
 
         localStorage.removeItem("isLoggedIn");
+        localStorage.removeItem("expiresAt");
         this.auth0.logout({
             clientID: CLIENT_ID,
             returnTo: window.location.origin

@@ -55,7 +55,6 @@ class App extends React.Component<any, any> {
     componentDidMount() {
         const expiresAt = Number(localStorage.getItem("expiresAt"));
         if (expiresAt > 0 && new Date().getTime() >= expiresAt) {
-            localStorage.removeItem("expiresAt");
             this.auth.logout();
         }
     }
