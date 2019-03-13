@@ -20,8 +20,6 @@ import {
 export interface IUserAccountPageState {
     accountInfo: Account | undefined;
     trials: Trial[] | undefined;
-    accountInfoError: string | undefined;
-    trialsError: string | undefined;
 }
 
 export default class UserAccountPage extends React.Component<
@@ -30,9 +28,7 @@ export default class UserAccountPage extends React.Component<
 > {
     state: IUserAccountPageState = {
         accountInfo: undefined,
-        trials: undefined,
-        accountInfoError: undefined,
-        trialsError: undefined
+        trials: undefined
     };
 
     componentDidMount() {
@@ -49,30 +45,20 @@ export default class UserAccountPage extends React.Component<
 
     @autobind
     private getUserData() {
-        getAccountInfo(this.props.token)
-            .then(accountResults => {
-                getTrials(this.props.token)
-                    .then(trialResults => {
-                        const userTrials: Trial[] = [];
-                        trialResults.forEach(trial => {
-                            if (
-                                trial.collaborators.includes(
-                                    accountResults![0].email
-                                )
-                            ) {
-                                userTrials.push(trial);
-                            }
-                        });
-                        this.setState({ trials: userTrials });
-                    })
-                    .catch(error => {
-                        this.setState({ trialsError: error.message });
-                    });
-                this.setState({ accountInfo: accountResults![0] });
-            })
-            .catch(error => {
-                this.setState({ accountInfoError: error.message });
+        getAccountInfo(this.props.token).then(accountResults => {
+            getTrials(this.props.token).then(trialResults => {
+                const userTrials: Trial[] = [];
+                trialResults.forEach(trial => {
+                    if (
+                        trial.collaborators.includes(accountResults![0].email)
+                    ) {
+                        userTrials.push(trial);
+                    }
+                });
+                this.setState({ trials: userTrials });
             });
+            this.setState({ accountInfo: accountResults![0] });
+        });
     }
 
     public render() {
@@ -89,61 +75,42 @@ export default class UserAccountPage extends React.Component<
                         </Typography>
                     </Toolbar>
                     <div className="User-details">
-                        {!this.state.accountInfoError &&
-                            !this.state.trialsError &&
-                            !this.state.accountInfo &&
-                            !this.state.trials && (
-                                <div className="User-account-progress">
-                                    <CircularProgress />
-                                </div>
-                            )}
-                        {this.state.accountInfoError && (
+                        {!this.state.accountInfo && !this.state.trials && (
                             <div className="User-account-progress">
-                                <Typography style={{ fontSize: 18 }}>
-                                    {this.state.accountInfoError}
+                                <CircularProgress />
+                            </div>
+                        )}
+                        {this.state.accountInfo && (
+                            <div>
+                                <Typography variant="h5">
+                                    Registration Form and Code of Conduct:
+                                </Typography>
+                                <Typography
+                                    variant="h6"
+                                    color="secondary"
+                                    paragraph={true}
+                                >
+                                    {new Date(
+                                        this.state.accountInfo.account_create_date
+                                    ).toLocaleString(LOCALE, DATE_OPTIONS)}
+                                </Typography>
+                                <Typography variant="h5">
+                                    Organization:
+                                </Typography>
+                                <Typography
+                                    variant="h6"
+                                    color="secondary"
+                                    paragraph={true}
+                                >
+                                    {
+                                        ORGANIZATION_NAME_MAP[
+                                            this.state.accountInfo.organization
+                                        ]
+                                    }
                                 </Typography>
                             </div>
                         )}
-                        {!this.state.accountInfoError &&
-                            this.state.accountInfo && (
-                                <div>
-                                    <Typography variant="h5">
-                                        Registration Form and Code of Conduct:
-                                    </Typography>
-                                    <Typography
-                                        variant="h6"
-                                        color="secondary"
-                                        paragraph={true}
-                                    >
-                                        {new Date(
-                                            this.state.accountInfo.account_create_date
-                                        ).toLocaleString(LOCALE, DATE_OPTIONS)}
-                                    </Typography>
-                                    <Typography variant="h5">
-                                        Organization:
-                                    </Typography>
-                                    <Typography
-                                        variant="h6"
-                                        color="secondary"
-                                        paragraph={true}
-                                    >
-                                        {
-                                            ORGANIZATION_NAME_MAP[
-                                                this.state.accountInfo
-                                                    .organization
-                                            ]
-                                        }
-                                    </Typography>
-                                </div>
-                            )}
-                        {this.state.trialsError && (
-                            <div className="User-account-progress">
-                                <Typography style={{ fontSize: 18 }}>
-                                    {this.state.trialsError}
-                                </Typography>
-                            </div>
-                        )}
-                        {!this.state.trialsError && this.state.trials && (
+                        {this.state.trials && (
                             <div>
                                 {this.state.trials.length > 0 && (
                                     <div>
@@ -172,8 +139,7 @@ export default class UserAccountPage extends React.Component<
                         )}
                     </div>
                 </Paper>
-                {!this.state.accountInfoError &&
-                    this.state.accountInfo &&
+                {this.state.accountInfo &&
                     this.state.accountInfo.role === "admin" && (
                         <AdminMenu
                             token={this.props.token}

@@ -16,7 +16,6 @@ import { getFiles } from "../../api/api";
 
 export interface IBrowseFilesPageState {
     files: File[] | undefined;
-    error: string | undefined;
     selectedTrialIds: string[];
     selectedExperimentalStrategies: string[];
     selectedDataFormats: string[];
@@ -29,7 +28,6 @@ export default class BrowseFilesPage extends React.Component<
 > {
     state: IBrowseFilesPageState = {
         files: undefined,
-        error: undefined,
         searchFilter: "",
         selectedDataFormats: [],
         selectedExperimentalStrategies: [],
@@ -50,13 +48,9 @@ export default class BrowseFilesPage extends React.Component<
 
     @autobind
     private getFiles() {
-        getFiles(this.props.token)
-            .then(results => {
-                this.setState({ files: results });
-            })
-            .catch(error => {
-                this.setState({ error: error.message });
-            });
+        getFiles(this.props.token).then(results => {
+            this.setState({ files: results });
+        });
     }
 
     @autobind
@@ -100,86 +94,72 @@ export default class BrowseFilesPage extends React.Component<
 
         return (
             <div className="Browse-files-page">
-                {this.state.error && (
-                    <div className="Browse-files-progress">
-                        <Typography style={{ fontSize: 18 }}>
-                            {this.state.error}
-                        </Typography>
-                    </div>
-                )}
-                {!this.state.error && !this.state.files && (
+                {!this.state.files && (
                     <div className="Browse-files-progress">
                         <CircularProgress />
                     </div>
                 )}
-                {!this.state.error &&
-                    this.state.files &&
-                    this.state.files.length === 0 && (
-                        <div className="Browse-files-progress">
-                            <Typography style={{ fontSize: 18 }}>
-                                No files found
-                            </Typography>
-                        </div>
-                    )}
-                {!this.state.error &&
-                    this.state.files &&
-                    this.state.files.length > 0 && (
-                        <Grid container={true} spacing={32}>
-                            <Grid item={true} xs={2}>
-                                <FileFilter
-                                    trialIds={_.uniq(
-                                        _.map(this.state.files, "trial_name")
-                                    )}
-                                    experimentalStrategies={_.uniq(
-                                        _.map(
-                                            this.state.files,
-                                            "experimental_strategy"
-                                        )
-                                    )}
-                                    dataFormats={_.uniq(
-                                        _.map(this.state.files, "data_format")
-                                    )}
-                                    onTrialIdChange={this.handleTrialIdChange}
-                                    onExperimentalStrategyChange={
-                                        this.handleExperimentalStrategyChange
-                                    }
-                                    onDataFormatChange={
-                                        this.handleDataFormatChange
-                                    }
-                                />
-                            </Grid>
-                            <Grid item={true} xs={10}>
-                                <div className="File-search-border">
-                                    <TextField
-                                        label="Search by file name"
-                                        type="search"
-                                        margin="normal"
-                                        variant="outlined"
-                                        value={this.state.searchFilter}
-                                        className="File-search"
-                                        InputProps={{
-                                            className: "File-search-input"
-                                        }}
-                                        InputLabelProps={{
-                                            className: "File-search-label"
-                                        }}
-                                        onChange={this.handleSearchFilterChange}
-                                    />
-                                </div>
-                                <FileTable
-                                    history={this.props.history}
-                                    files={filterFiles(
+                {this.state.files && this.state.files.length === 0 && (
+                    <div className="Browse-files-progress">
+                        <Typography style={{ fontSize: 18 }}>
+                            No files found
+                        </Typography>
+                    </div>
+                )}
+                {this.state.files && this.state.files.length > 0 && (
+                    <Grid container={true} spacing={32}>
+                        <Grid item={true} xs={2}>
+                            <FileFilter
+                                trialIds={_.uniq(
+                                    _.map(this.state.files, "trial_name")
+                                )}
+                                experimentalStrategies={_.uniq(
+                                    _.map(
                                         this.state.files,
-                                        this.state.selectedTrialIds,
-                                        this.state
-                                            .selectedExperimentalStrategies,
-                                        this.state.selectedDataFormats,
-                                        this.state.searchFilter
-                                    )}
-                                />
-                            </Grid>
+                                        "experimental_strategy"
+                                    )
+                                )}
+                                dataFormats={_.uniq(
+                                    _.map(this.state.files, "data_format")
+                                )}
+                                onTrialIdChange={this.handleTrialIdChange}
+                                onExperimentalStrategyChange={
+                                    this.handleExperimentalStrategyChange
+                                }
+                                onDataFormatChange={this.handleDataFormatChange}
+                            />
                         </Grid>
-                    )}
+                        <Grid item={true} xs={10}>
+                            <div className="File-search-border">
+                                <TextField
+                                    label="Search by file name"
+                                    type="search"
+                                    margin="normal"
+                                    variant="outlined"
+                                    value={this.state.searchFilter}
+                                    className="File-search"
+                                    InputProps={{
+                                        className: "File-search-input"
+                                    }}
+                                    InputLabelProps={{
+                                        className: "File-search-label"
+                                    }}
+                                    onChange={this.handleSearchFilterChange}
+                                />
+                            </div>
+                            <FileTable
+                                history={this.props.history}
+                                files={filterFiles(
+                                    this.state.files,
+                                    this.state.selectedTrialIds,
+                                    this.state.selectedExperimentalStrategies,
+                                    this.state.selectedDataFormats,
+                                    this.state.searchFilter
+                                )}
+                            />
+                        </Grid>
+                    </Grid>
+                )}
             </div>
         );
     }

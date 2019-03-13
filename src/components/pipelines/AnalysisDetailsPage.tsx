@@ -22,7 +22,6 @@ import { Link } from "react-router-dom";
 
 export interface IAnalysisDetailsPageState {
     analysis: Analysis | undefined;
-    error: string | undefined;
 }
 
 export default class AnalysisDetailsPage extends React.Component<
@@ -30,8 +29,7 @@ export default class AnalysisDetailsPage extends React.Component<
     IAnalysisDetailsPageState
 > {
     state: IAnalysisDetailsPageState = {
-        analysis: undefined,
-        error: undefined
+        analysis: undefined
     };
 
     componentDidMount() {
@@ -48,13 +46,12 @@ export default class AnalysisDetailsPage extends React.Component<
 
     @autobind
     private getAnalysis() {
-        getSingleAnalysis(this.props.token, this.props.match.params.analysisId)
-            .then(result => {
-                this.setState({ analysis: result });
-            })
-            .catch(error => {
-                this.setState({ error: error.message });
-            });
+        getSingleAnalysis(
+            this.props.token,
+            this.props.match.params.analysisId
+        ).then(result => {
+            this.setState({ analysis: result });
+        });
     }
 
     public render() {
@@ -64,19 +61,12 @@ export default class AnalysisDetailsPage extends React.Component<
 
         return (
             <div className="Browse-analyses-page">
-                {this.state.error && (
-                    <div className="Browse-analyses-progress">
-                        <Typography style={{ fontSize: 18 }}>
-                            {this.state.error}
-                        </Typography>
-                    </div>
-                )}
-                {!this.state.error && !this.state.analysis && (
+                {!this.state.analysis && (
                     <div className="Browse-analyses-progress">
                         <CircularProgress />
                     </div>
                 )}
-                {!this.state.error && this.state.analysis && (
+                {this.state.analysis && (
                     <Grid container={true} spacing={40}>
                         <Grid item={true} xs={4}>
                             <Typography variant="h5" gutterBottom={true}>

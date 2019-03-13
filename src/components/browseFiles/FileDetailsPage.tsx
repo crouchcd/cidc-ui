@@ -8,7 +8,6 @@ import FastqDetailsTable from "./FastqDetailsTable";
 
 export interface IFileDetailsPageState {
     file: File | undefined;
-    error: string | undefined;
 }
 
 export default class FileDetailsPage extends React.Component<
@@ -16,8 +15,7 @@ export default class FileDetailsPage extends React.Component<
     IFileDetailsPageState
 > {
     state: IFileDetailsPageState = {
-        file: undefined,
-        error: undefined
+        file: undefined
     };
 
     componentDidMount() {
@@ -34,13 +32,11 @@ export default class FileDetailsPage extends React.Component<
 
     @autobind
     private getFile() {
-        getSingleFile(this.props.token, this.props.match.params.fileId)
-            .then(result => {
+        getSingleFile(this.props.token, this.props.match.params.fileId).then(
+            result => {
                 this.setState({ file: result });
-            })
-            .catch(error => {
-                this.setState({ error: error.message });
-            });
+            }
+        );
     }
 
     public render() {
@@ -50,19 +46,12 @@ export default class FileDetailsPage extends React.Component<
 
         return (
             <div className="Browse-files-page">
-                {this.state.error && (
-                    <div className="Browse-files-progress">
-                        <Typography style={{ fontSize: 18 }}>
-                            {this.state.error}
-                        </Typography>
-                    </div>
-                )}
-                {!this.state.error && !this.state.file && (
+                {!this.state.file && (
                     <div className="Browse-files-progress">
                         <CircularProgress />
                     </div>
                 )}
-                {!this.state.error && this.state.file && (
+                {this.state.file && (
                     <Grid container={true} spacing={40}>
                         <Grid item={true} xs={6}>
                             <Grid
