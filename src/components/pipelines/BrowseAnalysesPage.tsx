@@ -1,21 +1,18 @@
-import {
-    Grid,
-    TextField,
-    CircularProgress,
-    Typography
-} from "@material-ui/core";
+import { Grid, CircularProgress, Typography } from "@material-ui/core";
 import autobind from "autobind-decorator";
 import _ from "lodash";
 import * as React from "react";
 import "./BrowseAnalyses.css";
 import { changeOption, filterAnalyses } from "./BrowseAnalysesUtil";
-import { getAnalyses } from "../../api/api";
+import { getAnalyses, getTrials } from "../../api/api";
 import { Analysis } from "../../model/analysis";
 import AnalysisTable from "./AnalysisTable";
 import AnalysisFilter from "./AnalysisFilter";
+import { Trial } from "../../model/trial";
 
 export interface IBrowseAnalysesPageState {
     analyses: Analysis[] | undefined;
+    trials: Trial[] | undefined;
     selectedTrialIds: string[];
     selectedExperimentalStrategies: string[];
     selectedStatuses: string[];
@@ -27,6 +24,7 @@ export default class BrowseAnalysesPage extends React.Component<
 > {
     state: IBrowseAnalysesPageState = {
         analyses: undefined,
+        trials: undefined,
         selectedTrialIds: [],
         selectedExperimentalStrategies: [],
         selectedStatuses: []
@@ -47,7 +45,9 @@ export default class BrowseAnalysesPage extends React.Component<
     @autobind
     private getAnalyses() {
         getAnalyses(this.props.token).then(results => {
-            this.setState({ analyses: results });
+            getTrials(this.props.token).then(result => {
+                this.setState({ analyses: results, trials: result });
+            });
         });
     }
 
@@ -126,6 +126,7 @@ export default class BrowseAnalysesPage extends React.Component<
                                     this.state.selectedExperimentalStrategies,
                                     this.state.selectedStatuses
                                 )}
+                                trials={this.state.trials}
                             />
                         </Grid>
                     </Grid>
