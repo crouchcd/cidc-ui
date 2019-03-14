@@ -169,6 +169,11 @@ export default class AnalysisTable extends React.Component<
                                                 ? null
                                                 : this.handleClick(analysis._id)
                                         }
+                                        style={{
+                                            backgroundColor: isLocked
+                                                ? "#FFE8E6"
+                                                : "inherit"
+                                        }}
                                     >
                                         <TableCell className="Analysis-table-row-cell">
                                             {analysis.trial_name}

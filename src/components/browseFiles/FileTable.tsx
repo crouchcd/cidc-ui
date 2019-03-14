@@ -188,6 +188,11 @@ export default class FileTable extends React.Component<
                                                 ? null
                                                 : this.handleClick(file._id)
                                         }
+                                        style={{
+                                            backgroundColor: isLocked
+                                                ? "#FFE8E6"
+                                                : "inherit"
+                                        }}
                                     >
                                         <TableCell className="File-table-row-cell">
                                             {file.file_name}
