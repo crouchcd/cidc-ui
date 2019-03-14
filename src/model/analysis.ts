@@ -8,4 +8,5 @@ export interface Analysis {
     status: string;
     files_used: any[];
     files_generated: any[];
+    snakemake_log_tails: string[];
 }

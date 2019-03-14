@@ -9,7 +9,8 @@ import {
     TableHead,
     TableRow,
     TableCell,
-    TableBody
+    TableBody,
+    TextField
 } from "@material-ui/core";
 import { Analysis } from "../../model/analysis";
 import AnalysisFileTable from "./AnalysisFileTable";
@@ -67,122 +68,146 @@ export default class AnalysisDetailsPage extends React.Component<
                     </div>
                 )}
                 {this.state.analysis && (
-                    <Grid container={true} spacing={40}>
-                        <Grid item={true} xs={4}>
-                            <Typography variant="h5" gutterBottom={true}>
-                                Pipeline Details:
-                            </Typography>
-                            <div className="Analysis-table">
-                                <Table>
-                                    <TableHead>
-                                        <TableRow>
-                                            <TableCell className="Analysis-table-header-cell">
-                                                Attribute Name
-                                            </TableCell>
-                                            <TableCell className="Analysis-table-header-cell">
-                                                Value
-                                            </TableCell>
-                                        </TableRow>
-                                    </TableHead>
-                                    <TableBody>
-                                        <TableRow>
-                                            <TableCell className="Analysis-table-row-cell">
-                                                Pipeline ID
-                                            </TableCell>
-                                            <TableCell className="Analysis-table-row-cell">
-                                                {this.state.analysis._id}
-                                            </TableCell>
-                                        </TableRow>
-                                        <TableRow>
-                                            <TableCell className="Analysis-table-row-cell">
-                                                Trial Name
-                                            </TableCell>
-                                            <TableCell className="Analysis-table-row-cell">
-                                                {this.state.analysis.trial_name}
-                                            </TableCell>
-                                        </TableRow>
-                                        <TableRow>
-                                            <TableCell className="Analysis-table-row-cell">
-                                                Experimental Strategy
-                                            </TableCell>
-                                            <TableCell className="Analysis-table-row-cell">
-                                                <Link
-                                                    to={
-                                                        EXPERIMENTAL_STRATEGY_MAP[
-                                                            this.state.analysis
-                                                                .experimental_strategy
-                                                        ]
-                                                    }
-                                                >
+                    <>
+                        <Grid container={true} spacing={40}>
+                            <Grid item={true} xs={4}>
+                                <Typography variant="h5" gutterBottom={true}>
+                                    Pipeline Details:
+                                </Typography>
+                                <div className="Analysis-table">
+                                    <Table>
+                                        <TableHead>
+                                            <TableRow>
+                                                <TableCell className="Analysis-table-header-cell">
+                                                    Attribute Name
+                                                </TableCell>
+                                                <TableCell className="Analysis-table-header-cell">
+                                                    Value
+                                                </TableCell>
+                                            </TableRow>
+                                        </TableHead>
+                                        <TableBody>
+                                            <TableRow>
+                                                <TableCell className="Analysis-table-row-cell">
+                                                    Pipeline ID
+                                                </TableCell>
+                                                <TableCell className="Analysis-table-row-cell">
+                                                    {this.state.analysis._id}
+                                                </TableCell>
+                                            </TableRow>
+                                            <TableRow>
+                                                <TableCell className="Analysis-table-row-cell">
+                                                    Trial Name
+                                                </TableCell>
+                                                <TableCell className="Analysis-table-row-cell">
                                                     {
                                                         this.state.analysis
-                                                            .experimental_strategy
+                                                            .trial_name
                                                     }
-                                                </Link>
-                                            </TableCell>
-                                        </TableRow>
-                                        <TableRow>
-                                            <TableCell className="Analysis-table-row-cell">
-                                                Time Started
-                                            </TableCell>
-                                            <TableCell className="Analysis-table-row-cell">
-                                                {new Date(
-                                                    this.state.analysis.start_date
-                                                ).toLocaleString(
-                                                    LOCALE,
-                                                    DATE_OPTIONS
-                                                )}
-                                            </TableCell>
-                                        </TableRow>
-                                        <TableRow>
-                                            <TableCell className="Analysis-table-row-cell">
-                                                Time Completed
-                                            </TableCell>
-                                            <TableCell className="Analysis-table-row-cell">
-                                                {this.state.analysis.end_date
-                                                    ? new Date(
-                                                          this.state.analysis.end_date
-                                                      ).toLocaleString(
-                                                          LOCALE,
-                                                          DATE_OPTIONS
-                                                      )
-                                                    : ""}
-                                            </TableCell>
-                                        </TableRow>
+                                                </TableCell>
+                                            </TableRow>
+                                            <TableRow>
+                                                <TableCell className="Analysis-table-row-cell">
+                                                    Experimental Strategy
+                                                </TableCell>
+                                                <TableCell className="Analysis-table-row-cell">
+                                                    <Link
+                                                        to={
+                                                            EXPERIMENTAL_STRATEGY_MAP[
+                                                                this.state
+                                                                    .analysis
+                                                                    .experimental_strategy
+                                                            ]
+                                                        }
+                                                    >
+                                                        {
+                                                            this.state.analysis
+                                                                .experimental_strategy
+                                                        }
+                                                    </Link>
+                                                </TableCell>
+                                            </TableRow>
+                                            <TableRow>
+                                                <TableCell className="Analysis-table-row-cell">
+                                                    Time Started
+                                                </TableCell>
+                                                <TableCell className="Analysis-table-row-cell">
+                                                    {new Date(
+                                                        this.state.analysis.start_date
+                                                    ).toLocaleString(
+                                                        LOCALE,
+                                                        DATE_OPTIONS
+                                                    )}
+                                                </TableCell>
+                                            </TableRow>
+                                            <TableRow>
+                                                <TableCell className="Analysis-table-row-cell">
+                                                    Time Completed
+                                                </TableCell>
+                                                <TableCell className="Analysis-table-row-cell">
+                                                    {this.state.analysis
+                                                        .end_date
+                                                        ? new Date(
+                                                              this.state.analysis.end_date
+                                                          ).toLocaleString(
+                                                              LOCALE,
+                                                              DATE_OPTIONS
+                                                          )
+                                                        : ""}
+                                                </TableCell>
+                                            </TableRow>
 
-                                        <TableRow>
-                                            <TableCell className="Analysis-table-row-cell">
-                                                Status
-                                            </TableCell>
-                                            <TableCell className="Analysis-table-row-cell">
-                                                {this.state.analysis.status}
-                                            </TableCell>
-                                        </TableRow>
-                                    </TableBody>
-                                </Table>
-                            </div>
+                                            <TableRow>
+                                                <TableCell className="Analysis-table-row-cell">
+                                                    Status
+                                                </TableCell>
+                                                <TableCell className="Analysis-table-row-cell">
+                                                    {this.state.analysis.status}
+                                                </TableCell>
+                                            </TableRow>
+                                        </TableBody>
+                                    </Table>
+                                </div>
+                            </Grid>
+                            <Grid item={true} xs={4}>
+                                <Typography variant="h5" gutterBottom={true}>
+                                    Pipeline Inputs:
+                                </Typography>
+                                {this.state.analysis.files_used && (
+                                    <AnalysisFileTable
+                                        files={this.state.analysis.files_used}
+                                    />
+                                )}
+                            </Grid>
+                            <Grid item={true} xs={4}>
+                                <Typography variant="h5" gutterBottom={true}>
+                                    Pipeline Outputs:
+                                </Typography>
+                                {this.state.analysis.files_generated && (
+                                    <AnalysisFileTable
+                                        files={
+                                            this.state.analysis.files_generated
+                                        }
+                                    />
+                                )}
+                            </Grid>
                         </Grid>
-                        <Grid item={true} xs={4}>
+                        <div style={{ paddingTop: 25 }}>
                             <Typography variant="h5" gutterBottom={true}>
-                                Pipeline Inputs:
+                                Pipeline Console Log:
                             </Typography>
-                            {this.state.analysis.files_used && (
-                                <AnalysisFileTable
-                                    files={this.state.analysis.files_used}
-                                />
-                            )}
-                        </Grid>
-                        <Grid item={true} xs={4}>
-                            <Typography variant="h5" gutterBottom={true}>
-                                Pipeline Outputs:
-                            </Typography>
-                            {this.state.analysis.files_generated && (
-                                <AnalysisFileTable
-                                    files={this.state.analysis.files_generated}
-                                />
-                            )}
-                        </Grid>
-                    </Grid>
+                            <TextField
+                                defaultValue={this.state.analysis.snakemake_log_tails.join(
+                                    "\n"
+                                )}
+                                multiline={true}
+                                fullWidth={true}
+                                disabled={true}
+                                variant="outlined"
+                                style={{ backgroundColor: "#ECF7EE" }}
+                            />
+                        </div>
+                    </>
                 )}
             </div>
         );
