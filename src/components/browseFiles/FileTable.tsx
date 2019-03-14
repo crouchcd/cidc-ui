@@ -9,6 +9,7 @@ import filesize from "filesize";
 import _ from "lodash";
 import * as React from "react";
 import { File } from "../../model/file";
+import { Trial } from "../../model/trial";
 
 const NAME_KEY = "file_name";
 const TRIAL_ID_KEY = "trial_name";
@@ -19,6 +20,7 @@ const SIZE_KEY = "file_size";
 
 export interface IFileTableProps {
     files: File[];
+    trials: Trial[];
     history: any;
 }
 
@@ -172,14 +174,25 @@ export default class FileTable extends React.Component<
                                     this.state.rowsPerPage
                             )
                             .map((file: File) => {
+                                const isLocked = this.props.trials.filter(
+                                    trial =>
+                                        file.trial_name === trial.trial_name
+                                )[0].locked;
                                 return (
                                     <TableRow
                                         key={file._id}
-                                        hover={true}
+                                        hover={!isLocked}
                                         // tslint:disable-next-line:jsx-no-lambda
                                         onClick={() =>
-                                            this.handleClick(file._id)
+                                            isLocked
+                                                ? null
+                                                : this.handleClick(file._id)
                                         }
+                                        style={{
+                                            backgroundColor: isLocked
+                                                ? "#FFE8E6"
+                                                : "inherit"
+                                        }}
                                     >
                                         <TableCell className="File-table-row-cell">
                                             {file.file_name}

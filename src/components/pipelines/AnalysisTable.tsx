@@ -9,6 +9,7 @@ import _ from "lodash";
 import * as React from "react";
 import { Analysis } from "../../model/analysis";
 import { LOCALE, DATE_OPTIONS } from "../../util/constants";
+import { Trial } from "../../model/trial";
 
 const ID_KEY = "_id";
 const TRIAL_ID_KEY = "trial_name";
@@ -19,6 +20,7 @@ const STATUS_KEY = "status";
 
 export interface IAnalysisTableProps {
     analyses: Analysis[];
+    trials: Trial[];
     history: any;
 }
 
@@ -153,14 +155,25 @@ export default class AnalysisTable extends React.Component<
                                     this.state.rowsPerPage
                             )
                             .map((analysis: Analysis) => {
+                                const isLocked = this.props.trials.filter(
+                                    trial =>
+                                        analysis.trial_name === trial.trial_name
+                                )[0].locked;
                                 return (
                                     <TableRow
                                         key={analysis._id}
-                                        hover={true}
+                                        hover={!isLocked}
                                         // tslint:disable-next-line:jsx-no-lambda
                                         onClick={() =>
-                                            this.handleClick(analysis._id)
+                                            isLocked
+                                                ? null
+                                                : this.handleClick(analysis._id)
                                         }
+                                        style={{
+                                            backgroundColor: isLocked
+                                                ? "#FFE8E6"
+                                                : "inherit"
+                                        }}
                                     >
                                         <TableCell className="Analysis-table-row-cell">
                                             {analysis.trial_name}
