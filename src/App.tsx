@@ -28,6 +28,14 @@ class App extends React.Component<any, any> {
         token: ""
     };
 
+    constructor(props: any) {
+        super(props);
+        const expiresAt = Number(localStorage.getItem("expiresAt"));
+        if (expiresAt > 0 && new Date().getTime() >= expiresAt) {
+            this.auth.logout();
+        }
+    }
+
     private auth = new Auth(this.handleEmailUpdate, this.handleTokenUpdate);
 
     @autobind
@@ -50,13 +58,6 @@ class App extends React.Component<any, any> {
     @autobind
     handleIdle() {
         this.auth.logout();
-    }
-
-    componentDidMount() {
-        const expiresAt = Number(localStorage.getItem("expiresAt"));
-        if (expiresAt > 0 && new Date().getTime() >= expiresAt) {
-            this.auth.logout();
-        }
     }
 
     public render() {

@@ -194,7 +194,7 @@ export default class AnalysisDetailsPage extends React.Component<
                         </Grid>
                         <div style={{ paddingTop: 25 }}>
                             <Typography variant="h5" gutterBottom={true}>
-                                Pipeline Console Log:
+                                Pipeline Console Log (last 50 lines):
                             </Typography>
                             <TextField
                                 defaultValue={this.state.analysis.snakemake_log_tails.join(
