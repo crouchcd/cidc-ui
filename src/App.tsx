@@ -11,6 +11,7 @@ import HomePage from "./components/home/HomePage";
 import TransferDataPage from "./components/transferData/TransferDataPage";
 import CliInstructions from "./components/transferData/CliInstructions";
 import PipelinesPage from "./components/pipelines/PipelinesPage";
+import AnalysisDetailsPage from "./components/pipelines/AnalysisDetailsPage";
 import PrivacyAndSecurityPage from "./components/privacyAndSecurity/PrivacyAndSecurityPage";
 import UserAccountPage from "./components/userAccount/UserAccountPage";
 import Register from "./auth/Register";
@@ -26,6 +27,14 @@ class App extends React.Component<any, any> {
         email: "",
         token: ""
     };
+
+    constructor(props: any) {
+        super(props);
+        const expiresAt = Number(localStorage.getItem("expiresAt"));
+        if (expiresAt > 0 && new Date().getTime() >= expiresAt) {
+            this.auth.logout();
+        }
+    }
 
     private auth = new Auth(this.handleEmailUpdate, this.handleTokenUpdate);
 
@@ -152,6 +161,17 @@ class App extends React.Component<any, any> {
                             // tslint:disable-next-line:jsx-no-lambda
                             render={props => (
                                 <FileDetailsPage
+                                    auth={this.auth}
+                                    token={this.state.token}
+                                    {...props}
+                                />
+                            )}
+                        />
+                        <Route
+                            path="/pipeline-details/:analysisId"
+                            // tslint:disable-next-line:jsx-no-lambda
+                            render={props => (
+                                <AnalysisDetailsPage
                                     auth={this.auth}
                                     token={this.state.token}
                                     {...props}

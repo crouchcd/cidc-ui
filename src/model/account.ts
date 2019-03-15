@@ -5,11 +5,11 @@ export interface Account {
     username: string;
     email: string;
     role: string;
-    registered: boolean;
+    approved: boolean;
     last_access: string;
     first_n: string;
     last_n: string;
     organization: string;
     position_description: string;
-    registration_submit_date: string;
+    account_create_date: string;
 }

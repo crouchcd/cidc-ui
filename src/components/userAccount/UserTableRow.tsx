@@ -14,16 +14,15 @@ import {
 import autobind from "autobind-decorator";
 import DeleteIcon from "@material-ui/icons/Delete";
 import EditIcon from "@material-ui/icons/Edit";
-import SaveIcon from "@material-ui/icons/Save";
 import UserTrialsDialog from "./UserTrialsDialog";
-import { ORGANIZATION_NAME_MAP } from "../../util/Constants";
+import { ORGANIZATION_NAME_MAP } from "../../util/constants";
 import "./UserAccount.css";
-import { updateRole, deleteUser } from "../../api/api";
+import { updateRole, deleteUser, getUserEtag } from "../../api/api";
 
 export default class UserTableRow extends React.Component<any, {}> {
     state = {
         role: this.props.account.role,
-        saveDisabled: true,
+        roleDisabled: false,
         trialsDialogOpen: false,
         deleteDialogOpen: false
     };
@@ -32,29 +31,24 @@ export default class UserTableRow extends React.Component<any, {}> {
         this.setState({ deleteDialogOpen: true });
     }
 
-    private handleSave() {
-        updateRole(
-            this.props.token,
-            this.props.account._id,
-            this.props.account._etag,
-            this.state.role
-        ).then(results => {
-            this.setState({ saveDisabled: true });
-            this.props.reloadUsers();
-        });
-    }
-
     private openTrials() {
         this.setState({ trialsDialogOpen: true });
     }
 
     @autobind
     private handleRoleChange(event: React.ChangeEvent<HTMLSelectElement>) {
-        let saveDisabled = false;
-        if (event.target.value === this.props.account.role) {
-            saveDisabled = true;
-        }
-        this.setState({ role: event.target.value, saveDisabled });
+        this.setState({ role: event.target.value, roleDisabled: true });
+        getUserEtag(this.props.token, this.props.account._id).then(results => {
+            updateRole(
+                this.props.token,
+                this.props.account._id,
+                results,
+                event.target.value
+            ).then(result => {
+                this.setState({ roleDisabled: false });
+                this.props.reloadUsers();
+            });
+        });
     }
 
     @autobind
@@ -69,12 +63,12 @@ export default class UserTableRow extends React.Component<any, {}> {
 
     @autobind
     private handleDeleteUser() {
-        deleteUser(
-            this.props.token,
-            this.props.account._id,
-            this.props.account._etag
-        ).then(results => {
-            this.props.reloadUsers();
+        getUserEtag(this.props.token, this.props.account._id).then(results => {
+            deleteUser(this.props.token, this.props.account._id, results).then(
+                result => {
+                    this.props.reloadUsers();
+                }
+            );
         });
     }
 
@@ -91,16 +85,14 @@ export default class UserTableRow extends React.Component<any, {}> {
                     {ORGANIZATION_NAME_MAP[this.props.account.organization]}
                 </TableCell>
                 <TableCell>
-                    <FormControl style={{ minWidth: 120, marginRight: 20 }}>
+                    <FormControl
+                        style={{ minWidth: 120, marginRight: 20 }}
+                        disabled={this.state.roleDisabled}
+                    >
                         <Select
                             value={this.state.role}
                             onChange={this.handleRoleChange}
                         >
-                            {this.props.account.role === "registrant" && (
-                                <MenuItem value="registrant">
-                                    Registrant
-                                </MenuItem>
-                            )}
                             <MenuItem value="reader">Reader</MenuItem>
                             <MenuItem value="uploader">Uploader</MenuItem>
                             <MenuItem value="lead">Lead</MenuItem>
@@ -109,22 +101,13 @@ export default class UserTableRow extends React.Component<any, {}> {
                             <MenuItem value="disabled">Disabled</MenuItem>
                         </Select>
                     </FormControl>
-                    <Fab
-                        size="small"
-                        color="primary"
-                        disabled={this.state.saveDisabled}
-                        // tslint:disable-next-line:jsx-no-lambda
-                        onClick={() => this.handleSave()}
-                    >
-                        <SaveIcon />
-                    </Fab>
                 </TableCell>
                 <TableCell>
                     <Button
                         size="small"
                         variant="outlined"
                         color="primary"
-                        disabled={this.props.account.role === "registrant"}
+                        disabled={!this.props.account.approved}
                         // tslint:disable-next-line:jsx-no-lambda
                         onClick={() => this.openTrials()}
                     >

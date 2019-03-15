@@ -7,8 +7,9 @@ import TableRow from "@material-ui/core/TableRow";
 import autobind from "autobind-decorator";
 import _ from "lodash";
 import * as React from "react";
-import { Analysis } from "../../model/Analysis";
-import { LOCALE, dateOptions } from "../../util/Constants";
+import { Analysis } from "../../model/analysis";
+import { LOCALE, DATE_OPTIONS } from "../../util/constants";
+import { Trial } from "../../model/trial";
 
 const ID_KEY = "_id";
 const TRIAL_ID_KEY = "trial_name";
@@ -19,6 +20,7 @@ const STATUS_KEY = "status";
 
 export interface IAnalysisTableProps {
     analyses: Analysis[];
+    trials: Trial[];
     history: any;
 }
 
@@ -61,24 +63,17 @@ export default class AnalysisTable extends React.Component<
         this.setState({ sortBy, sortDirection: isAsc ? "desc" : "asc" });
     }
 
+    @autobind
+    private handleClick(analysisId: string) {
+        this.props.history.push("/pipeline-details/" + analysisId);
+    }
+
     public render() {
         return (
             <div className="Analysis-table">
                 <Table>
                     <TableHead>
                         <TableRow>
-                            <TableCell className="Analysis-table-header-cell">
-                                <TableSortLabel
-                                    active={this.state.sortBy === ID_KEY}
-                                    direction={this.state.sortDirection}
-                                    // tslint:disable-next-line:jsx-no-lambda
-                                    onClick={() =>
-                                        this.handleChangeSorting(ID_KEY)
-                                    }
-                                >
-                                    Pipeline ID
-                                </TableSortLabel>
-                            </TableCell>
                             <TableCell className="Analysis-table-header-cell">
                                 <TableSortLabel
                                     active={this.state.sortBy === TRIAL_ID_KEY}
@@ -88,7 +83,7 @@ export default class AnalysisTable extends React.Component<
                                         this.handleChangeSorting(TRIAL_ID_KEY)
                                     }
                                 >
-                                    Trial ID
+                                    Trial Name
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell className="Analysis-table-header-cell">
@@ -148,7 +143,7 @@ export default class AnalysisTable extends React.Component<
                             </TableCell>
                         </TableRow>
                     </TableHead>
-                    <TableBody>
+                    <TableBody className="Analysis-table-body">
                         {_.orderBy(
                             this.props.analyses,
                             this.state.sortBy,
@@ -160,11 +155,26 @@ export default class AnalysisTable extends React.Component<
                                     this.state.rowsPerPage
                             )
                             .map((analysis: Analysis) => {
+                                const isLocked = this.props.trials.filter(
+                                    trial =>
+                                        analysis.trial_name === trial.trial_name
+                                )[0].locked;
                                 return (
-                                    <TableRow key={analysis._id}>
-                                        <TableCell className="Analysis-table-row-cell">
-                                            {analysis._id}
-                                        </TableCell>
+                                    <TableRow
+                                        key={analysis._id}
+                                        hover={!isLocked}
+                                        // tslint:disable-next-line:jsx-no-lambda
+                                        onClick={() =>
+                                            isLocked
+                                                ? null
+                                                : this.handleClick(analysis._id)
+                                        }
+                                        style={{
+                                            backgroundColor: isLocked
+                                                ? "#FFE8E6"
+                                                : "inherit"
+                                        }}
+                                    >
                                         <TableCell className="Analysis-table-row-cell">
                                             {analysis.trial_name}
                                         </TableCell>
@@ -176,7 +186,7 @@ export default class AnalysisTable extends React.Component<
                                                 analysis.start_date
                                             ).toLocaleString(
                                                 LOCALE,
-                                                dateOptions
+                                                DATE_OPTIONS
                                             )}
                                         </TableCell>
                                         <TableCell className="Analysis-table-row-cell">
@@ -185,7 +195,7 @@ export default class AnalysisTable extends React.Component<
                                                       analysis.end_date
                                                   ).toLocaleString(
                                                       LOCALE,
-                                                      dateOptions
+                                                      DATE_OPTIONS
                                                   )
                                                 : ""}
                                         </TableCell>

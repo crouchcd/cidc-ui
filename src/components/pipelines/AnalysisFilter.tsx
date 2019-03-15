@@ -5,8 +5,10 @@ import AnalysisFilterCheckboxGroup from "./AnalysisFilterCheckboxGroup";
 export interface IAnalysisFilterProps {
     trialIds: string[];
     experimentalStrategies: string[];
+    statuses: string[];
     onTrialIdChange: (trialId: string) => void;
     onExperimentalStrategyChange: (experimentalStrategy: string) => void;
+    onStatusChange: (status: string) => void;
 }
 
 export default class AnalysisFilter extends React.Component<
@@ -19,7 +21,7 @@ export default class AnalysisFilter extends React.Component<
                 <Grid container={true}>
                     <Grid item={true} xs={12}>
                         <AnalysisFilterCheckboxGroup
-                            title="Trial ID"
+                            title="Trial Name"
                             options={this.props.trialIds}
                             onChange={this.props.onTrialIdChange}
                         />
@@ -29,6 +31,13 @@ export default class AnalysisFilter extends React.Component<
                             title="Experimental Strategy"
                             options={this.props.experimentalStrategies}
                             onChange={this.props.onExperimentalStrategyChange}
+                        />
+                    </Grid>
+                    <Grid item={true} xs={12}>
+                        <AnalysisFilterCheckboxGroup
+                            title="Status"
+                            options={this.props.statuses}
+                            onChange={this.props.onStatusChange}
                         />
                     </Grid>
                 </Grid>

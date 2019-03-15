@@ -1,8 +1,8 @@
 import { createAPIHelper } from "./utilities";
-import { File } from "../model/File";
-import { Account } from "../model/Account";
-import { Trial } from "../model/Trial";
-import { Analysis } from "../model/Analysis";
+import { File } from "../model/file";
+import { Account } from "../model/account";
+import { Trial } from "../model/trial";
+import { Analysis } from "../model/analysis";
 
 const apiHelper = createAPIHelper();
 
@@ -74,22 +74,18 @@ async function getTrials(token: string): Promise<Trial[] | undefined> {
     return result._items;
 }
 
-async function updateUser(
+async function createUser(
     token: string,
-    itemID: string,
-    etag: string,
     newUser: any
 ): Promise<Account | undefined> {
     const options = {
-        endpoint: "accounts_update",
+        endpoint: "accounts_create",
         json: true,
         token,
-        body: newUser,
-        itemID,
-        etag
+        body: newUser
     };
 
-    const result = await apiHelper.patch<Account>(options);
+    const result = await apiHelper.post<Account>(options);
 
     if (!result) {
         return;
@@ -124,7 +120,7 @@ async function updateRole(
         endpoint: "accounts",
         json: true,
         token,
-        body: { role },
+        body: { role, approved: "true" },
         itemID,
         etag
     };
@@ -200,15 +196,57 @@ async function getAnalyses(token: string): Promise<Analysis[] | undefined> {
     return result._items;
 }
 
+async function getUserEtag(
+    token: string,
+    itemID: string
+): Promise<string | undefined> {
+    const options = {
+        endpoint: "accounts",
+        json: true,
+        itemID,
+        token
+    };
+
+    const result = await apiHelper.get<{ _etag: string }>(options);
+
+    if (!result) {
+        return;
+    }
+
+    return result._etag;
+}
+
+async function getSingleAnalysis(
+    token: string,
+    itemID: string
+): Promise<Analysis | undefined> {
+    const options = {
+        endpoint: "analysis",
+        json: true,
+        itemID,
+        token
+    };
+
+    const result = await apiHelper.get<Analysis>(options);
+
+    if (!result) {
+        return;
+    }
+
+    return result;
+}
+
 export {
     getFiles,
     getSingleFile,
     getAccountInfo,
     getTrials,
-    updateUser,
+    createUser,
     getAllAccounts,
     updateRole,
     deleteUser,
     updateTrial,
-    getAnalyses
+    getAnalyses,
+    getUserEtag,
+    getSingleAnalysis
 };

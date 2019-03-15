@@ -1,5 +1,4 @@
 .Browse-analyses-page {
-    width: 90%;
     margin: auto;
     padding: 20px;
     background-color: #ecf0f1;
@@ -34,6 +33,10 @@
 
 .Analysis-table {
     border: 1px solid #cfd0d0;
+}
+
+.Analysis-table-body {
+    cursor: pointer;
 }
 
 .Analysis-table-row-cell {

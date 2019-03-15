@@ -1,4 +1,4 @@
-import { FastqProperties } from "./FastqProperties";
+import { FastqProperties } from "./fastqProperties";
 
 // tslint:disable-next-line:interface-name
 export interface File {

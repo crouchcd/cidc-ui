@@ -1,15 +1,15 @@
-import { Analysis } from "../../model/Analysis";
+import { Analysis } from "../../model/analysis";
 
 export function filterAnalyses(
     analyses: Analysis[],
     selectedTrialIds: string[],
     selectedExperimentalStrategies: string[],
-    searchFilter: string
+    selectedStatuses: string[]
 ): Analysis[] {
     return analyses.filter((analysis: Analysis) => {
         let isTrialIdMatch = true;
         let isExperimentalStrategyMatch = true;
-        let isSearchFilterMatch = true;
+        let isStatusMatch = true;
         if (selectedTrialIds.length > 0) {
             isTrialIdMatch = selectedTrialIds.includes(analysis.trial_name);
         }
@@ -18,14 +18,10 @@ export function filterAnalyses(
                 analysis.experimental_strategy
             );
         }
-        if (searchFilter.length > 0) {
-            isSearchFilterMatch = analysis._id
-                .toLowerCase()
-                .includes(searchFilter.toLowerCase());
+        if (selectedStatuses.length > 0) {
+            isStatusMatch = selectedStatuses.includes(analysis.status);
         }
-        return (
-            isTrialIdMatch && isExperimentalStrategyMatch && isSearchFilterMatch
-        );
+        return isTrialIdMatch && isExperimentalStrategyMatch && isStatusMatch;
     });
 }
 

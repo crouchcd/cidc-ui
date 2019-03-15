@@ -43,14 +43,10 @@ export default class Auth {
             if (authResult && authResult.accessToken && authResult.idToken) {
                 getAccountInfo(authResult.idToken)
                     .then(results => {
-                        if (results[0].organization) {
-                            if (results[0].role !== "registrant") {
-                                this.setSession(authResult, "/");
-                            } else {
-                                history.replace("/register?unactivated=true");
-                            }
+                        if (results[0].approved) {
+                            this.setSession(authResult, "/");
                         } else {
-                            history.replace("/register");
+                            history.replace("/register?unactivated=true");
                         }
                     })
                     .catch(error => {
@@ -78,10 +74,15 @@ export default class Auth {
     }
 
     @autobind
+    getExpiresAt() {
+        return this.expiresAt;
+    }
+
+    @autobind
     setSession(authResult: Auth0DecodedHash, returnPath: string) {
         localStorage.setItem("isLoggedIn", "true");
-
-        const expiresAt = authResult.expiresIn * 1000 + new Date().getTime();
+        const expiresAt = authResult.idTokenPayload.exp * 1000;
+        localStorage.setItem("expiresAt", String(expiresAt));
         this.accessToken = authResult.accessToken;
         this.idToken = authResult.idToken;
         this.expiresAt = expiresAt;
@@ -115,6 +116,7 @@ export default class Auth {
         this.userinfo = null;
 
         localStorage.removeItem("isLoggedIn");
+        localStorage.removeItem("expiresAt");
         this.auth0.logout({
             clientID: CLIENT_ID,
             returnTo: window.location.origin

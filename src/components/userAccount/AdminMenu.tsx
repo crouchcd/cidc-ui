@@ -12,7 +12,7 @@ import {
 } from "@material-ui/core";
 import { getAllAccounts } from "../../api/api";
 import autobind from "autobind-decorator";
-import { Account } from "../../model/Account";
+import { Account } from "../../model/account";
 import UserTableRow from "./UserTableRow";
 
 export default class AdminMenu extends React.Component<any, {}> {
@@ -32,7 +32,9 @@ export default class AdminMenu extends React.Component<any, {}> {
         getAllAccounts(this.props.token).then(results => {
             this.setState({
                 accounts: results.filter(
-                    account => account.role !== "system" && account.organization
+                    account =>
+                        account.role !== "system" &&
+                        account._id !== this.props.userId
                 )
             });
         });

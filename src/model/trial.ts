@@ -4,4 +4,5 @@ export interface Trial {
     _etag: string;
     trial_name: string;
     collaborators: string[];
+    locked: boolean;
 }
