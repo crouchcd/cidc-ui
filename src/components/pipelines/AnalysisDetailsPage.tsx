@@ -192,21 +192,23 @@ export default class AnalysisDetailsPage extends React.Component<
                                 )}
                             </Grid>
                         </Grid>
-                        <div style={{ paddingTop: 25 }}>
-                            <Typography variant="h5" gutterBottom={true}>
-                                Pipeline Console Log (last 50 lines):
-                            </Typography>
-                            <TextField
-                                defaultValue={this.state.analysis.snakemake_log_tails.join(
-                                    "\n"
-                                )}
-                                multiline={true}
-                                fullWidth={true}
-                                disabled={true}
-                                variant="outlined"
-                                style={{ backgroundColor: "#ECF7EE" }}
-                            />
-                        </div>
+                        {this.state.analysis.snakemake_log_tails && (
+                            <div style={{ paddingTop: 25 }}>
+                                <Typography variant="h5" gutterBottom={true}>
+                                    Pipeline Console Log (last 50 lines):
+                                </Typography>
+                                <TextField
+                                    defaultValue={this.state.analysis.snakemake_log_tails.join(
+                                        "\n"
+                                    )}
+                                    multiline={true}
+                                    fullWidth={true}
+                                    disabled={true}
+                                    variant="outlined"
+                                    style={{ backgroundColor: "#ECF7EE" }}
+                                />
+                            </div>
+                        )}
                     </>
                 )}
             </div>

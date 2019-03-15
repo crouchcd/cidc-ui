@@ -143,7 +143,7 @@ export default class AnalysisTable extends React.Component<
                             </TableCell>
                         </TableRow>
                     </TableHead>
-                    <TableBody className="Analysis-table-body">
+                    <TableBody>
                         {_.orderBy(
                             this.props.analyses,
                             this.state.sortBy,
@@ -172,7 +172,10 @@ export default class AnalysisTable extends React.Component<
                                         style={{
                                             backgroundColor: isLocked
                                                 ? "#FFE8E6"
-                                                : "inherit"
+                                                : "inherit",
+                                            cursor: isLocked
+                                                ? "inherit"
+                                                : "pointer"
                                         }}
                                     >
                                         <TableCell className="Analysis-table-row-cell">
