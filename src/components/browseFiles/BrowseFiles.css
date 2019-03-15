@@ -35,10 +35,6 @@
     border: 1px solid #cfd0d0;
 }
 
-.File-table-body {
-    cursor: pointer;
-}
-
 .File-table-row-cell {
     font-size: 14px !important;
 }
