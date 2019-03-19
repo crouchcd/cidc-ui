@@ -31,7 +31,7 @@ export default class AdminMenu extends React.Component<any, {}> {
     private reloadUsers() {
         getAllAccounts(this.props.token).then(results => {
             this.setState({
-                accounts: results.filter(
+                accounts: results!.filter(
                     account =>
                         account.role !== "system" &&
                         account._id !== this.props.userId
@@ -63,9 +63,9 @@ export default class AdminMenu extends React.Component<any, {}> {
     }
 
     private filterAccounts(
-        accounts: Account[],
+        accounts: Account[] | undefined,
         searchFilter: string
-    ): Account[] {
+    ): Account[] | undefined {
         if (!accounts) {
             return undefined;
         }

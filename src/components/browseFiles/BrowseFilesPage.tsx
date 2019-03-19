@@ -161,7 +161,7 @@ export default class BrowseFilesPage extends React.Component<
                                     this.state.selectedDataFormats,
                                     this.state.searchFilter
                                 )}
-                                trials={this.state.trials}
+                                trials={this.state.trials!}
                             />
                         </Grid>
                     </Grid>

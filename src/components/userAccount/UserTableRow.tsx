@@ -42,9 +42,9 @@ export default class UserTableRow extends React.Component<any, {}> {
             updateRole(
                 this.props.token,
                 this.props.account._id,
-                results,
+                results!,
                 event.target.value
-            ).then(result => {
+            ).then((result: any) => {
                 this.setState({ roleDisabled: false });
                 this.props.reloadUsers();
             });
@@ -64,7 +64,7 @@ export default class UserTableRow extends React.Component<any, {}> {
     @autobind
     private handleDeleteUser() {
         getUserEtag(this.props.token, this.props.account._id).then(results => {
-            deleteUser(this.props.token, this.props.account._id, results).then(
+            deleteUser(this.props.token, this.props.account._id, results!).then(
                 result => {
                     this.props.reloadUsers();
                 }
