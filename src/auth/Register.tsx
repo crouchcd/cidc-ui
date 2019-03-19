@@ -38,25 +38,29 @@ export default class Register extends React.Component<any, {}> {
             return;
         }
 
-        this.props.auth.auth0.checkSession({}, async (error, authResult) => {
-            this.setState({ token: authResult.idToken });
-            getAccountInfo(authResult.idToken)
-                .then(results => {
-                    if (results[0].approved) {
-                        this.props.history.replace("/");
-                    } else {
-                        this.setState({ unactivated: true });
-                    }
-                })
-                .catch(err => {
-                    this.setState({
-                        email: authResult.idTokenPayload.email,
-                        first_n: authResult.idTokenPayload.given_name,
-                        last_n: authResult.idTokenPayload.family_name,
-                        preferred_contact_email: authResult.idTokenPayload.email
+        this.props.auth.auth0.checkSession(
+            {},
+            async (error: any, authResult: any) => {
+                this.setState({ token: authResult.idToken });
+                getAccountInfo(authResult.idToken)
+                    .then(results => {
+                        if (results![0].approved) {
+                            this.props.history.replace("/");
+                        } else {
+                            this.setState({ unactivated: true });
+                        }
+                    })
+                    .catch(err => {
+                        this.setState({
+                            email: authResult.idTokenPayload.email,
+                            first_n: authResult.idTokenPayload.given_name,
+                            last_n: authResult.idTokenPayload.family_name,
+                            preferred_contact_email:
+                                authResult.idTokenPayload.email
+                        });
                     });
-                });
-        });
+            }
+        );
     }
 
     @autobind
@@ -111,7 +115,7 @@ export default class Register extends React.Component<any, {}> {
                 preferred_contact_email: this.state.preferred_contact_email
             };
 
-            createUser(this.state.token, newUser).then(result => {
+            createUser(this.state.token!, newUser).then((result: any) => {
                 this.setState({ unactivated: true });
             });
         }

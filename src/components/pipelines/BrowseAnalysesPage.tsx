@@ -126,7 +126,7 @@ export default class BrowseAnalysesPage extends React.Component<
                                     this.state.selectedExperimentalStrategies,
                                     this.state.selectedStatuses
                                 )}
-                                trials={this.state.trials}
+                                trials={this.state.trials!}
                             />
                         </Grid>
                     </Grid>

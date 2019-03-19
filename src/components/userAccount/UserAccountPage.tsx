@@ -48,7 +48,7 @@ export default class UserAccountPage extends React.Component<
         getAccountInfo(this.props.token).then(accountResults => {
             getTrials(this.props.token).then(trialResults => {
                 const userTrials: Trial[] = [];
-                trialResults.forEach(trial => {
+                trialResults!.forEach(trial => {
                     if (
                         trial.collaborators.includes(accountResults![0].email)
                     ) {
