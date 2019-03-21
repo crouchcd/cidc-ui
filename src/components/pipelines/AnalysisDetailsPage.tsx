@@ -170,28 +170,58 @@ export default class AnalysisDetailsPage extends React.Component<
                                 </div>
                             </Grid>
                             <Grid item={true} xs={4}>
-                                <Typography variant="h5" gutterBottom={true}>
-                                    Pipeline Inputs:
-                                </Typography>
                                 {this.state.analysis.files_used && (
-                                    <AnalysisFileTable
-                                        files={this.state.analysis.files_used}
-                                    />
+                                    <>
+                                        <Typography
+                                            variant="h5"
+                                            gutterBottom={true}
+                                        >
+                                            Pipeline Inputs:
+                                        </Typography>
+                                        <AnalysisFileTable
+                                            files={
+                                                this.state.analysis.files_used
+                                            }
+                                        />
+                                    </>
                                 )}
                             </Grid>
                             <Grid item={true} xs={4}>
-                                <Typography variant="h5" gutterBottom={true}>
-                                    Pipeline Outputs:
-                                </Typography>
                                 {this.state.analysis.files_generated && (
-                                    <AnalysisFileTable
-                                        files={
-                                            this.state.analysis.files_generated
-                                        }
-                                    />
+                                    <>
+                                        <Typography
+                                            variant="h5"
+                                            gutterBottom={true}
+                                        >
+                                            Pipeline Outputs:
+                                        </Typography>
+                                        <AnalysisFileTable
+                                            files={
+                                                this.state.analysis
+                                                    .files_generated
+                                            }
+                                        />
+                                    </>
                                 )}
                             </Grid>
                         </Grid>
+                        {this.state.analysis.error_message && (
+                            <div style={{ paddingTop: 25 }}>
+                                <Typography variant="h5" gutterBottom={true}>
+                                    Error Message:
+                                </Typography>
+                                <TextField
+                                    defaultValue={
+                                        this.state.analysis.error_message
+                                    }
+                                    multiline={true}
+                                    fullWidth={true}
+                                    disabled={true}
+                                    variant="outlined"
+                                    style={{ backgroundColor: "#ECF7EE" }}
+                                />
+                            </div>
+                        )}
                         {this.state.analysis.snakemake_log_tails && (
                             <div style={{ paddingTop: 25 }}>
                                 <Typography variant="h5" gutterBottom={true}>

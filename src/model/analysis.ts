@@ -9,4 +9,5 @@ export interface Analysis {
     files_used: any[];
     files_generated: any[];
     snakemake_log_tails: string[];
+    error_message: string;
 }
