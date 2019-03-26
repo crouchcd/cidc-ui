@@ -1,4 +1,9 @@
-import { TablePagination, TableSortLabel } from "@material-ui/core";
+import {
+    TablePagination,
+    TableSortLabel,
+    Popover,
+    Typography
+} from "@material-ui/core";
 import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
 import TableCell from "@material-ui/core/TableCell";
@@ -29,6 +34,7 @@ export interface IFileTableState {
     page: number;
     sortBy: string;
     sortDirection: "asc" | "desc";
+    anchorEl: any;
 }
 
 export default class FileTable extends React.Component<
@@ -39,7 +45,8 @@ export default class FileTable extends React.Component<
         page: 0,
         rowsPerPage: 10,
         sortBy: NAME_KEY,
-        sortDirection: "asc"
+        sortDirection: "asc",
+        anchorEl: null
     };
 
     @autobind
@@ -66,6 +73,18 @@ export default class FileTable extends React.Component<
         const isAsc =
             this.state.sortBy === sortBy && this.state.sortDirection === "asc";
         this.setState({ sortBy, sortDirection: isAsc ? "desc" : "asc" });
+    }
+
+    private handlePopoverOpen(event: any, isLocked: boolean) {
+        if (isLocked) {
+            this.setState({ anchorEl: event.target });
+        }
+    }
+
+    private handlePopoverClose(isLocked: boolean) {
+        if (isLocked) {
+            this.setState({ anchorEl: null });
+        }
     }
 
     public render() {
@@ -196,6 +215,15 @@ export default class FileTable extends React.Component<
                                                 ? "inherit"
                                                 : "pointer"
                                         }}
+                                        onMouseOver={() =>
+                                            this.handlePopoverOpen(
+                                                event,
+                                                isLocked
+                                            )
+                                        }
+                                        onMouseOut={() =>
+                                            this.handlePopoverClose(isLocked)
+                                        }
                                     >
                                         <TableCell className="File-table-row-cell">
                                             {file.file_name}
@@ -229,6 +257,23 @@ export default class FileTable extends React.Component<
                     onChangePage={this.handleChangePage}
                     onChangeRowsPerPage={this.handleChangeRowsPerPage}
                 />
+                <Popover
+                    style={{ pointerEvents: "none" }}
+                    open={Boolean(this.state.anchorEl)}
+                    anchorEl={this.state.anchorEl}
+                    anchorOrigin={{
+                        vertical: "top",
+                        horizontal: "left"
+                    }}
+                    transformOrigin={{
+                        vertical: "bottom",
+                        horizontal: "left"
+                    }}
+                >
+                    <Typography style={{ margin: 5 }}>
+                        This trial is currently locked
+                    </Typography>
+                </Popover>
             </div>
         );
     }
