@@ -7,17 +7,17 @@ import nanoid from "nanoid";
 const CLIENT_ID: string = "Yjlt8LT5vXFJw1Z8m8eaB5aZO26uPyeD";
 
 export default class Auth {
-    private accessToken: string;
-    private idToken: string;
-    private expiresAt: number;
-    private userinfo: Auth0UserProfile;
+    private accessToken!: string | undefined;
+    private idToken!: string | undefined;
+    private expiresAt!: number;
+    private userinfo!: Auth0UserProfile | undefined;
     private nonce: string;
-    private handleEmailUpdate: (email: string) => void;
-    private handleTokenUpdate: (token: string) => void;
+    private handleEmailUpdate: (email: string | undefined) => void;
+    private handleTokenUpdate: (token: string | undefined) => void;
 
     constructor(
-        handleEmailUpdate: (email: string) => void,
-        handleTokenUpdate: (token: string) => void
+        handleEmailUpdate: (email: string | undefined) => void,
+        handleTokenUpdate: (token: string | undefined) => void
     ) {
         this.handleEmailUpdate = handleEmailUpdate;
         this.handleTokenUpdate = handleTokenUpdate;
@@ -43,7 +43,7 @@ export default class Auth {
             if (authResult && authResult.accessToken && authResult.idToken) {
                 getAccountInfo(authResult.idToken)
                     .then(results => {
-                        if (results[0].approved) {
+                        if (results![0].approved) {
                             this.setSession(authResult, "/");
                         } else {
                             history.replace("/register?unactivated=true");
@@ -70,7 +70,7 @@ export default class Auth {
 
     @autobind
     getEmail() {
-        return this.userinfo.email;
+        return this.userinfo!.email;
     }
 
     @autobind
@@ -87,7 +87,7 @@ export default class Auth {
         this.idToken = authResult.idToken;
         this.expiresAt = expiresAt;
         this.handleTokenUpdate(this.idToken);
-        this.auth0.client.userInfo(this.accessToken, (err, userinfo) => {
+        this.auth0.client.userInfo(this.accessToken!, (err, userinfo) => {
             this.userinfo = userinfo;
             if (userinfo) {
                 this.handleEmailUpdate(this.getEmail());
@@ -110,10 +110,10 @@ export default class Auth {
 
     @autobind
     logout() {
-        this.accessToken = null;
-        this.idToken = null;
+        this.accessToken = undefined;
+        this.idToken = undefined;
         this.expiresAt = 0;
-        this.userinfo = null;
+        this.userinfo = undefined;
 
         localStorage.removeItem("isLoggedIn");
         localStorage.removeItem("expiresAt");

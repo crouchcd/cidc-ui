@@ -46,12 +46,12 @@ class App extends React.Component<any, any> {
     }
 
     @autobind
-    handleEmailUpdate(email: string) {
+    handleEmailUpdate(email: string | undefined) {
         this.setState({ email });
     }
 
     @autobind
-    handleTokenUpdate(token: string) {
+    handleTokenUpdate(token: string | undefined) {
         this.setState({ token });
     }
 

@@ -19,8 +19,17 @@ import autobind from "autobind-decorator";
 import { getTrials, updateTrial } from "../../api/api";
 import { Trial } from "../../model/trial";
 
-export default class UserTrialsDialog extends React.Component<any, {}> {
-    state = {
+export interface IUserTrialsDialogState {
+    trials: Trial[] | undefined;
+    page: number;
+    rowsPerPage: number;
+}
+
+export default class UserTrialsDialog extends React.Component<
+    any,
+    IUserTrialsDialogState
+> {
+    state: IUserTrialsDialogState = {
         trials: undefined,
         page: 0,
         rowsPerPage: 10
@@ -64,7 +73,7 @@ export default class UserTrialsDialog extends React.Component<any, {}> {
     @autobind
     private handleSave() {
         let updatedTrialCount: number = 0;
-        this.state.trials.forEach((trial: Trial) => {
+        this.state.trials!.forEach((trial: Trial) => {
             updateTrial(
                 this.props.token,
                 trial._id,
@@ -72,7 +81,7 @@ export default class UserTrialsDialog extends React.Component<any, {}> {
                 trial.collaborators
             ).then(results => {
                 updatedTrialCount++;
-                if (this.state.trials.length === updatedTrialCount) {
+                if (this.state.trials!.length === updatedTrialCount) {
                     this.props.onCancel();
                 }
             });

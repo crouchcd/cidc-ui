@@ -31,7 +31,7 @@
     "react-idle-timer": "^4.2.3",
     "react-markdown": "^4.0.4",
     "react-router-dom": "^4.3.1",
-    "react-scripts-ts": "^3.1.0",
+    "react-scripts": "^2.1.8",
     "request-promise-native": "^1.0.5"
   },
   "lint-staged": {
@@ -47,13 +47,13 @@
   },
   "scripts": {
     "precommit": "lint-staged",
-    "start": "react-scripts-ts start",
-    "start-dev": "REACT_APP_NODE_ENV='dev' react-scripts-ts start",
-    "build": "react-scripts-ts build",
-    "build-upload": "react-scripts-ts build ; ./google-deploy.sh",
-    "test": "REACT_APP_NODE_ENV='dev' react-scripts-ts test --env=jsdom",
-    "test-cover": "REACT_APP_NODE_ENV='dev' react-scripts-ts test --env=jsdom --coverage",
-    "eject": "react-scripts-ts eject",
+    "start": "react-scripts start",
+    "start-dev": "REACT_APP_NODE_ENV='dev' react-scripts start",
+    "build": "react-scripts build",
+    "build-upload": "react-scripts build ; ./google-deploy.sh",
+    "test": "REACT_APP_NODE_ENV='dev' react-scripts test --env=jsdom",
+    "test-cover": "REACT_APP_NODE_ENV='dev' react-scripts test --env=jsdom --coverage",
+    "eject": "react-scripts eject",
     "lint": "tslint -p tsconfig.json"
   },
   "devDependencies": {
