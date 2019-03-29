@@ -59,15 +59,15 @@ export default class CliInstructions extends React.Component<
                 <Paper className="User-account-paper" style={{ marginTop: 20 }}>
                     <Toolbar className="User-account-toolbar">
                         <Typography className="User-account-toolbar-text">
-                            JWT For logging into CLI
+                            Token for logging into CLI
                         </Typography>
                     </Toolbar>
                     <div className="User-details">
                         <div>
                             <Typography style={{ fontSize: 18 }}>
                                 After you've installed the CLI and are ready to
-                                upload data, paste the JWT below into the
-                                jwt_login command to authenticate yourself.
+                                upload data, paste the token below into the
+                                login command to authenticate yourself.
                             </Typography>
                             <div
                                 style={{
@@ -83,7 +83,7 @@ export default class CliInstructions extends React.Component<
                                         fontFamily: "Monaco"
                                     }}
                                 >
-                                    (Cmd) jwt_login ey927853.......
+                                    (Cmd) login ey927853.......
                                 </Typography>
                             </div>
                             <div
@@ -101,18 +101,17 @@ export default class CliInstructions extends React.Component<
                                     style={{ color: "#db2828" }}
                                     paragraph={true}
                                 >
-                                    Your JWT is a long token that represents
-                                    your identity within the CIDC System, Treat
-                                    it as you would a password! Anyone who has
-                                    your JWT can perform actions as if they were
-                                    you.
+                                    Your token represents your identity within
+                                    the CIDC System, treat it as you would a
+                                    password! Anyone who has your token can
+                                    perform actions as if they were you.
                                 </Typography>
                                 <Typography
                                     style={{ color: "#db2828" }}
                                     paragraph={true}
                                 >
-                                    Do not share your JWT with anyone! We will
-                                    never ask you to send a JWT over email.
+                                    Do not share your token with anyone! We will
+                                    never ask you to send a token over email.
                                 </Typography>
                                 <Button
                                     variant="contained"
@@ -120,8 +119,8 @@ export default class CliInstructions extends React.Component<
                                     // tslint:disable-next-line:jsx-no-lambda
                                     onClick={() => this.handleClick()}
                                 >
-                                    Click to reveal the JWT that you will paste
-                                    in the above command
+                                    Click to reveal the token that you will
+                                    paste in the above command
                                 </Button>
                                 {this.state.tokenVisible && (
                                     <div style={{ marginTop: 10 }}>
@@ -134,7 +133,7 @@ export default class CliInstructions extends React.Component<
                                                         variant="contained"
                                                         color="primary"
                                                     >
-                                                        Copy JWT to Clipboard
+                                                        Copy token to Clipboard
                                                     </Button>
                                                 </CopyToClipboard>
                                             </Grid>
@@ -142,12 +141,14 @@ export default class CliInstructions extends React.Component<
                                                 <div className="Token-input-border">
                                                     <TextField
                                                         defaultValue={this.props.auth.getIdToken()}
-                                                        margin="none"
-                                                        variant="outlined"
+                                                        InputProps={{
+                                                            disableUnderline: true
+                                                        }}
                                                         style={{
                                                             backgroundColor:
                                                                 "white",
-                                                            height: 36
+                                                            height: 26,
+                                                            padding: 5
                                                         }}
                                                     />
                                                 </div>
