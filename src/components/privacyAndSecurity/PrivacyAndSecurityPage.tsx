@@ -162,8 +162,12 @@ export default class PrivacyAndSecurityPage extends React.Component<any, {}> {
                     U.S. Government Information System
                 </Typography>
                 <Typography style={{ fontSize: 18 }} paragraph={true}>
-                    Due to the nature of data within this system, the following
-                    provisions apply:
+                    The term “U.S. Government information system” includes
+                    systems operated on behalf of the U.S. Government; This
+                    information system is operating on behalf of the National
+                    Cancer Institute, an agency within the National Institutes
+                    of Health. Due to the nature of data within this system, the
+                    following provisions apply:
                 </Typography>
                 <Typography style={{ fontSize: 18 }} paragraph={true}>
                     <li>
