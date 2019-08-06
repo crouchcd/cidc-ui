@@ -1,7 +1,7 @@
 | Branch | Coverage | Travis |
 | --- | --- | --- |
-| Master | [![codecov](https://codecov.io/gh/CIMAC-CIDC/cidc-front-end/branch/master/graph/badge.svg)](https://codecov.io/gh/CIMAC-CIDC/cidc-front-end/branch/master/) | ![travis](https://img.shields.io/travis/CIMAC-CIDC/cidc-front-end/master.svg)
-| Staging | [![codecov](https://codecov.io/gh/CIMAC-CIDC/cidc-front-end/branch/staging/graph/badge.svg)](https://codecov.io/gh/CIMAC-CIDC/cidc-front-end/branch/staging/) | ![travis](https://img.shields.io/travis/CIMAC-CIDC/cidc-front-end/staging.svg)
+| Master | [![codecov](https://codecov.io/gh/CIMAC-CIDC/cidc-front-end/branch/master/graph/badge.svg)](https://codecov.io/gh/CIMAC-CIDC/cidc-front-end/branch/master/) | ![travis](https://img.shields.io/travis/CIMAC-CIDC/cidc-ui/master.svg)
+| Staging | [![codecov](https://codecov.io/gh/CIMAC-CIDC/cidc-front-end/branch/staging/graph/badge.svg)](https://codecov.io/gh/CIMAC-CIDC/cidc-front-end/branch/staging/) | ![travis](https://img.shields.io/travis/CIMAC-CIDC/cidc-ui/staging.svg)
 ## CIDC UI Readme
 
 
