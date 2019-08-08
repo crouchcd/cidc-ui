@@ -126,7 +126,7 @@ export default class Auth {
 
     @autobind
     isAuthenticated() {
-        const expiresAt = this.expiresAt;
+        const expiresAt = this.getExpiresAt();
         return new Date().getTime() < expiresAt;
     }
 
