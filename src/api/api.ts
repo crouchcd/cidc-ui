@@ -3,8 +3,16 @@ import { File } from "../model/file";
 import { Account } from "../model/account";
 import { Trial } from "../model/trial";
 import { Analysis } from "../model/analysis";
+import { decode } from "jsonwebtoken";
 
-const apiHelper = createAPIHelper();
+// While we transition from the old API to the new API,
+// both will be in partial use here.
+const newURL: string = process.env.REACT_APP_API_URL!;
+const oldURL: string =
+    process.env.REACT_APP_OLD_API_URL || window.location.origin + "/api";
+
+const oldAPI = createAPIHelper(oldURL);
+const newAPI = createAPIHelper(newURL);
 
 async function getFiles(token: string): Promise<File[] | undefined> {
     const options = {
@@ -13,7 +21,7 @@ async function getFiles(token: string): Promise<File[] | undefined> {
         token
     };
 
-    const result = await apiHelper.get<{ _items: File[] }>(options);
+    const result = await oldAPI.get<{ _items: File[] }>(options);
 
     if (!result) {
         return;
@@ -33,7 +41,7 @@ async function getSingleFile(
         token
     };
 
-    const result = await apiHelper.get<File>(options);
+    const result = await oldAPI.get<File>(options);
 
     if (!result) {
         return;
@@ -43,13 +51,17 @@ async function getSingleFile(
 }
 
 async function getAccountInfo(token: string): Promise<Account[] | undefined> {
+    const decodedToken = decode(token) as any;
+    const email = decodedToken!.email;
+
     const options = {
-        endpoint: "accounts_info",
+        endpoint: "users",
         json: true,
+        parameters: { where: JSON.stringify({ email }) },
         token
     };
 
-    const result = await apiHelper.get<{ _items: Account[] }>(options);
+    const result = await newAPI.get<{ _items: Account[] }>(options);
 
     if (!result) {
         return;
@@ -65,7 +77,7 @@ async function getTrials(token: string): Promise<Trial[] | undefined> {
         token
     };
 
-    const result = await apiHelper.get<{ _items: Trial[] }>(options);
+    const result = await oldAPI.get<{ _items: Trial[] }>(options);
 
     if (!result) {
         return;
@@ -79,13 +91,13 @@ async function createUser(
     newUser: any
 ): Promise<Account | undefined> {
     const options = {
-        endpoint: "accounts_create",
+        endpoint: "new_users",
         json: true,
         token,
         body: newUser
     };
 
-    const result = await apiHelper.post<Account>(options);
+    const result = await newAPI.post<Account>(options);
 
     if (!result) {
         return;
@@ -96,12 +108,12 @@ async function createUser(
 
 async function getAllAccounts(token: string): Promise<Account[] | undefined> {
     const options = {
-        endpoint: "accounts",
+        endpoint: "users",
         json: true,
         token
     };
 
-    const result = await apiHelper.get<{ _items: Account[] }>(options);
+    const result = await newAPI.get<{ _items: Account[] }>(options);
 
     if (!result) {
         return;
@@ -117,15 +129,15 @@ async function updateRole(
     role: string
 ): Promise<Account | undefined> {
     const options = {
-        endpoint: "accounts",
+        endpoint: "users",
         json: true,
         token,
-        body: { role, approved: "true" },
+        body: { role },
         itemID,
         etag
     };
 
-    const result = await apiHelper.patch<Account>(options);
+    const result = await newAPI.patch<Account>(options);
 
     if (!result) {
         return;
@@ -139,21 +151,24 @@ async function deleteUser(
     itemID: string,
     etag: string
 ): Promise<Account | undefined> {
-    const options = {
-        endpoint: "accounts",
-        json: true,
-        token,
-        itemID,
-        etag
-    };
+    console.error("user deletion not currently supported");
+    return;
 
-    const result = await apiHelper.delete<Account>(options);
+    // const options = {
+    //     endpoint: "accounts",
+    //     json: true,
+    //     token,
+    //     itemID,
+    //     etag
+    // };
 
-    if (!result) {
-        return;
-    }
+    // const result = await oldAPI.delete<Account>(options);
 
-    return result;
+    // if (!result) {
+    //     return;
+    // }
+
+    // return result;
 }
 
 async function updateTrial(
@@ -171,7 +186,7 @@ async function updateTrial(
         etag
     };
 
-    const result = await apiHelper.patch<Trial>(options);
+    const result = await oldAPI.patch<Trial>(options);
 
     if (!result) {
         return;
@@ -187,7 +202,7 @@ async function getAnalyses(token: string): Promise<Analysis[] | undefined> {
         token
     };
 
-    const result = await apiHelper.get<{ _items: Analysis[] }>(options);
+    const result = await oldAPI.get<{ _items: Analysis[] }>(options);
 
     if (!result) {
         return;
@@ -201,13 +216,13 @@ async function getUserEtag(
     itemID: string
 ): Promise<string | undefined> {
     const options = {
-        endpoint: "accounts",
+        endpoint: "users",
         json: true,
         itemID,
         token
     };
 
-    const result = await apiHelper.get<{ _etag: string }>(options);
+    const result = await newAPI.get<{ _etag: string }>(options);
 
     if (!result) {
         return;
@@ -227,7 +242,7 @@ async function getSingleAnalysis(
         token
     };
 
-    const result = await apiHelper.get<Analysis>(options);
+    const result = await oldAPI.get<Analysis>(options);
 
     if (!result) {
         return;
