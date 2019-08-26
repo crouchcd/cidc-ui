@@ -1,173 +1,126 @@
-import { createAPIHelper } from "./utilities";
-import { File } from "../model/file";
 import { Account } from "../model/account";
 import { Trial } from "../model/trial";
-import { Analysis } from "../model/analysis";
 import { decode } from "jsonwebtoken";
+import { DataFile } from "../model/file";
+import axios, { AxiosInstance, AxiosResponse } from "axios";
 
-// While we transition from the old API to the new API,
-// both will be in partial use here.
-const newURL: string = process.env.REACT_APP_API_URL!;
-const oldURL: string = process.env.REACT_APP_OLD_API_URL!;
+const URL: string = process.env.REACT_APP_API_URL!;
 
-const oldAPI = createAPIHelper(oldURL);
-const newAPI = createAPIHelper(newURL);
-
-async function getFiles(token: string): Promise<File[] | undefined> {
-    const options = {
-        endpoint: "downloadable_files",
-        json: true,
-        token
-    };
-
-    const result = await newAPI.get<{ _items: File[] }>(options);
-
-    if (!result) {
-        return;
-    }
-
-    return result._items;
+function getApiClient(token: string): AxiosInstance {
+    return axios.create({
+        headers: { Authorization: `Bearer ${token}` },
+        baseURL: URL
+    });
 }
 
-async function getSingleFile(
+function _itemURL(endpoint: string, itemID: string): string {
+    return `${endpoint}/${itemID}`;
+}
+
+function _extractItem<T>(response: AxiosResponse<T>): T {
+    return response.data;
+}
+
+function _extractItems<T extends { _items: any[] }>(
+    response: AxiosResponse<T>
+): T["_items"] {
+    return _extractItem(response)._items;
+}
+
+function _getItem<T>(
+    token: string,
+    endpoint: string,
+    itemID: string
+): Promise<T> {
+    return getApiClient(token)
+        .get(_itemURL(endpoint, itemID))
+        .then(_extractItem);
+}
+
+function _getItems<T>(token: string, endpoint: string): Promise<T> {
+    return getApiClient(token)
+        .get(endpoint)
+        .then(_extractItems);
+}
+
+function getFiles(token: string): Promise<DataFile[]> {
+    return _getItems(token, "downloadable_files");
+}
+
+function getSingleFile(
     token: string,
     itemID: string
-): Promise<File | undefined> {
-    const options = {
-        endpoint: "downloadable_files",
-        json: true,
-        itemID,
-        token
-    };
-
-    const result = await newAPI.get<File>(options);
-
-    if (!result) {
-        return;
-    }
-
-    return result;
+): Promise<DataFile | undefined> {
+    return _getItem(token, "downloadable_files", itemID);
 }
 
-async function getAccountInfo(token: string): Promise<Account[] | undefined> {
+function getAccountInfo(token: string): Promise<Account | undefined> {
     const decodedToken = decode(token) as any;
     const email = decodedToken!.email;
 
-    const options = {
-        endpoint: "users",
-        json: true,
-        parameters: { where: JSON.stringify({ email }) },
-        token
-    };
-
-    const result = await newAPI.get<{ _items: Account[] }>(options);
-
-    if (!result) {
-        return;
-    }
-
-    return result._items;
+    return getApiClient(token)
+        .get("users", { params: { email } })
+        .then(res => {
+            const users = _extractItems(res);
+            return users ? users[0] : undefined;
+        });
 }
 
-async function getTrials(token: string): Promise<Trial[] | undefined> {
-    const options = {
-        endpoint: "trial_metadata",
-        json: true,
-        token
-    };
-
-    const result = await newAPI.get<{ _items: Trial[] }>(options);
-
-    if (!result) {
-        return;
-    }
-
-    return result._items;
+function getTrials(token: string): Promise<Trial[]> {
+    return _getItems(token, "trial_metadata");
 }
 
-async function createUser(
-    token: string,
-    newUser: any
-): Promise<Account | undefined> {
-    const options = {
-        endpoint: "new_users",
-        json: true,
-        token,
-        body: newUser
-    };
-
-    const result = await newAPI.post<Account>(options);
-
-    if (!result) {
-        return;
-    }
-
-    return result;
+function createUser(token: string, newUser: any): Promise<Account | undefined> {
+    return getApiClient(token).post("new_users", newUser);
 }
 
-async function getAllAccounts(token: string): Promise<Account[] | undefined> {
-    const options = {
-        endpoint: "users",
-        json: true,
-        token
-    };
-
-    const result = await newAPI.get<{ _items: Account[] }>(options);
-
-    if (!result) {
-        return;
-    }
-
-    return result._items;
+function getAllAccounts(token: string): Promise<Account[]> {
+    return _getItems(token, "users");
 }
 
-async function updateRole(
+function updateRole(
     token: string,
     itemID: string,
     etag: string,
     role: string
-): Promise<Account | undefined> {
-    const options = {
-        endpoint: "users",
-        json: true,
-        token,
-        body: { role },
-        itemID,
-        etag
-    };
-
-    const result = await newAPI.patch<Account>(options);
-
-    if (!result) {
-        return;
-    }
-
-    return result;
+): Promise<Account> {
+    return getApiClient(token)
+        .patch(
+            _itemURL("users", itemID),
+            { role },
+            { headers: { "if-match": etag } }
+        )
+        .then(_extractItem);
 }
+
+function getManifestValidationErrors(
+    token: string,
+    form: { schema: string; template: File }
+): Promise<string[] | undefined> {
+    const formData = new FormData();
+    formData.append("schema", form.schema.toLowerCase());
+    formData.append("template", form.template);
+
+    return getApiClient(token)
+        .post("ingestion/validate", formData, {
+            headers: { "content-type": "multipart/form" }
+        })
+        .then(res => _extractItem(res).errors);
+}
+
+function getUserEtag(token: string, itemID: string): Promise<string> {
+    return _getItem<Account>(token, "users", itemID).then(user => user._etag);
+}
+
+// ----------- Old API methods (not currently supported) ----------- //
 
 async function deleteUser(
     token: string,
     itemID: string,
     etag: string
 ): Promise<Account | undefined> {
-    console.error("user deletion not currently supported");
+    console.error("not currently supported");
     return;
-
-    // const options = {
-    //     endpoint: "accounts",
-    //     json: true,
-    //     token,
-    //     itemID,
-    //     etag
-    // };
-
-    // const result = await oldAPI.delete<Account>(options);
-
-    // if (!result) {
-    //     return;
-    // }
-
-    // return result;
 }
 
 async function updateTrial(
@@ -176,81 +129,13 @@ async function updateTrial(
     etag: string,
     collaborators: any
 ): Promise<Trial | undefined> {
-    const options = {
-        endpoint: "trials",
-        json: true,
-        token,
-        body: { collaborators },
-        itemID,
-        etag
-    };
-
-    const result = await oldAPI.patch<Trial>(options);
-
-    if (!result) {
-        return;
-    }
-
-    return result;
-}
-
-async function getAnalyses(token: string): Promise<Analysis[] | undefined> {
-    const options = {
-        endpoint: "analysis",
-        json: true,
-        token
-    };
-
-    const result = await oldAPI.get<{ _items: Analysis[] }>(options);
-
-    if (!result) {
-        return;
-    }
-
-    return result._items;
-}
-
-async function getUserEtag(
-    token: string,
-    itemID: string
-): Promise<string | undefined> {
-    const options = {
-        endpoint: "users",
-        json: true,
-        itemID,
-        token
-    };
-
-    const result = await newAPI.get<{ _etag: string }>(options);
-
-    if (!result) {
-        return;
-    }
-
-    return result._etag;
-}
-
-async function getSingleAnalysis(
-    token: string,
-    itemID: string
-): Promise<Analysis | undefined> {
-    const options = {
-        endpoint: "analysis",
-        json: true,
-        itemID,
-        token
-    };
-
-    const result = await oldAPI.get<Analysis>(options);
-
-    if (!result) {
-        return;
-    }
-
-    return result;
+    console.error("not currently supported");
+    return;
 }
 
 export {
+    _getItem,
+    _getItems,
     getFiles,
     getSingleFile,
     getAccountInfo,
@@ -260,7 +145,6 @@ export {
     updateRole,
     deleteUser,
     updateTrial,
-    getAnalyses,
     getUserEtag,
-    getSingleAnalysis
+    getManifestValidationErrors
 };

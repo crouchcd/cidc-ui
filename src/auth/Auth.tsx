@@ -1,3 +1,4 @@
+import * as React from "react";
 import auth0, { Auth0DecodedHash, Auth0UserProfile } from "auth0-js";
 import history from "./History";
 import autobind from "autobind-decorator";
@@ -43,8 +44,8 @@ export default class Auth {
         this.auth0.parseHash((err, authResult) => {
             if (authResult && authResult.accessToken && authResult.idToken) {
                 getAccountInfo(authResult.idToken)
-                    .then(results => {
-                        if (results![0].approval_date) {
+                    .then(user => {
+                        if (user && user.approval_date) {
                             this.setSession(authResult, "/");
                         } else {
                             history.replace("/register?unactivated=true");
@@ -145,3 +146,5 @@ export default class Auth {
         return true;
     }
 }
+
+export const AuthContext = React.createContext<Auth | undefined>(undefined);
