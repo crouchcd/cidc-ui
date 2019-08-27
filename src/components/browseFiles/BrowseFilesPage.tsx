@@ -1,9 +1,4 @@
-import {
-    Grid,
-    TextField,
-    CircularProgress,
-    Typography
-} from "@material-ui/core";
+import { Grid, TextField, Typography } from "@material-ui/core";
 import autobind from "autobind-decorator";
 import _ from "lodash";
 import * as React from "react";
@@ -14,6 +9,7 @@ import FileFilter from "./FileFilter";
 import FileTable from "./FileTable";
 import { getFiles, getTrials } from "../../api/api";
 import { Trial } from "../../model/trial";
+import Loader from "../generic/Loader";
 
 export interface IBrowseFilesPageState {
     files: DataFile[] | undefined;
@@ -99,11 +95,7 @@ export default class BrowseFilesPage extends React.Component<
 
         return (
             <div className="Browse-files-page">
-                {!this.state.files && (
-                    <div className="Browse-files-progress">
-                        <CircularProgress />
-                    </div>
-                )}
+                {!this.state.files && <Loader />}
                 {this.state.files && this.state.files.length === 0 && (
                     <div className="Browse-files-progress">
                         <Typography style={{ fontSize: 18 }}>
