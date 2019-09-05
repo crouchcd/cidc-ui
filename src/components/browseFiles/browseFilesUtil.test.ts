@@ -3,8 +3,8 @@ import { changeOption, filterFiles } from "./browseFilesUtil";
 const files = [
     {
         id: "1",
-        file_type: "FASTQ",
-        assay_category: "WES",
+        data_format: "FASTQ",
+        assay_type: "WES",
         file_name: "cimac-6521-001.fa",
         number_of_samples: 1,
         file_size_bytes: 234,
@@ -15,8 +15,8 @@ const files = [
     },
     {
         id: "2",
-        file_type: "FASTQ",
-        assay_category: "WES",
+        data_format: "FASTQ",
+        assay_type: "WES",
         file_name: "cimac-6521-002.fa",
         number_of_samples: 1,
         file_size_bytes: 21,
@@ -27,8 +27,8 @@ const files = [
     },
     {
         id: "3",
-        file_type: "FASTQ",
-        assay_category: "WES",
+        data_format: "FASTQ",
+        assay_type: "WES",
         file_name: "cimac-6521-003.fa",
         number_of_samples: 1,
         file_size_bytes: 22345,
@@ -39,8 +39,8 @@ const files = [
     },
     {
         id: "4",
-        file_type: "FASTQ",
-        assay_category: "WES",
+        data_format: "FASTQ",
+        assay_type: "WES",
         file_name: "cimac-6521-004.fa",
         number_of_samples: 1,
         file_size_bytes: 12345545,
@@ -51,8 +51,8 @@ const files = [
     },
     {
         id: "5",
-        file_type: "VCF",
-        assay_category: "WES",
+        data_format: "VCF",
+        assay_type: "WES",
         file_name: "cimac-6521.vcf",
         number_of_samples: 1,
         file_size_bytes: 7654645,
@@ -63,8 +63,8 @@ const files = [
     },
     {
         id: "6",
-        file_type: "MAF",
-        assay_category: "WES",
+        data_format: "MAF",
+        assay_type: "WES",
         file_name: "dfci-9999.maf",
         number_of_samples: 276,
         file_size_bytes: 1234567,
@@ -85,8 +85,8 @@ test("Filters it correctly", () => {
     ).toEqual([
         {
             id: "6",
-            file_type: "MAF",
-            assay_category: "WES",
+            data_format: "MAF",
+            assay_type: "WES",
             file_name: "dfci-9999.maf",
             number_of_samples: 276,
             file_size_bytes: 1234567,
