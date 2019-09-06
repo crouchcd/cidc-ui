@@ -36,15 +36,7 @@ export default class FileDetailsTable extends React.Component<
                                 File Name
                             </TableCell>
                             <TableCell className="File-table-row-cell">
-                                {this.props.file.file_name}
-                            </TableCell>
-                        </TableRow>
-                        <TableRow>
-                            <TableCell className="File-table-row-cell">
-                                File ID
-                            </TableCell>
-                            <TableCell className="File-table-row-cell">
-                                {this.props.file.id}
+                                {this.props.file.object_url}
                             </TableCell>
                         </TableRow>
                         <TableRow>
