@@ -74,18 +74,6 @@ export default class FileTable extends React.Component<
         this.setState({ sortBy, sortDirection: isAsc ? "desc" : "asc" });
     }
 
-    private handlePopoverOpen(event: any, isLocked: boolean) {
-        if (isLocked) {
-            this.setState({ anchorEl: event.target });
-        }
-    }
-
-    private handlePopoverClose(isLocked: boolean) {
-        if (isLocked) {
-            this.setState({ anchorEl: null });
-        }
-    }
-
     public render() {
         return (
             <div className="File-table">
@@ -170,33 +158,14 @@ export default class FileTable extends React.Component<
                             .map((file: DataFile) => {
                                 // NOTE: remove the concept of "locked" trials for now,
                                 // but evaluate adding it back as necessary.
-                                const isLocked = false;
                                 return (
                                     <TableRow
+                                        className="File-table-row"
                                         key={file.id}
-                                        hover={!isLocked}
+                                        hover={true}
                                         // tslint:disable-next-line:jsx-no-lambda
                                         onClick={() =>
-                                            isLocked
-                                                ? null
-                                                : this.handleClick(file.id)
-                                        }
-                                        style={{
-                                            backgroundColor: isLocked
-                                                ? "#FFE8E6"
-                                                : "inherit",
-                                            cursor: isLocked
-                                                ? "inherit"
-                                                : "pointer"
-                                        }}
-                                        onMouseOver={event =>
-                                            this.handlePopoverOpen(
-                                                event,
-                                                isLocked
-                                            )
-                                        }
-                                        onMouseOut={() =>
-                                            this.handlePopoverClose(isLocked)
+                                            this.handleClick(file.id)
                                         }
                                     >
                                         <TableCell className="File-table-row-cell">
