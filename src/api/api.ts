@@ -2,7 +2,7 @@ import { Account } from "../model/account";
 import { Trial } from "../model/trial";
 import { decode } from "jsonwebtoken";
 import { DataFile } from "../model/file";
-import axios, { AxiosInstance, AxiosResponse } from "axios";
+import axios, { AxiosInstance, AxiosResponse, AxiosError } from "axios";
 
 const URL: string = process.env.REACT_APP_API_URL!;
 
@@ -25,6 +25,18 @@ function _extractItems<T extends { _items: any[] }>(
     response: AxiosResponse<T>
 ): T["_items"] {
     return _extractItem(response)._items;
+}
+
+function _extractErrorMessage(error: AxiosError): never {
+    const response = error.response;
+    if (response && response.data) {
+        if (response.data._status === "ERR") {
+            throw response.data._error.message;
+        } else {
+            throw response.data.toString();
+        }
+    }
+    throw error.toString();
 }
 
 function _getItem<T>(
@@ -93,19 +105,52 @@ function updateRole(
         .then(_extractItem);
 }
 
-function getManifestValidationErrors(
+interface IManifestForm {
+    schema: string;
+    template: File;
+}
+
+function _makeManifestRequest<T>(
+    endpoint: string,
     token: string,
-    form: { schema: string; template: File }
-): Promise<string[] | undefined> {
+    form: IManifestForm
+): Promise<AxiosResponse<T>> {
     const formData = new FormData();
     formData.append("schema", form.schema.toLowerCase());
     formData.append("template", form.template);
 
     return getApiClient(token)
-        .post("ingestion/validate", formData, {
+        .post(endpoint, formData, {
             headers: { "content-type": "multipart/form" }
         })
-        .then(res => _extractItem(res).errors);
+        .catch(_extractErrorMessage);
+}
+
+interface IManifestUploadResponse {
+    metadata_json_patch: { lead_organization_study_id: string };
+}
+function uploadManifest(
+    token: string,
+    form: IManifestForm
+): Promise<IManifestUploadResponse> {
+    return _makeManifestRequest<IManifestUploadResponse>(
+        "ingestion/upload_manifest",
+        token,
+        form
+    ).then(_extractItem);
+}
+
+function getManifestValidationErrors(
+    token: string,
+    form: IManifestForm
+): Promise<string[] | undefined> {
+    return _makeManifestRequest<{ errors: string[] }>(
+        "ingestion/validate",
+        token,
+        form
+    )
+        .then(res => _extractItem(res).errors)
+        .catch(error => [error.toString()]);
 }
 
 function getUserEtag(token: string, itemID: string): Promise<string> {
@@ -126,6 +171,8 @@ async function deleteUser(
 export {
     _getItem,
     _getItems,
+    _extractErrorMessage,
+    getApiClient,
     getFiles,
     getSingleFile,
     getAccountInfo,
@@ -135,5 +182,6 @@ export {
     updateRole,
     deleteUser,
     getUserEtag,
+    uploadManifest,
     getManifestValidationErrors
 };

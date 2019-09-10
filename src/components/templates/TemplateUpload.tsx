@@ -8,21 +8,29 @@ import {
     Grid,
     Input,
     InputLabel,
-    MenuItem,
     Select,
     List,
     ListItem,
     ListItemText,
-    ListItemAvatar,
-    Divider
+    Divider,
+    MenuItem,
+    ListItemIcon
 } from "@material-ui/core";
 import { ITemplateCardProps } from "./TemplatesPage";
 import { allNames, onValueChange } from "./utils";
-import { getManifestValidationErrors } from "../../api/api";
+import { getManifestValidationErrors, uploadManifest } from "../../api/api";
 import { AuthContext } from "../../auth/Auth";
 import { WarningRounded, CheckBoxRounded } from "@material-ui/icons";
 import { XLSX_MIMETYPE } from "../../util/constants";
 import Loader from "../generic/Loader";
+
+type Status =
+    | "loading"
+    | "unset"
+    | "validationErrors"
+    | "validationSuccess"
+    | "uploadErrors"
+    | "uploadSuccess";
 
 const TemplateUpload: React.FunctionComponent<ITemplateCardProps> = (
     props: ITemplateCardProps
@@ -34,20 +42,27 @@ const TemplateUpload: React.FunctionComponent<ITemplateCardProps> = (
     const [manifestType, setManifestType] = React.useState<string | undefined>(
         undefined
     );
-    const [isValidating, setIsValidating] = React.useState<boolean>(false);
+    const [status, setStatus] = React.useState<Status>("unset");
     const [errors, setErrors] = React.useState<string[] | undefined>(undefined);
     const [file, setFile] = React.useState<File | undefined>(undefined);
+    const [targetTrial, setTargetTrial] = React.useState<string | undefined>(
+        undefined
+    );
 
     // When the manifest file or manifest type changes, run validations
     React.useEffect(() => {
         if (file && manifestType) {
-            setIsValidating(true);
+            setStatus("loading");
             getManifestValidationErrors(auth.getIdToken()!, {
                 schema: manifestType,
                 template: file
             }).then(errs => {
                 setErrors(errs);
-                setIsValidating(false);
+                if (errs) {
+                    setStatus(
+                        errs.length ? "validationErrors" : "validationSuccess"
+                    );
+                }
             });
         }
     }, [file, manifestType, auth]);
@@ -57,8 +72,68 @@ const TemplateUpload: React.FunctionComponent<ITemplateCardProps> = (
 
     const onSubmit = (e: React.SyntheticEvent) => {
         e.preventDefault();
-        // TODO: enable manifest uploads once the API supports it
-        window.alert("Manifest uploads are not yet supported.");
+        if (manifestType && file) {
+            setStatus("loading");
+            uploadManifest(auth.getIdToken()!, {
+                schema: manifestType,
+                template: file
+            })
+                .then(({ metadata_json_patch }) => {
+                    setStatus("uploadSuccess");
+                    setTargetTrial(
+                        metadata_json_patch.lead_organization_study_id
+                    );
+                })
+                .catch(err => {
+                    setErrors([`Upload failed: ${err.toString()}`]);
+                    setStatus("uploadErrors");
+                });
+        }
+    };
+
+    const errorList =
+        errors &&
+        errors.map(error => (
+            <ListItem key={error}>
+                <ListItemIcon>
+                    <WarningRounded color="error" />
+                </ListItemIcon>
+                <ListItemText>{error}</ListItemText>
+            </ListItem>
+        ));
+
+    const successMessage = (message: string) => (
+        <ListItem>
+            <ListItemIcon>
+                <CheckBoxRounded color="primary" />
+            </ListItemIcon>
+            <ListItemText>{message}</ListItemText>
+        </ListItem>
+    );
+
+    const feedbackDisplay: { [k in Status]: React.ReactElement } = {
+        unset: (
+            <Typography color="textSecondary" data-testid="unset">
+                Select a manifest to view validations.
+            </Typography>
+        ),
+        loading: <Loader size={32} />,
+        validationErrors: (
+            <List data-testid="validationErrors">{errorList}</List>
+        ),
+        validationSuccess: (
+            <List dense data-testid="validationSuccess">
+                {successMessage("Manifest is valid.")}
+            </List>
+        ),
+        uploadErrors: <List data-testid="uploadErrors">{errorList}</List>,
+        uploadSuccess: (
+            <List dense data-testid="uploadSuccess">
+                {successMessage(
+                    `Successfully uploaded ${manifestType} manifest to ${targetTrial}.`
+                )}
+            </List>
+        )
     };
 
     return (
@@ -82,7 +157,8 @@ const TemplateUpload: React.FunctionComponent<ITemplateCardProps> = (
                                 <Select
                                     inputProps={{
                                         id: "manifestType",
-                                        name: "type"
+                                        name: "type",
+                                        "data-testid": "manifest-type-select"
                                     }}
                                     value={manifestType || ""}
                                     onChange={onValueChange(setManifestType)}
@@ -124,7 +200,8 @@ const TemplateUpload: React.FunctionComponent<ITemplateCardProps> = (
                                     }}
                                     inputProps={{
                                         ref: fileInput,
-                                        accept: XLSX_MIMETYPE
+                                        accept: XLSX_MIMETYPE,
+                                        "data-testid": "manifest-file-input"
                                     }}
                                     type="file"
                                 />
@@ -137,6 +214,7 @@ const TemplateUpload: React.FunctionComponent<ITemplateCardProps> = (
                                 variant="contained"
                                 color="primary"
                                 disabled={!fileValid}
+                                data-testid="submit-button"
                             >
                                 Upload
                             </Button>
@@ -152,35 +230,7 @@ const TemplateUpload: React.FunctionComponent<ITemplateCardProps> = (
                     }}
                 >
                     <Grid container direction="row" alignItems="center">
-                        {isValidating ? (
-                            <Loader size={32} />
-                        ) : errors === undefined ? (
-                            <Typography color="textSecondary">
-                                Select a manifest to view validations.
-                            </Typography>
-                        ) : (
-                            <List dense>
-                                {errors.length === 0 ? (
-                                    <ListItem>
-                                        <ListItemAvatar>
-                                            <CheckBoxRounded color="primary" />
-                                        </ListItemAvatar>
-                                        <ListItemText>
-                                            Manifest is valid.
-                                        </ListItemText>
-                                    </ListItem>
-                                ) : (
-                                    errors.map(error => (
-                                        <ListItem key={error}>
-                                            <ListItemAvatar>
-                                                <WarningRounded color="error" />
-                                            </ListItemAvatar>
-                                            <ListItemText>{error}</ListItemText>
-                                        </ListItem>
-                                    ))
-                                )}
-                            </List>
-                        )}
+                        {feedbackDisplay[status]}
                     </Grid>
                 </div>
             </CardContent>
