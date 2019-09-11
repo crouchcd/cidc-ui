@@ -29,24 +29,38 @@ export default class Auth {
     auth0 = new auth0.WebAuth({
         domain: DOMAIN,
         clientID: CLIENT_ID,
-        redirectUri: window.location.origin + "/callback",
+        // redirectUri: window.location.origin + "/callback",
         responseType: "token id_token",
         scope: "openid profile email"
     });
 
     @autobind
     login() {
-        this.auth0.authorize({ nonce: this.nonce });
+        this.auth0.authorize({
+            redirectUri:
+                window.location.origin +
+                "/callback?next=" +
+                encodeURIComponent(
+                    window.location.pathname + window.location.search
+                ),
+            nonce: this.nonce
+        });
     }
 
     @autobind
-    handleAuthentication() {
+    handleAuthentication(props: any) {
         this.auth0.parseHash((err, authResult) => {
             if (authResult && authResult.accessToken && authResult.idToken) {
                 getAccountInfo(authResult.idToken)
                     .then(user => {
                         if (user && user.approval_date) {
-                            this.setSession(authResult, "/");
+                            const next =
+                                "search" in props.location
+                                    ? new URLSearchParams(
+                                          props.location.search
+                                      ).get("next")
+                                    : "/";
+                            this.setSession(authResult, next);
                         } else {
                             history.replace("/register?unactivated=true");
                         }
