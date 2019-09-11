@@ -58,7 +58,7 @@ export default class Auth {
                                 "search" in props.location
                                     ? new URLSearchParams(
                                           props.location.search
-                                      ).get("next")
+                                      ).get("next") || "/"
                                     : "/";
                             this.setSession(authResult, next);
                         } else {
