@@ -40,7 +40,7 @@ class App extends React.Component<any, any> {
     @autobind
     handleAuthentication(props: any) {
         if (/access_token|id_token|error/.test(props.location.hash)) {
-            this.auth.handleAuthentication();
+            this.auth.handleAuthentication(props);
         }
     }
 
