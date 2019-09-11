@@ -3,7 +3,9 @@ import {
     Toolbar,
     Typography,
     Paper,
-    CircularProgress
+    CircularProgress,
+    Chip,
+    Grid
 } from "@material-ui/core";
 import "./UserAccount.css";
 import { Account } from "../../model/account";
@@ -78,9 +80,9 @@ export default class UserAccountPage extends React.Component<
                                     Registration Form and Code of Conduct:
                                 </Typography>
                                 <Typography
-                                    variant="h6"
-                                    color="secondary"
-                                    paragraph={true}
+                                    variant="h5"
+                                    color="textSecondary"
+                                    paragraph
                                 >
                                     {new Date(
                                         this.state.accountInfo._created
@@ -90,9 +92,9 @@ export default class UserAccountPage extends React.Component<
                                     Organization:
                                 </Typography>
                                 <Typography
-                                    variant="h6"
-                                    color="secondary"
-                                    paragraph={true}
+                                    variant="h5"
+                                    color="textSecondary"
+                                    paragraph
                                 >
                                     {
                                         ORGANIZATION_NAME_MAP[
@@ -109,17 +111,22 @@ export default class UserAccountPage extends React.Component<
                                         <Typography variant="h5">
                                             Trials you are assigned to:
                                         </Typography>
-                                        {this.state.trials.map(trial => {
-                                            return (
-                                                <Typography
-                                                    variant="h6"
-                                                    color="secondary"
-                                                    key={trial._id}
-                                                >
-                                                    <li>{trial.trial_id}</li>
-                                                </Typography>
-                                            );
-                                        })}
+                                        <Grid container spacing={8}>
+                                            {this.state.trials.map(trial => {
+                                                return (
+                                                    <Grid
+                                                        item
+                                                        key={trial.trial_id}
+                                                    >
+                                                        <Chip
+                                                            label={
+                                                                trial.trial_id
+                                                            }
+                                                        />
+                                                    </Grid>
+                                                );
+                                            })}
+                                        </Grid>
                                     </div>
                                 )}
                                 {this.state.trials.length === 0 && (
