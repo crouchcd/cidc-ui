@@ -29,7 +29,7 @@ export default class Auth {
     auth0 = new auth0.WebAuth({
         domain: DOMAIN,
         clientID: CLIENT_ID,
-        // redirectUri: window.location.origin + "/callback",
+        redirectUri: window.location.origin + "/callback",
         responseType: "token id_token",
         scope: "openid profile email"
     });
