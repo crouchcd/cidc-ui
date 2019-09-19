@@ -7,19 +7,15 @@ import {
 } from "@testing-library/react";
 import TemplateUpload from "./TemplateUpload";
 import { XLSX_MIMETYPE } from "../../util/constants";
-import Auth, { AuthContext } from "../../auth/Auth";
 import { getManifestValidationErrors, uploadManifest } from "../../api/api";
+import { AuthContext } from "../../identity/AuthProvider";
 jest.mock("../../api/api");
 
 const TOKEN = "BLAH";
 
 function renderWithMockedAuthContext() {
-    const mockAuth = new Auth(jest.fn(), jest.fn());
-
-    mockAuth.getIdToken = jest.fn(() => TOKEN);
-
     return render(
-        <AuthContext.Provider value={mockAuth}>
+        <AuthContext.Provider value={{ idToken: TOKEN, user: { email: "" } }}>
             <TemplateUpload cardClass="foo" />
         </AuthContext.Provider>
     );

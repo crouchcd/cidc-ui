@@ -3,10 +3,6 @@ import { Typography } from "@material-ui/core";
 
 export default class PrivacyAndSecurityPage extends React.Component<any, {}> {
     public render() {
-        if (!this.props.auth.checkAuth(this.props.location.pathname)) {
-            return null;
-        }
-
         return (
             <div>
                 <Typography

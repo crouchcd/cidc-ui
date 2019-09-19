@@ -10,14 +10,11 @@ import {
 import "./TransferData.css";
 import CopyToClipboard from "react-copy-to-clipboard";
 import CIDCGithubMarkdown from "./CIDCGithubMarkdown";
+import { withIdToken } from "../../identity/AuthProvider";
 
-export default class CliInstructions extends React.Component<any> {
+class CliInstructions extends React.Component<any> {
     public render() {
-        if (!this.props.auth.checkAuth(this.props.location.pathname)) {
-            return null;
-        }
-
-        const token = this.props.auth.getIdToken();
+        const token = this.props.token;
         const truncToken = token && token.slice(0, 20);
 
         return (
@@ -98,3 +95,5 @@ export default class CliInstructions extends React.Component<any> {
         );
     }
 }
+
+export default withIdToken(CliInstructions);

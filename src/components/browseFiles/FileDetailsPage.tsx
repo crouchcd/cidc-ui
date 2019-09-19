@@ -4,15 +4,13 @@ import { getSingleFile } from "../../api/api";
 import { DataFile } from "../../model/file";
 import { Typography, CircularProgress, Grid, Button } from "@material-ui/core";
 import FileDetailsTable from "./FileDetailsTable";
+import { withIdToken } from "../../identity/AuthProvider";
 
 export interface IFileDetailsPageState {
     file: DataFile | undefined;
 }
 
-export default class FileDetailsPage extends React.Component<
-    any,
-    IFileDetailsPageState
-> {
+class FileDetailsPage extends React.Component<any, IFileDetailsPageState> {
     state: IFileDetailsPageState = {
         file: undefined
     };
@@ -39,10 +37,6 @@ export default class FileDetailsPage extends React.Component<
     }
 
     public render() {
-        if (!this.props.auth.checkAuth(this.props.location.pathname)) {
-            return null;
-        }
-
         return (
             <div className="Browse-files-page">
                 {!this.state.file && (
@@ -87,3 +81,5 @@ export default class FileDetailsPage extends React.Component<
         );
     }
 }
+
+export default withIdToken(FileDetailsPage);

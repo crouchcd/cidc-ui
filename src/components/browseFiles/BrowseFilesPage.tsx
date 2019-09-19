@@ -9,6 +9,7 @@ import FileFilter from "./FileFilter";
 import FileTable from "./FileTable";
 import { getFiles } from "../../api/api";
 import Loader from "../generic/Loader";
+import { withIdToken } from "../../identity/AuthProvider";
 
 export interface IBrowseFilesPageState {
     files: DataFile[] | undefined;
@@ -19,10 +20,7 @@ export interface IBrowseFilesPageState {
     searchFilter: string;
 }
 
-export default class BrowseFilesPage extends React.Component<
-    any,
-    IBrowseFilesPageState
-> {
+class BrowseFilesPage extends React.Component<any, IBrowseFilesPageState> {
     state: IBrowseFilesPageState = {
         files: undefined,
         trials: undefined,
@@ -87,10 +85,6 @@ export default class BrowseFilesPage extends React.Component<
     }
 
     public render() {
-        if (!this.props.auth.checkAuth(this.props.location.pathname)) {
-            return null;
-        }
-
         return (
             <div className="Browse-files-page">
                 {!this.state.files && <Loader />}
@@ -157,3 +151,5 @@ export default class BrowseFilesPage extends React.Component<
         );
     }
 }
+
+export default withIdToken(BrowseFilesPage);
