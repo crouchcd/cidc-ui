@@ -100,7 +100,7 @@ export default class FileTable extends React.Component<
                                         this.handleChangeSorting(TRIAL_ID_KEY)
                                     }
                                 >
-                                    Study ID
+                                    Protocol Identifier
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell className="File-table-header-cell">
@@ -167,7 +167,7 @@ export default class FileTable extends React.Component<
                                             this.handleClick(file.id)
                                         }
                                     >
-                                        <TableCell className="File-table-row-cell">
+                                        <TableCell className="File-table-row-cell filename">
                                             {file.object_url}
                                         </TableCell>
                                         <TableCell className="File-table-row-cell">
