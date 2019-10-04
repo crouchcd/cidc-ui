@@ -1,9 +1,27 @@
 import * as React from "react";
-import { Tabs, Tab, Card, Typography, Link } from "@material-ui/core";
-import { withRouter, RouteComponentProps } from "react-router-dom";
+import {
+    Tabs,
+    Tab,
+    Card,
+    Typography,
+    Link as MuiLink,
+    Divider,
+    Grid,
+    withStyles
+} from "@material-ui/core";
+import {
+    withRouter,
+    RouteComponentProps,
+    Link as RouterLink
+} from "react-router-dom";
 import "./Header.css";
 import logo from "../../logo.png";
-import { AuthContext } from "../../identity/AuthProvider";
+import {
+    AccountCircle,
+    Search,
+    TableChart,
+    CloudUpload
+} from "@material-ui/icons";
 
 const ENV = process.env.REACT_APP_ENV;
 
@@ -18,17 +36,35 @@ const EnvBanner: React.FunctionComponent = () =>
             <Typography variant="overline">
                 Warning! You're accessing a development instance of the CIDC
                 portal. If this is a mistake, please navigate to{" "}
-                <Link href="https://portal.cimac-network.org">
+                <MuiLink href="https://portal.cimac-network.org">
                     https://portal.cimac-network.org
-                </Link>
+                </MuiLink>
                 .
             </Typography>
         </Card>
     ) : null;
 
-const Header: React.FunctionComponent<RouteComponentProps> = props => {
-    const authData = React.useContext(AuthContext);
+interface IStyledTabsProps {
+    value: string;
+    onChange: (event: React.ChangeEvent<{}>, newValue: string) => void;
+}
 
+const StyledTabs = withStyles({
+    indicator: {
+        display: "flex",
+        justifyContent: "center",
+        backgroundColor: "transparent",
+        "& > div": {
+            maxWidth: 60,
+            width: "100%",
+            backgroundColor: "black"
+        }
+    }
+})((props: IStyledTabsProps) => (
+    <Tabs {...props} TabIndicatorProps={{ children: <div /> }} />
+));
+
+const Header: React.FunctionComponent<RouteComponentProps> = props => {
     function handleChange(_: React.ChangeEvent<{}>, value: any) {
         props.history.push(value);
     }
@@ -47,70 +83,51 @@ const Header: React.FunctionComponent<RouteComponentProps> = props => {
     }
 
     return (
-        <div style={{ backgroundColor: "var(--light-grey)" }}>
+        <div style={{ backgroundColor: "var(--light-grey-gradient)" }}>
             <EnvBanner />
-            <img
-                src={logo}
-                className="Logo"
-                alt="The Cancer Immunologic Data Commons"
-            />
-            <Tabs
-                value={selectedTab}
-                onChange={handleChange}
-                className="Header-tabs"
-            >
-                <Tab
-                    disableRipple={true}
-                    value="/"
-                    style={{ minWidth: 100 }}
-                    label={<span className="Header-tab-label">Home</span>}
-                />
-                <Tab
-                    disableRipple={true}
-                    value="/transfer-data"
-                    label={
-                        <span className="Header-tab-label">Transfer Data</span>
-                    }
-                />
-                <Tab
-                    disableRipple={true}
-                    value="/browse-files"
-                    label={
-                        <span className="Header-tab-label">Browse Files</span>
-                    }
-                />
-                <Tab
-                    disableRipple={true}
-                    value="/templates"
-                    style={{ minWidth: 100 }}
-                    label={<span className="Header-tab-label">Templates</span>}
-                />
-                <Tab
-                    disableRipple={true}
-                    value="/privacy-security"
-                    label={
-                        <span className="Header-tab-label">
-                            Privacy and Security
-                        </span>
-                    }
-                />
-                <Tab
-                    disableRipple={true}
-                    value="/user-account"
-                    style={{ minWidth: 300 }}
-                    label={
-                        <span className="Header-tab-label">
-                            {(authData && authData.user.email) || ""}
-                        </span>
-                    }
-                />
-                <Tab
-                    disableRipple={true}
-                    value="/logout"
-                    style={{ minWidth: 100 }}
-                    label={<span className="Header-tab-label">Logout</span>}
-                />
-            </Tabs>
+            <div className="Header-tabs">
+                <Grid
+                    container
+                    alignItems="center"
+                    style={{ width: "100%", paddingBottom: "0" }}
+                >
+                    <Grid item>
+                        <RouterLink to="/">
+                            <img src={logo} className="Logo" alt="Home" />
+                        </RouterLink>
+                    </Grid>
+                    <Grid item>
+                        <StyledTabs value={selectedTab} onChange={handleChange}>
+                            <Tab
+                                disableRipple={true}
+                                value="/browse-files"
+                                label="Browse Files"
+                                icon={<Search />}
+                            />
+                            <Tab
+                                disableRipple={true}
+                                value="/transfer-data"
+                                label="Transfer Data"
+                                icon={<CloudUpload />}
+                            />
+                            <Tab
+                                disableRipple={true}
+                                value="/templates"
+                                label="Templates"
+                                icon={<TableChart />}
+                            />
+                            <Tab
+                                disableRipple={true}
+                                value="/user-account"
+                                label="Profile"
+                                icon={<AccountCircle />}
+                            />
+                        </StyledTabs>
+                    </Grid>
+                </Grid>
+            </div>
+
+            <Divider light />
         </div>
     );
 };
