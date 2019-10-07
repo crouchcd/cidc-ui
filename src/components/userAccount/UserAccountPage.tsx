@@ -1,24 +1,23 @@
 import * as React from "react";
 import {
-    Toolbar,
     Typography,
-    Paper,
     CircularProgress,
     Chip,
-    Grid
+    Grid,
+    Card,
+    CardHeader,
+    CardContent,
+    Link
 } from "@material-ui/core";
 import "./UserAccount.css";
 import { getPermissions } from "../../api/api";
 import AdminMenu from "./AdminMenu";
-import {
-    LOCALE,
-    DATE_OPTIONS,
-    ORGANIZATION_NAME_MAP
-} from "../../util/constants";
+import { ORGANIZATION_NAME_MAP } from "../../util/constants";
 import Permission from "../../model/permission";
 import ContactAnAdmin from "../generic/ContactAnAdmin";
 import { AuthContext } from "../../identity/AuthProvider";
 import { useUserContext } from "../../identity/UserProvider";
+import { AccountCircle, FolderShared } from "@material-ui/icons";
 
 export default function UserAccountPage() {
     const authData = React.useContext(AuthContext);
@@ -39,57 +38,101 @@ export default function UserAccountPage() {
 
     return (
         <div>
-            <Paper className="User-account-paper">
-                <Toolbar className="User-account-toolbar">
-                    <Typography className="User-account-toolbar-text">
-                        User Account
-                    </Typography>
-                </Toolbar>
-                <div className="User-details">
-                    {!userAccount || !permissions ? (
-                        <div className="User-account-progress">
-                            <CircularProgress />
-                        </div>
-                    ) : (
-                        <>
-                            <div>
-                                <Typography variant="h5">
-                                    Registration Form and Code of Conduct:
-                                </Typography>
-                                <Typography
-                                    variant="h5"
-                                    color="textSecondary"
-                                    paragraph
+            {!userAccount || !permissions ? (
+                <div className="User-account-progress">
+                    <CircularProgress />
+                </div>
+            ) : (
+                <Grid container spacing={24}>
+                    <Grid item>
+                        <Card style={{ height: "100%" }}>
+                            <CardHeader
+                                avatar={<AccountCircle />}
+                                title={
+                                    <Grid
+                                        container
+                                        justify="space-between"
+                                        alignItems="center"
+                                    >
+                                        <Typography variant="h6">
+                                            Personal Info
+                                        </Typography>
+                                        <Link href="/logout">Logout</Link>
+                                    </Grid>
+                                }
+                            />
+                            <CardContent>
+                                <Grid
+                                    container
+                                    justify="flex-start"
+                                    direction="column"
                                 >
-                                    {new Date(
-                                        userAccount._created
-                                    ).toLocaleString(LOCALE, DATE_OPTIONS)}
-                                </Typography>
-                                <Typography variant="h5">
-                                    Organization:
-                                </Typography>
-                                <Typography
-                                    variant="h5"
-                                    color="textSecondary"
-                                    paragraph
-                                >
-                                    {
-                                        ORGANIZATION_NAME_MAP[
-                                            userAccount.organization
-                                        ]
-                                    }
-                                </Typography>
-                            </div>
-                            <div>
-                                <div>
-                                    <Typography variant="h5">
-                                        Dataset Access:
+                                    <Grid item>
+                                        <Typography
+                                            variant="h6"
+                                            color="textSecondary"
+                                            paragraph
+                                        >
+                                            {`${userAccount.first_n} ${
+                                                userAccount.last_n
+                                            }`}
+                                        </Typography>
+                                    </Grid>
+                                    <Grid item>
+                                        <Typography
+                                            variant="h6"
+                                            color="textSecondary"
+                                            paragraph
+                                        >
+                                            {userAccount.email}
+                                        </Typography>
+                                    </Grid>
+                                    <Grid item>
+                                        <Typography
+                                            variant="h6"
+                                            color="textSecondary"
+                                            paragraph
+                                        >
+                                            {
+                                                ORGANIZATION_NAME_MAP[
+                                                    userAccount.organization
+                                                ]
+                                            }
+                                        </Typography>
+                                    </Grid>
+                                    <Grid item>
+                                        <Typography
+                                            variant="h6"
+                                            color="textSecondary"
+                                            paragraph
+                                        >
+                                            Joined on{" "}
+                                            {new Date(
+                                                userAccount._created
+                                            ).toLocaleDateString()}
+                                        </Typography>
+                                    </Grid>
+                                </Grid>
+                            </CardContent>
+                        </Card>
+                    </Grid>
+                    <Grid item>
+                        <Card style={{ height: "100%" }}>
+                            <CardHeader
+                                avatar={<FolderShared />}
+                                title={
+                                    <Typography variant="h6">
+                                        Dataset Access
                                     </Typography>
+                                }
+                            />
+                            <CardContent>
+                                <div>
                                     <Grid container spacing={8}>
                                         {isAdmin ? (
                                             <Grid item>
                                                 <Typography
-                                                    variant="h5"
+                                                    variant="h6"
                                                     color="textSecondary"
                                                     paragraph
                                                 >
@@ -125,7 +168,8 @@ export default function UserAccountPage() {
                                                     paragraph
                                                 >
                                                     You do not have access to
-                                                    any datasets.{" "}
+                                                    any datasets.
+                                                    <br />
                                                     <ContactAnAdmin /> if you
                                                     believe this is a mistake.
                                                 </Typography>
@@ -133,11 +177,11 @@ export default function UserAccountPage() {
                                         )}
                                     </Grid>
                                 </div>
-                            </div>
-                        </>
-                    )}
-                </div>
-            </Paper>
+                            </CardContent>
+                        </Card>
+                    </Grid>
+                </Grid>
+            )}
             {userAccount && authData && userAccount.role === "cidc-admin" && (
                 <AdminMenu token={authData.idToken} userId={userAccount.id} />
             )}

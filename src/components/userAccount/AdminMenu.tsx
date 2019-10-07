@@ -1,19 +1,20 @@
 import * as React from "react";
 import {
-    Paper,
-    Toolbar,
     Typography,
     Table,
     TableBody,
     TableRow,
     TablePagination,
-    CircularProgress,
-    TextField
+    TextField,
+    Card,
+    CardHeader,
+    CardContent
 } from "@material-ui/core";
 import { getAllAccounts } from "../../api/api";
 import autobind from "autobind-decorator";
 import { Account } from "../../model/account";
 import UserTableRow from "./UserTableRow";
+import { List } from "@material-ui/icons";
 
 export interface IAdminMenuProps {
     token: string;
@@ -92,19 +93,17 @@ export default class AdminMenu extends React.Component<IAdminMenuProps, {}> {
         );
         return (
             <div style={{ marginTop: 20 }}>
-                <Paper className="User-account-paper">
-                    <Toolbar className="User-account-toolbar">
-                        <Typography className="User-account-toolbar-text">
-                            Admin Tasks
-                        </Typography>
-                    </Toolbar>
-                    {!accounts && (
-                        <div className="User-account-progress">
-                            <CircularProgress />
-                        </div>
-                    )}
-                    {accounts && (
-                        <div>
+                {accounts && (
+                    <Card>
+                        <CardHeader
+                            avatar={<List />}
+                            title={
+                                <Typography variant="h6">
+                                    Admin Tasks
+                                </Typography>
+                            }
+                        />
+                        <CardContent>
                             <div className="Email-search">
                                 <TextField
                                     label="Search by email"
@@ -158,9 +157,9 @@ export default class AdminMenu extends React.Component<IAdminMenuProps, {}> {
                                     this.handleChangeRowsPerPage
                                 }
                             />
-                        </div>
-                    )}
-                </Paper>
+                        </CardContent>
+                    </Card>
+                )}
             </div>
         );
     }
