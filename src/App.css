@@ -11,13 +11,6 @@
     margin: auto;
 }
 
-/* .markdown-body code,
-.markdown-body pre {
-    font-family: SFMono-Regular, Consolas, Liberation Mono, Menlo, Courier,
-        monospace !important;
-    font-size: 12px !important;
-} */
-
 .Content {
     padding: 3em;
     min-height: 960px; /* totally arbitrary */
