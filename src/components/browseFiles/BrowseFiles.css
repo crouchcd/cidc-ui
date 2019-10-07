@@ -45,7 +45,9 @@
 }
 
 .filename {
-    word-break: break-word;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .File-table-header-cell {
