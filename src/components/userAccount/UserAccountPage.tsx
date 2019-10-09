@@ -10,7 +10,7 @@ import {
     Link
 } from "@material-ui/core";
 import "./UserAccount.css";
-import { getPermissions } from "../../api/api";
+import { getPermissionsForUser } from "../../api/api";
 import AdminMenu from "./AdminMenu";
 import { ORGANIZATION_NAME_MAP } from "../../util/constants";
 import Permission from "../../model/permission";
@@ -29,9 +29,11 @@ export default function UserAccountPage() {
 
     React.useEffect(() => {
         if (authData && authData.idToken) {
-            getPermissions(authData.idToken).then(setPermissions);
+            getPermissionsForUser(authData.idToken, userAccount.id).then(
+                setPermissions
+            );
         }
-    }, [authData]);
+    }, [authData, userAccount.id]);
 
     const isAdmin = userAccount && userAccount.role === "cidc-admin";
     const hasPerms = permissions && permissions.length > 0;

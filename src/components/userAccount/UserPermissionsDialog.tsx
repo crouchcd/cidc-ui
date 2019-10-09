@@ -18,7 +18,7 @@ import mapValues from "lodash/mapValues";
 import autobind from "autobind-decorator";
 import {
     getTrials,
-    getPermissions,
+    getPermissionsForUser,
     grantPermission,
     revokePermission
 } from "../../api/api";
@@ -71,7 +71,6 @@ class UserPermissionsDialog extends React.Component<
     @autobind
     componentDidMount() {
         if (this.props.open) {
-            this.setState({ trials: undefined });
             getTrials(this.props.token).then(trials =>
                 this.setState({ trials })
             );
@@ -87,9 +86,11 @@ class UserPermissionsDialog extends React.Component<
 
     @autobind
     refreshPermissions() {
-        getPermissions(this.props.token).then(permissions => {
-            this.setState({ permissions });
-        });
+        getPermissionsForUser(this.props.token, this.props.user.id).then(
+            permissions => {
+                this.setState({ permissions });
+            }
+        );
     }
 
     @autobind
@@ -97,7 +98,7 @@ class UserPermissionsDialog extends React.Component<
         return (e: React.ChangeEvent<HTMLInputElement>, deleteId?: number) => {
             const checked = e.currentTarget.checked;
             if (checked) {
-                // Add temporary permission to state
+                // Add to local state
                 const tempNewPerm = { trial, assay_type: assay } as Permission;
                 this.setState(({ permissions }) => ({
                     permissions: permissions
@@ -105,15 +106,15 @@ class UserPermissionsDialog extends React.Component<
                         : [tempNewPerm]
                 }));
 
-                // Refresh data from the API to get real update
+                // Add to API
                 grantPermission(
                     this.props.token,
                     this.props.user,
                     trial,
                     assay
-                ).then(() => this.refreshPermissions());
+                );
             } else if (!checked && deleteId) {
-                // Fake a delete in local state
+                // Delete from local state
                 this.setState(({ permissions }) => ({
                     permissions:
                         permissions &&
@@ -122,10 +123,8 @@ class UserPermissionsDialog extends React.Component<
                         )
                 }));
 
-                // Actually carry out the delete in the API
-                revokePermission(this.props.token, deleteId).then(() =>
-                    this.refreshPermissions()
-                );
+                // Delete from API
+                revokePermission(this.props.token, deleteId);
             }
         };
     }
