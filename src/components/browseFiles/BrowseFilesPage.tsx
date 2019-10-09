@@ -118,7 +118,7 @@ class BrowseFilesPage extends React.Component<any, IBrowseFilesPageState> {
                         <Grid item={true} xs={9}>
                             <div className="File-search-border">
                                 <TextField
-                                    label="Search by file name"
+                                    label="Search"
                                     type="search"
                                     margin="normal"
                                     variant="outlined"
