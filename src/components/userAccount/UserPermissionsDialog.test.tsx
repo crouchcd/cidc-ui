@@ -3,7 +3,7 @@ import { render, fireEvent, waitForElement } from "@testing-library/react";
 import {
     grantPermission,
     revokePermission,
-    getPermissions,
+    getPermissionsForUser,
     getTrials
 } from "../../api/api";
 import { Account } from "../../model/account";
@@ -24,11 +24,11 @@ const WES_PERMISSION = {
 };
 const PERMISSIONS = [
     WES_PERMISSION,
-    { to_user: USER.id, trial: "test-1", assay_type: "olink" }
+    { to_user: USER.id, trial: TRIAL.trial_id, assay_type: "olink" }
 ];
 
 getTrials.mockResolvedValue(TRIALS);
-getPermissions.mockResolvedValue(PERMISSIONS);
+getPermissionsForUser.mockResolvedValue(PERMISSIONS);
 
 function doRender() {
     const infoContext = {
