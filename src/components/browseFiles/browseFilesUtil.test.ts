@@ -96,38 +96,29 @@ test("Filters it correctly", () => {
     expect(
         filterFiles(files, ["DFCI-9999"], ["WES"], ["MAF", "VCF"], "dfci")
     ).toEqual([files[0]]);
-});
 
-test("Filters it correctly", () => {
     expect(filterFiles(files, [], [], [], "DFCI-9999")).toEqual([files[0]]);
-});
 
-test("Filters it correctly", () => {
     expect(filterFiles(files, [], [], [], "some_value")).toEqual([files[2]]);
-});
 
-test("Filters it correctly", () => {
     expect(filterFiles(files, [], [], [], "some_key")).toEqual([
         files[2],
         files[3]
     ]);
-});
 
-test("Filters it correctly", () => {
     expect(filterFiles(files, [], [], [], "other_key")).toEqual([
         files[4],
         files[5]
     ]);
-});
 
-// test space in search string as AND
-test("Filters it correctly", () => {
+    // test space in search string as AND
     expect(
         filterFiles(files, [], [], [], "other_key some_other_value")
     ).toEqual([files[5]]);
-});
 
-test("Filters it correctly", () => {
+    // AND between additional_metadata and filename
+    expect(filterFiles(files, [], [], [], "other_key vcf")).toEqual([files[5]]);
+
     expect(
         filterFiles(files, [], [], [], "other_key some_other_value NONEXISTING")
     ).toEqual([]);
