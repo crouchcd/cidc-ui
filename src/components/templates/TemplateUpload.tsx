@@ -168,7 +168,9 @@ const TemplateUpload: React.FunctionComponent<ITemplateCardProps> = (
                                         "data-testid": "manifest-type-select"
                                     }}
                                     value={manifestType || ""}
-                                    onChange={onValueChange(setManifestType)}
+                                    onChange={(e: any) =>
+                                        onValueChange(setManifestType)(e)
+                                    }
                                 >
                                     {info &&
                                         info.supportedTemplates.manifests.map(
