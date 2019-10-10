@@ -24,9 +24,18 @@ export function filterFiles(
             isDataFormatMatch = selectedDataFormats.includes(file.data_format);
         }
         if (searchFilter.length > 0) {
-            isSearchFilterMatch = file.object_url
-                .toLowerCase()
-                .includes(searchFilter.toLowerCase());
+            const additionalMD = JSON.stringify(
+                file.additional_metadata || {}
+            ).toLowerCase();
+            const url = file.object_url.toLowerCase();
+            isSearchFilterMatch = searchFilter
+                .split(" ")
+                .map(t => t.toLowerCase())
+                .every(
+                    (searchToken: string) =>
+                        url.includes(searchToken) ||
+                        additionalMD.includes(searchToken)
+                );
         }
         return (
             isTrialIdMatch &&
