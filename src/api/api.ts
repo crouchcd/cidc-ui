@@ -152,7 +152,7 @@ function getManifestValidationErrors(
         form
     )
         .then(res => _extractItem(res).errors)
-        .catch(error => [error.toString()]);
+        .catch(error => error.errors || [error.toString()]);
 }
 
 function _getEtag<T extends { _etag: string }>(
