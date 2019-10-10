@@ -34,7 +34,7 @@ export function filterFiles(
                 .every(
                     (searchToken: string) =>
                         url.includes(searchToken) ||
-                        additional_md.includes(searchToken)
+                        additionalMD.includes(searchToken)
                 );
         }
         return (
