@@ -11,7 +11,7 @@ const files: DataFile[] = [
         file_size_bytes: 1234567,
         trial: "DFCI-9999",
         uploaded_timestamp: new Date("2019-01-17T21:27:53.175496"),
-        object_url: "dfci-9999.maf",
+        object_url: "DFCI-9999/dfci-9999.maf",
         download_link: "download_url"
     },
     {
@@ -23,7 +23,7 @@ const files: DataFile[] = [
         file_size_bytes: 234,
         trial: "DFCI-1234",
         uploaded_timestamp: new Date("2019-01-17T21:27:53.175496"),
-        object_url: "test_uri",
+        object_url: "DFCI-1234/cimac-6521-001.fa",
         download_link: "download_url"
     },
     {
@@ -35,7 +35,7 @@ const files: DataFile[] = [
         file_size_bytes: 21,
         trial: "DFCI-1234",
         uploaded_timestamp: new Date("2019-01-17T21:27:53.175496"),
-        object_url: "test_uri",
+        object_url: "DFCI-1234/cimac-6521-002.fa",
         download_link: "download_url",
         additional_metadata: {
             some_key: "some_value"
@@ -50,7 +50,7 @@ const files: DataFile[] = [
         file_size_bytes: 22345,
         trial: "DFCI-1234",
         uploaded_timestamp: new Date("2019-01-17T21:27:53.175496"),
-        object_url: "test_uri",
+        object_url: "DFCI-1234/cimac-6521-003.fa",
         download_link: "download_url",
         additional_metadata: {
             some_key: "other_value"
@@ -65,7 +65,7 @@ const files: DataFile[] = [
         file_size_bytes: 12345545,
         trial: "DFCI-1234",
         uploaded_timestamp: new Date("2019-01-17T21:27:53.175496"),
-        object_url: "test_uri",
+        object_url: "DFCI-1234/cimac-6521-004.fa",
         download_link: "download_url",
         additional_metadata: {
             other_key: "other_value"
@@ -80,7 +80,7 @@ const files: DataFile[] = [
         file_size_bytes: 7654645,
         trial: "DFCI-9999",
         uploaded_timestamp: new Date("2019-01-17T21:27:53.175496"),
-        object_url: "test_uri",
+        object_url: "DFCI-9999/cimac-6521.vcf",
         download_link: "download_url",
         additional_metadata: {
             other_key: "some_other_value"
@@ -94,10 +94,16 @@ test("Returns the same file list if nothing is filtered", () => {
 
 test("Filters it correctly", () => {
     expect(
-        filterFiles(files, ["DFCI-9999"], ["WES"], ["MAF", "VCF"], "dfci")
+        filterFiles(
+            files,
+            ["DFCI-9999"],
+            ["WES"],
+            ["MAF", "VCF"],
+            "dfci-9999.maf"
+        )
     ).toEqual([files[0]]);
 
-    expect(filterFiles(files, [], [], [], "DFCI-9999")).toEqual([files[0]]);
+    expect(filterFiles(files, [], [], [], "dfci-9999.maf")).toEqual([files[0]]);
 
     expect(filterFiles(files, [], [], [], "some_value")).toEqual([files[2]]);
 
