@@ -69,10 +69,12 @@ const TemplateDownload: React.FunctionComponent<ITemplateCardProps> = (
                                         name: "type"
                                     }}
                                     value={templateType || ""}
-                                    onChange={onValueChange(value => {
-                                        setTemplateType(value);
-                                        setTemplateName(undefined);
-                                    })}
+                                    onChange={(e: any) =>
+                                        onValueChange(value => {
+                                            setTemplateType(value);
+                                            setTemplateName(undefined);
+                                        })(e)
+                                    }
                                 >
                                     <MenuItem value="manifests">
                                         Shipping/Receiving Manifest
@@ -95,7 +97,9 @@ const TemplateDownload: React.FunctionComponent<ITemplateCardProps> = (
                                         name: "name"
                                     }}
                                     value={templateName || ""}
-                                    onChange={onValueChange(setTemplateName)}
+                                    onChange={(e: any) =>
+                                        onValueChange(setTemplateName)(e)
+                                    }
                                     disabled={!templateNames.length}
                                 >
                                     {templateNames.map(name => (

@@ -32,8 +32,10 @@ const theme = createMuiTheme({
             }
         },
         MuiTab: {
-            selected: {
-                color: "black"
+            root: {
+                "&$selected": {
+                    color: "black"
+                }
             }
         }
     }

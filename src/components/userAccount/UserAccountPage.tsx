@@ -45,7 +45,7 @@ export default function UserAccountPage() {
                     <CircularProgress />
                 </div>
             ) : (
-                <Grid container spacing={24}>
+                <Grid container spacing={3}>
                     <Grid item>
                         <Card style={{ height: "100%" }}>
                             <CardHeader
@@ -130,7 +130,7 @@ export default function UserAccountPage() {
                             />
                             <CardContent>
                                 <div>
-                                    <Grid container spacing={8}>
+                                    <Grid container spacing={2}>
                                         {isAdmin ? (
                                             <Grid item>
                                                 <Typography

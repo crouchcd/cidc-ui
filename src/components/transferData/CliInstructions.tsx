@@ -59,7 +59,7 @@ class CliInstructions extends React.Component<any> {
                                     they were you.
                                 </Typography>
                                 <div style={{ marginTop: 10 }}>
-                                    <Grid container={true} spacing={8}>
+                                    <Grid container={true} spacing={1}>
                                         <Grid item={true}>
                                             <div className="Token-input-border">
                                                 <TextField
