@@ -36,7 +36,10 @@ const files: DataFile[] = [
         trial: "DFCI-1234",
         uploaded_timestamp: new Date("2019-01-17T21:27:53.175496"),
         object_url: "test_uri",
-        download_link: "download_url"
+        download_link: "download_url",
+        additional_metadata: {
+            some_key: "some_value"
+        }
     },
     {
         id: 3,
@@ -48,7 +51,10 @@ const files: DataFile[] = [
         trial: "DFCI-1234",
         uploaded_timestamp: new Date("2019-01-17T21:27:53.175496"),
         object_url: "test_uri",
-        download_link: "download_url"
+        download_link: "download_url",
+        additional_metadata: {
+            some_key: "other_value"
+        }
     },
     {
         id: 4,
@@ -60,7 +66,10 @@ const files: DataFile[] = [
         trial: "DFCI-1234",
         uploaded_timestamp: new Date("2019-01-17T21:27:53.175496"),
         object_url: "test_uri",
-        download_link: "download_url"
+        download_link: "download_url",
+        additional_metadata: {
+            other_key: "other_value"
+        }
     },
     {
         id: 5,
@@ -72,7 +81,10 @@ const files: DataFile[] = [
         trial: "DFCI-9999",
         uploaded_timestamp: new Date("2019-01-17T21:27:53.175496"),
         object_url: "test_uri",
-        download_link: "download_url"
+        download_link: "download_url",
+        additional_metadata: {
+            other_key: "some_other_value"
+        }
     }
 ];
 
@@ -84,6 +96,41 @@ test("Filters it correctly", () => {
     expect(
         filterFiles(files, ["DFCI-9999"], ["WES"], ["MAF", "VCF"], "dfci")
     ).toEqual([files[0]]);
+});
+
+test("Filters it correctly", () => {
+    expect(filterFiles(files, [], [], [], "DFCI-9999")).toEqual([files[0]]);
+});
+
+test("Filters it correctly", () => {
+    expect(filterFiles(files, [], [], [], "some_value")).toEqual([files[2]]);
+});
+
+test("Filters it correctly", () => {
+    expect(filterFiles(files, [], [], [], "some_key")).toEqual([
+        files[2],
+        files[3]
+    ]);
+});
+
+test("Filters it correctly", () => {
+    expect(filterFiles(files, [], [], [], "other_key")).toEqual([
+        files[4],
+        files[5]
+    ]);
+});
+
+// test space in search string as AND
+test("Filters it correctly", () => {
+    expect(
+        filterFiles(files, [], [], [], "other_key some_other_value")
+    ).toEqual([files[5]]);
+});
+
+test("Filters it correctly", () => {
+    expect(
+        filterFiles(files, [], [], [], "other_key some_other_value NONEXISTING")
+    ).toEqual([]);
 });
 
 test("Adds option to options list if it's not there", () => {
