@@ -27,8 +27,9 @@ import {
 } from "@material-ui/icons";
 import { XLSX_MIMETYPE } from "../../util/constants";
 import Loader from "../generic/Loader";
-import { AuthContext } from "../../identity/AuthProvider";
+import { AuthContext } from "../identity/AuthProvider";
 import { InfoContext } from "../info/InfoProvider";
+import { DataContext } from "../data/DataProvider";
 
 type Status =
     | "loading"
@@ -43,6 +44,7 @@ const TemplateUpload: React.FunctionComponent<ITemplateCardProps> = (
 ) => {
     const authData = React.useContext(AuthContext);
     const info = React.useContext(InfoContext);
+    const dataContext = React.useContext(DataContext);
 
     const fileInput = React.useRef<HTMLInputElement>(null);
 
@@ -85,6 +87,9 @@ const TemplateUpload: React.FunctionComponent<ITemplateCardProps> = (
                 .then(({ metadata_json_patch }) => {
                     setStatus("uploadSuccess");
                     setTargetTrial(metadata_json_patch.protocol_identifier);
+                    if (dataContext) {
+                        dataContext.refreshData();
+                    }
                 })
                 .catch(err => {
                     setErrors([`Upload failed: ${err.toString()}`]);
