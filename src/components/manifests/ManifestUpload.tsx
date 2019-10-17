@@ -7,18 +7,17 @@ import {
     FormControl,
     Grid,
     Input,
-    InputLabel,
-    Select,
     List,
     ListItem,
     ListItemText,
     Divider,
-    MenuItem,
     ListItemIcon,
-    CardHeader
+    CardHeader,
+    RadioGroup,
+    FormControlLabel,
+    Radio,
+    FormLabel
 } from "@material-ui/core";
-import { ITemplateCardProps } from "./TemplatesPage";
-import { onValueChange } from "./utils";
 import { getManifestValidationErrors, uploadManifest } from "../../api/api";
 import {
     WarningRounded,
@@ -30,6 +29,7 @@ import Loader from "../generic/Loader";
 import { AuthContext } from "../identity/AuthProvider";
 import { InfoContext } from "../info/InfoProvider";
 import { DataContext } from "../data/DataProvider";
+import "./Manifests.css";
 
 type Status =
     | "loading"
@@ -39,9 +39,7 @@ type Status =
     | "uploadErrors"
     | "uploadSuccess";
 
-const TemplateUpload: React.FunctionComponent<ITemplateCardProps> = (
-    props: ITemplateCardProps
-) => {
+const ManifestUpload: React.FunctionComponent = () => {
     const authData = React.useContext(AuthContext);
     const info = React.useContext(InfoContext);
     const dataContext = React.useContext(DataContext);
@@ -75,6 +73,11 @@ const TemplateUpload: React.FunctionComponent<ITemplateCardProps> = (
             });
         }
     }, [file, manifestType, authData]);
+
+    const onValueChange = (setState: (v: string | undefined) => void) => {
+        return (e: React.ChangeEvent<HTMLSelectElement>) =>
+            setState(e.target.value);
+    };
 
     const onSubmit = (e: React.SyntheticEvent) => {
         e.preventDefault();
@@ -144,7 +147,7 @@ const TemplateUpload: React.FunctionComponent<ITemplateCardProps> = (
     };
 
     return (
-        <Card className={props.cardClass}>
+        <Card className="Manifests-card">
             <CardHeader
                 avatar={<CloudUpload />}
                 title={
@@ -163,39 +166,39 @@ const TemplateUpload: React.FunctionComponent<ITemplateCardProps> = (
                     >
                         <Grid item xs={3}>
                             <FormControl fullWidth>
-                                <InputLabel htmlFor="manifestType">
+                                <FormLabel component="legend">
                                     Manifest Type
-                                </InputLabel>
-                                <Select
-                                    inputProps={{
-                                        id: "manifestType",
-                                        name: "type",
-                                        "data-testid": "manifest-type-select"
-                                    }}
+                                </FormLabel>
+                                <RadioGroup
+                                    name="manifestType"
                                     value={manifestType || ""}
                                     onChange={(e: any) =>
                                         onValueChange(setManifestType)(e)
                                     }
+                                    row
                                 >
                                     {info &&
                                         info.supportedTemplates.manifests.map(
                                             name => (
-                                                <MenuItem
+                                                <FormControlLabel
                                                     key={name}
+                                                    label={name}
                                                     value={name}
+                                                    control={<Radio />}
+                                                    data-testid={`radio-${name}`}
                                                 >
                                                     {name}
-                                                </MenuItem>
+                                                </FormControlLabel>
                                             )
                                         )}
-                                </Select>
+                                </RadioGroup>
                             </FormControl>
                         </Grid>
                         <Grid item xs={3}>
                             <FormControl fullWidth>
-                                <InputLabel htmlFor="uploadInput" shrink>
+                                <FormLabel component="legend">
                                     Select a manifest to upload
-                                </InputLabel>
+                                </FormLabel>
                                 <Input
                                     id="uploadInput"
                                     onClick={() => {
@@ -252,4 +255,4 @@ const TemplateUpload: React.FunctionComponent<ITemplateCardProps> = (
     );
 };
 
-export default TemplateUpload;
+export default ManifestUpload;

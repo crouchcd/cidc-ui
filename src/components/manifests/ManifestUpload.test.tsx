@@ -5,7 +5,7 @@ import {
     waitForElement,
     RenderResult
 } from "@testing-library/react";
-import TemplateUpload from "./TemplateUpload";
+import ManifestUpload from "./ManifestUpload";
 import { XLSX_MIMETYPE } from "../../util/constants";
 import { getManifestValidationErrors, uploadManifest } from "../../api/api";
 import { AuthContext } from "../identity/AuthProvider";
@@ -23,7 +23,7 @@ function renderWithMockedAuthContext() {
             <AuthContext.Provider
                 value={{ idToken: TOKEN, user: { email: "" } }}
             >
-                <TemplateUpload cardClass="foo" />
+                <ManifestUpload cardClass="foo" />
             </AuthContext.Provider>
         </InfoContext.Provider>
     );
@@ -49,7 +49,7 @@ async function selectValueMUI(
 test("manifest validation", async () => {
     const renderResult = renderWithMockedAuthContext();
     const { queryByTestId, getByTestId, getByText } = renderResult;
-    const manifestTypeSelect = getByTestId("manifest-type-select");
+    const pbmcRadio = getByTestId("radio-pbmc");
     const manifestFileInput = getByTestId("manifest-file-input");
     const submitButton = getByTestId("submit-button");
 
@@ -66,7 +66,7 @@ test("manifest validation", async () => {
     // Select a manifest type. Material UI components make this
     // difficult: we need to first click on the select component,
     // then click on the dropdown option that subsequently appears.
-    await selectValueMUI(renderResult, manifestTypeSelect, "pbmc");
+    fireEvent.click(pbmcRadio);
     expectNoValidationsDisplayed();
     expect(submitButton).toHaveAttribute("disabled");
 
@@ -105,12 +105,12 @@ test("manifest validation", async () => {
 test("manifest submission", async () => {
     const renderResult = renderWithMockedAuthContext();
     const { getByTestId, queryByTestId } = renderResult;
-    const manifestTypeSelect = getByTestId("manifest-type-select");
+    const pbmcRadio = getByTestId("radio-pbmc");
     const manifestFileInput = getByTestId("manifest-file-input");
     const submitButton = getByTestId("submit-button");
 
     // Select a manifest type
-    selectValueMUI(renderResult, manifestTypeSelect, "pbmc");
+    fireEvent.click(pbmcRadio);
 
     // Select a file to upload and wait for validations to complete
     getManifestValidationErrors.mockResolvedValue([]);
