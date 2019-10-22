@@ -25,11 +25,20 @@ const EnvBanner: React.FunctionComponent = () =>
     ENV !== "prod" ? (
         <Card
             style={{
-                background: "#ffcc00",
+                background:
+                    "repeating-linear-gradient(45deg, #ffcc00, #ffcc00 10px, black 10px, black 20px)",
+                padding: "1em",
                 textAlign: "center"
             }}
         >
-            <Typography variant="overline">
+            <Typography
+                variant="overline"
+                style={{
+                    background: "white",
+                    padding: "0.5em",
+                    lineHeight: "2em"
+                }}
+            >
                 Warning! You're accessing a development instance of the CIDC
                 portal. If this is a mistake, please navigate to{" "}
                 <MuiLink href="https://portal.cimac-network.org">
