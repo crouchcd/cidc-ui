@@ -104,23 +104,14 @@ export default class AdminMenu extends React.Component<IAdminMenuProps, {}> {
                             }
                         />
                         <CardContent>
-                            <div className="Email-search">
-                                <TextField
-                                    label="Search by email"
-                                    type="search"
-                                    margin="normal"
-                                    variant="outlined"
-                                    value={this.state.searchFilter}
-                                    className="File-search"
-                                    InputProps={{
-                                        className: "File-search-input"
-                                    }}
-                                    InputLabelProps={{
-                                        className: "File-search-label"
-                                    }}
-                                    onChange={this.handleSearchFilterChange}
-                                />
-                            </div>
+                            <TextField
+                                label="Search by email"
+                                type="search"
+                                variant="outlined"
+                                margin="dense"
+                                value={this.state.searchFilter}
+                                onChange={this.handleSearchFilterChange}
+                            />
                             <Table>
                                 <TableBody>
                                     {accounts

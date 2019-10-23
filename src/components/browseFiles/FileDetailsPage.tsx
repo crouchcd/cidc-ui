@@ -1,13 +1,6 @@
 import * as React from "react";
 import { getSingleFile, getDownloadURL } from "../../api/api";
-import {
-    CircularProgress,
-    Grid,
-    Button,
-    Card,
-    CardContent,
-    CardHeader
-} from "@material-ui/core";
+import { Grid, Button, Card, CardContent, CardHeader } from "@material-ui/core";
 import { AdditionalMetadataTable, CoreDetailsTable } from "./FileDetails";
 import { AuthContext } from "../identity/AuthProvider";
 import { DataFile } from "../../model/file";
@@ -15,6 +8,7 @@ import { RouteComponentProps } from "react-router";
 import { CloudDownload, Link, Refresh } from "@material-ui/icons";
 import CopyToClipboardButton from "../generic/CopyToClipboardButton";
 import { ButtonProps } from "@material-ui/core/Button";
+import Loader from "../generic/Loader";
 
 const DownloadURL: React.FunctionComponent<{
     fileId: string;
@@ -103,9 +97,7 @@ const FileDetailsPage: React.FunctionComponent<
     return (
         <div>
             {!file || !idToken ? (
-                <div className="Browse-files-progress">
-                    <CircularProgress />
-                </div>
+                <Loader />
             ) : (
                 <Grid
                     container

@@ -1,7 +1,6 @@
 import * as React from "react";
 import {
     Typography,
-    CircularProgress,
     Chip,
     Grid,
     Card,
@@ -9,15 +8,18 @@ import {
     CardContent,
     Link
 } from "@material-ui/core";
-import "./UserAccount.css";
 import AdminMenu from "./AdminMenu";
 import { ORGANIZATION_NAME_MAP } from "../../util/constants";
 import ContactAnAdmin from "../generic/ContactAnAdmin";
 import { AuthContext } from "../identity/AuthProvider";
 import { useUserContext } from "../identity/UserProvider";
 import { AccountCircle, FolderShared } from "@material-ui/icons";
+import Loader from "../generic/Loader";
+import { useRootStyles } from "../../rootStyles";
 
 export default function UserAccountPage() {
+    const classes = useRootStyles();
+
     const authData = React.useContext(AuthContext);
     const userAccount = useUserContext();
 
@@ -26,11 +28,9 @@ export default function UserAccountPage() {
     const hasPerms = permissions && permissions.length > 0;
 
     return (
-        <div>
+        <div className={classes.centeredPage}>
             {!userAccount || !permissions ? (
-                <div className="User-account-progress">
-                    <CircularProgress />
-                </div>
+                <Loader />
             ) : (
                 <Grid container spacing={3}>
                     <Grid item>
