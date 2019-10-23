@@ -1,7 +1,6 @@
 import * as React from "react";
 import {
     Dialog,
-    CircularProgress,
     DialogTitle,
     DialogContent,
     Table,
@@ -187,11 +186,7 @@ class UserPermissionsDialog extends React.Component<
                             </Grid>
                         </Grid>
                     </DialogTitle>
-                    {!this.state.trials && (
-                        <div className="User-account-progress">
-                            <CircularProgress />
-                        </div>
-                    )}
+                    {!this.state.trials && <Loader />}
                     <DialogContent>
                         {this.state.trials && (
                             <div>

@@ -29,7 +29,6 @@ import Loader from "../generic/Loader";
 import { AuthContext } from "../identity/AuthProvider";
 import { InfoContext } from "../info/InfoProvider";
 import { DataContext } from "../data/DataProvider";
-import "./Manifests.css";
 
 type Status =
     | "loading"
@@ -147,7 +146,7 @@ const ManifestUpload: React.FunctionComponent = () => {
     };
 
     return (
-        <Card className="Manifests-card">
+        <Card>
             <CardHeader
                 avatar={<CloudUpload />}
                 title={

@@ -8,7 +8,6 @@ import {
 } from "@material-ui/core";
 import { InfoContext } from "../info/InfoProvider";
 import { CloudDownload } from "@material-ui/icons";
-import "./Manifests.css";
 import TemplateDownloadButton from "../generic/TemplateDownloadButton";
 import Loader from "../generic/Loader";
 
@@ -18,7 +17,7 @@ const ManifestTemplateDownload: React.FunctionComponent = () => {
     const manifests = info && info.supportedTemplates.manifests;
 
     return (
-        <Card className="Manifests-card">
+        <Card>
             <CardHeader
                 avatar={<CloudDownload />}
                 title={
