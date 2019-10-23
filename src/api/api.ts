@@ -74,6 +74,14 @@ function getSingleFile(
     );
 }
 
+function getDownloadURL(token: string, fileID: string): Promise<string> {
+    return getApiClient(token)
+        .get("downloadable_files/download_url", {
+            params: { id: fileID }
+        })
+        .then(_extractItem);
+}
+
 function getAccountInfo(token: string): Promise<Account | undefined> {
     return getApiClient(token)
         .get("users/self")
@@ -152,7 +160,7 @@ function getManifestValidationErrors(
         form
     )
         .then(res => _extractItem(res).errors)
-        .catch(error => [error.toString()]);
+        .catch(error => error.errors || [error.toString()]);
 }
 
 function _getEtag<T extends { _etag: string }>(
@@ -235,6 +243,7 @@ export {
     getApiClient,
     getFiles,
     getSingleFile,
+    getDownloadURL,
     getAccountInfo,
     getTrials,
     createUser,

@@ -12,8 +12,8 @@ import {
     CircularProgress
 } from "@material-ui/core";
 import "./Register.css";
-import { ORGANIZATION_NAME_MAP } from "../util/constants";
-import { createUser } from "../api/api";
+import { ORGANIZATION_NAME_MAP } from "../../util/constants";
+import { createUser } from "../../api/api";
 import { AuthContext } from "./AuthProvider";
 import history from "./History";
 
@@ -103,7 +103,7 @@ export default function Register() {
                     Please complete your CIMAC-CIDC Data Portal registration
                     request below.
                 </Typography>
-                <Grid container={true} spacing={24}>
+                <Grid container={true} spacing={3}>
                     <Grid item={true} xs={12}>
                         <TextField
                             label="Login Email"
@@ -152,7 +152,9 @@ export default function Register() {
                             <InputLabel>Organization</InputLabel>
                             <Select
                                 value={state.organization}
-                                onChange={handleOrganizationChange}
+                                onChange={(e: any) =>
+                                    handleOrganizationChange(e)
+                                }
                                 input={<OutlinedInput labelWidth={100} />}
                             >
                                 <MenuItem value="EMPTY">Please select</MenuItem>

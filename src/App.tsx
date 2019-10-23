@@ -6,20 +6,19 @@ import { Router, Switch, Route } from "react-router-dom";
 import Header from "./components/header/Header";
 import Footer from "./components/footer/Footer";
 import HomePage from "./components/home/HomePage";
-import TransferDataPage from "./components/transferData/TransferDataPage";
-import CliInstructions from "./components/transferData/CliInstructions";
-import TemplatesPage from "./components/templates/TemplatesPage";
+import TransferDataPage from "./components/assays/AssaysPage";
+import ManifestsPage from "./components/manifests/ManifestsPage";
 import PrivacyAndSecurityPage from "./components/privacyAndSecurity/PrivacyAndSecurityPage";
 import UserAccountPage from "./components/userAccount/UserAccountPage";
-import Register from "./identity/Register";
-import Unactivated from "./identity/Unactivated";
-import history from "./identity/History";
-import AssayInstructions from "./components/transferData/AssayInstructions";
-import AuthProvider from "./identity/AuthProvider";
-import UserProvider from "./identity/UserProvider";
+import Register from "./components/identity/Register";
+import Unactivated from "./components/identity/Unactivated";
+import history from "./components/identity/History";
+import AuthProvider from "./components/identity/AuthProvider";
+import UserProvider from "./components/identity/UserProvider";
 import ErrorGuard from "./components/errors/ErrorGuard";
 import InfoProvider from "./components/info/InfoProvider";
 import { createMuiTheme, MuiThemeProvider } from "@material-ui/core";
+import DataProvider from "./components/data/DataProvider";
 
 const theme = createMuiTheme({
     overrides: {
@@ -32,8 +31,10 @@ const theme = createMuiTheme({
             }
         },
         MuiTab: {
-            selected: {
-                color: "black"
+            root: {
+                "&$selected": {
+                    color: "black"
+                }
             }
         }
     }
@@ -47,62 +48,55 @@ export default function App() {
                     <ErrorGuard>
                         <AuthProvider>
                             <UserProvider>
-                                <InfoProvider>
-                                    <Header />
-                                    <div className="Content">
-                                        <Switch>
-                                            <Route
-                                                path="/"
-                                                exact={true}
-                                                component={HomePage}
-                                            />
-                                            <Route
-                                                path="/transfer-data"
-                                                component={TransferDataPage}
-                                                exact
-                                            />
-                                            <Route
-                                                path="/transfer-data/cli-instructions"
-                                                component={CliInstructions}
-                                            />
-                                            <Route
-                                                path="/transfer-data/:assay"
-                                                component={AssayInstructions}
-                                            />
-                                            <Route
-                                                path="/browse-files"
-                                                component={BrowseFilesPage}
-                                            />
-                                            <Route
-                                                path="/templates"
-                                                component={TemplatesPage}
-                                            />
-                                            <Route
-                                                path="/privacy-security"
-                                                component={
-                                                    PrivacyAndSecurityPage
-                                                }
-                                            />
-                                            <Route
-                                                path="/user-account"
-                                                component={UserAccountPage}
-                                            />
-                                            <Route
-                                                path="/file-details/:fileId"
-                                                component={FileDetailsPage}
-                                            />
-                                            <Route
-                                                path="/register"
-                                                component={Register}
-                                            />
-                                            <Route
-                                                path="/unactivated"
-                                                component={Unactivated}
-                                            />
-                                        </Switch>
-                                    </div>
-                                    <Footer />
-                                </InfoProvider>
+                                <DataProvider>
+                                    <InfoProvider>
+                                        <Header />
+                                        <div className="Content">
+                                            <Switch>
+                                                <Route
+                                                    path="/"
+                                                    exact={true}
+                                                    component={HomePage}
+                                                />
+                                                <Route
+                                                    path="/assays"
+                                                    component={TransferDataPage}
+                                                />
+                                                <Route
+                                                    path="/browse-files"
+                                                    component={BrowseFilesPage}
+                                                />
+                                                <Route
+                                                    path="/manifests"
+                                                    component={ManifestsPage}
+                                                />
+                                                <Route
+                                                    path="/privacy-security"
+                                                    component={
+                                                        PrivacyAndSecurityPage
+                                                    }
+                                                />
+                                                <Route
+                                                    path="/user-account"
+                                                    component={UserAccountPage}
+                                                />
+                                                <Route
+                                                    path="/file-details/:fileId"
+                                                    component={FileDetailsPage}
+                                                />
+                                                <Route
+                                                    path="/register"
+                                                    component={Register}
+                                                />
+                                                <Route
+                                                    path="/unactivated"
+                                                    component={Unactivated}
+                                                />
+                                            </Switch>
+                                        </div>
+                                        <Footer />
+                                    </InfoProvider>
+                                </DataProvider>
                             </UserProvider>
                         </AuthProvider>
                     </ErrorGuard>

@@ -91,7 +91,7 @@ export default class UserTableRow extends React.Component<any, {}> {
                     >
                         <Select
                             value={this.state.role}
-                            onChange={this.handleRoleChange}
+                            onChange={(e: any) => this.handleRoleChange(e)}
                         >
                             {ROLES.map(role => (
                                 <MenuItem value={role} key={role}>

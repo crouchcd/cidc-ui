@@ -1,149 +1,186 @@
-import { Grid, TextField, Typography } from "@material-ui/core";
+import { Grid, TextField, Typography, Button } from "@material-ui/core";
 import autobind from "autobind-decorator";
 import _ from "lodash";
 import * as React from "react";
-import { DataFile } from "../../model/file";
 import "./BrowseFiles.css";
 import { changeOption, filterFiles } from "./browseFilesUtil";
 import FileFilter from "./FileFilter";
 import FileTable from "./FileTable";
-import { getFiles } from "../../api/api";
+import { withIdToken } from "../identity/AuthProvider";
+import { RouteComponentProps } from "react-router";
+import { withData, IDataContext } from "../data/DataProvider";
+import { Refresh } from "@material-ui/icons";
 import Loader from "../generic/Loader";
-import { withIdToken } from "../../identity/AuthProvider";
 
-export interface IBrowseFilesPageState {
-    files: DataFile[] | undefined;
-    trials: string[] | undefined;
-    selectedTrialIds: string[];
-    selectedExperimentalStrategies: string[];
-    selectedDataFormats: string[];
-    searchFilter: string;
-}
+class BrowseFilesPage extends React.Component<
+    RouteComponentProps & { token: string } & IDataContext
+> {
+    @autobind
+    private handleArrayParamChange(
+        params: URLSearchParams,
+        values: string[],
+        paramKey: "protocol_id" | "type" | "data_format",
+        value: string
+    ) {
+        const newValues = changeOption(values, value);
 
-class BrowseFilesPage extends React.Component<any, IBrowseFilesPageState> {
-    state: IBrowseFilesPageState = {
-        files: undefined,
-        trials: undefined,
-        searchFilter: "",
-        selectedDataFormats: [],
-        selectedExperimentalStrategies: [],
-        selectedTrialIds: []
-    };
-
-    componentDidMount() {
-        if (this.props.token) {
-            this.getFiles();
+        // Clear all old values for this param then set new values
+        params.delete(paramKey);
+        for (const val of newValues) {
+            params.append(paramKey, val);
         }
-    }
 
-    componentDidUpdate(prevProps: any) {
-        if (this.props.token !== prevProps.token) {
-            this.getFiles();
-        }
-    }
-
-    @autobind
-    private getFiles() {
-        getFiles(this.props.token).then(files => {
-            const trials = _.uniq(files.map(file => file.trial));
-            this.setState({ files, trials });
-        });
-    }
-
-    @autobind
-    private handleTrialIdChange(trialId: string) {
-        this.setState({
-            selectedTrialIds: changeOption(this.state.selectedTrialIds, trialId)
-        });
-    }
-
-    @autobind
-    private handleExperimentalStrategyChange(experimentalStrategy: string) {
-        this.setState({
-            selectedExperimentalStrategies: changeOption(
-                this.state.selectedExperimentalStrategies,
-                experimentalStrategy
-            )
-        });
-    }
-
-    @autobind
-    private handleDataFormatChange(dataFormat: string) {
-        this.setState({
-            selectedDataFormats: changeOption(
-                this.state.selectedDataFormats,
-                dataFormat
-            )
+        // Apply search string updates to the current location
+        this.props.history.push({
+            ...this.props.location,
+            search: params.toString()
         });
     }
 
     @autobind
     private handleSearchFilterChange(
-        event: React.ChangeEvent<HTMLInputElement>
+        event: React.ChangeEvent<HTMLInputElement>,
+        params: URLSearchParams
     ) {
-        this.setState({ searchFilter: event.target.value });
+        params.set("search", event.target.value);
+        this.props.history.push({
+            ...this.props.location,
+            search: params.toString()
+        });
     }
 
     public render() {
+        // Extract current filter parameters from the URL
+        const params = new URLSearchParams(this.props.location.search);
+        const searchFilter = params.get("search") || "";
+        const selectedTrialIds = params.getAll("protocol_id");
+        const selectedDataFormats = params.getAll("data_format");
+        const selectedTypes = params.getAll("type");
+
+        const trials = _.uniq(this.props.files.map(f => f.trial));
+
         return (
             <div className="Browse-files-page">
-                {!this.state.files && <Loader />}
-                {this.state.files && this.state.files.length === 0 && (
+                {this.props.files.length === 0 && (
                     <div className="Browse-files-progress">
                         <Typography style={{ fontSize: 18 }}>
-                            No files found
+                            No files found.
                         </Typography>
                     </div>
                 )}
-                {this.state.files && this.state.files.length > 0 && (
-                    <Grid container={true} spacing={32}>
+                {this.props.files.length > 0 && (
+                    <Grid container={true} spacing={3}>
                         <Grid item={true} xs={3}>
                             <FileFilter
-                                trialIds={_.uniq(
-                                    _.map(this.state.files, "trial")
-                                )}
-                                experimentalStrategies={_.uniq(
-                                    _.map(this.state.files, "assay_type")
-                                )}
-                                dataFormats={_.uniq(
-                                    _.map(this.state.files, "data_format")
-                                )}
-                                onTrialIdChange={this.handleTrialIdChange}
-                                onExperimentalStrategyChange={
-                                    this.handleExperimentalStrategyChange
+                                trialIds={{
+                                    options: _.uniq(
+                                        _.map(this.props.files, "trial")
+                                    ),
+                                    checked: selectedTrialIds
+                                }}
+                                experimentalStrategies={{
+                                    options: _.uniq(
+                                        _.map(this.props.files, "assay_type")
+                                    ),
+                                    checked: selectedTypes
+                                }}
+                                dataFormats={{
+                                    options: _.uniq(
+                                        _.map(this.props.files, "data_format")
+                                    ),
+                                    checked: selectedDataFormats
+                                }}
+                                onTrialIdChange={tid =>
+                                    this.handleArrayParamChange(
+                                        params,
+                                        selectedTrialIds,
+                                        "protocol_id",
+                                        tid
+                                    )
                                 }
-                                onDataFormatChange={this.handleDataFormatChange}
+                                onExperimentalStrategyChange={typ =>
+                                    this.handleArrayParamChange(
+                                        params,
+                                        selectedTypes,
+                                        "type",
+                                        typ
+                                    )
+                                }
+                                onDataFormatChange={dataFormat =>
+                                    this.handleArrayParamChange(
+                                        params,
+                                        selectedDataFormats,
+                                        "data_format",
+                                        dataFormat
+                                    )
+                                }
                             />
                         </Grid>
                         <Grid item={true} xs={9}>
-                            <div className="File-search-border">
-                                <TextField
-                                    label="Search by file name"
-                                    type="search"
-                                    margin="normal"
-                                    variant="outlined"
-                                    value={this.state.searchFilter}
-                                    className="File-search"
-                                    InputProps={{
-                                        className: "File-search-input"
-                                    }}
-                                    InputLabelProps={{
-                                        className: "File-search-label"
-                                    }}
-                                    onChange={this.handleSearchFilterChange}
+                            <Grid
+                                container
+                                direction="row"
+                                justify="space-between"
+                            >
+                                <Grid item>
+                                    <div className="File-search-border">
+                                        <TextField
+                                            label="Search"
+                                            type="search"
+                                            margin="normal"
+                                            variant="outlined"
+                                            value={searchFilter}
+                                            className="File-search"
+                                            InputProps={{
+                                                className: "File-search-input"
+                                            }}
+                                            InputLabelProps={{
+                                                className: "File-search-label"
+                                            }}
+                                            onChange={(
+                                                e: React.ChangeEvent<
+                                                    HTMLInputElement
+                                                >
+                                            ) =>
+                                                this.handleSearchFilterChange(
+                                                    e,
+                                                    params
+                                                )
+                                            }
+                                        />
+                                    </div>
+                                </Grid>
+                                <Grid item>
+                                    <Button
+                                        endIcon={<Refresh />}
+                                        disabled={
+                                            this.props.dataStatus === "fetching"
+                                        }
+                                        onClick={() => this.props.refreshData()}
+                                    >
+                                        Refresh
+                                    </Button>
+                                </Grid>
+                            </Grid>
+                            {this.props.dataStatus === "fetching" && <Loader />}
+                            {this.props.dataStatus === "fetched" && (
+                                <FileTable
+                                    history={this.props.history}
+                                    files={filterFiles(
+                                        this.props.files,
+                                        selectedTrialIds,
+                                        selectedTypes,
+                                        selectedDataFormats,
+                                        searchFilter
+                                    )}
+                                    trials={trials}
                                 />
-                            </div>
-                            <FileTable
-                                history={this.props.history}
-                                files={filterFiles(
-                                    this.state.files,
-                                    this.state.selectedTrialIds,
-                                    this.state.selectedExperimentalStrategies,
-                                    this.state.selectedDataFormats,
-                                    this.state.searchFilter
-                                )}
-                                trials={this.state.trials!}
-                            />
+                            )}
+                            {this.props.dataStatus === "failed" && (
+                                <Typography>
+                                    Encountered an error fetching file data.
+                                </Typography>
+                            )}
                         </Grid>
                     </Grid>
                 )}
@@ -152,4 +189,4 @@ class BrowseFilesPage extends React.Component<any, IBrowseFilesPageState> {
     }
 }
 
-export default withIdToken(BrowseFilesPage);
+export default withData(withIdToken(BrowseFilesPage));
