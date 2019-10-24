@@ -6,13 +6,18 @@ export const colors = {
     DARK_BLUE_GREY: "#3b4856"
 };
 
+export const widths = {
+    pageWidth: 1200,
+    markdownWidth: 880
+};
+
 export const useRootStyles = makeStyles({
     root: {
         minWidth: "640px !important",
         height: "100vh"
     },
     markdown: {
-        width: 880,
+        width: widths.markdownWidth,
         margin: "auto"
     },
     content: {
@@ -21,7 +26,7 @@ export const useRootStyles = makeStyles({
         background: "white"
     },
     centeredPage: {
-        width: 1200,
+        width: widths.pageWidth,
         margin: "auto"
     }
 });
