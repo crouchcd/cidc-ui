@@ -18,7 +18,7 @@ import {
 import logo from "../../logo.png";
 import { AccountCircle, Search, TableChart } from "@material-ui/icons";
 import { useUserContext } from "../identity/UserProvider";
-import { colors } from "../../rootStyles";
+import { colors, widths } from "../../rootStyles";
 
 const ENV = process.env.REACT_APP_ENV;
 
@@ -73,7 +73,8 @@ const StyledTabs = withStyles({
 const useHeaderStyles = makeStyles({
     tabs: {
         background: `linear-gradient(to right, white,${colors.LIGHT_BLUE} 300px, ${colors.LIGHT_BLUE})`,
-        width: "100%"
+        width: "100%",
+        margin: 0
     },
     logo: { height: 87, padding: 5 }
 });
@@ -100,7 +101,7 @@ const Header: React.FunctionComponent<RouteComponentProps> = props => {
     }
 
     return (
-        <div>
+        <div style={{ minWidth: widths.pageWidth }}>
             <EnvBanner />
             <div className={classes.tabs}>
                 <Grid
