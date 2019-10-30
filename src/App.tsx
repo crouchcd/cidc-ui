@@ -26,8 +26,7 @@ const theme = createMuiTheme({
             root: {
                 boxShadow: "none",
                 border: "1px solid #cfd0d0",
-                borderRadius: 5,
-                overflowX: "scroll"
+                borderRadius: 5
             }
         },
         MuiTab: {
