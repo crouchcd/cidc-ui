@@ -15,6 +15,7 @@ import autobind from "autobind-decorator";
 import { Account } from "../../model/account";
 import UserTableRow from "./UserTableRow";
 import { List } from "@material-ui/icons";
+import orderBy from "lodash/orderBy";
 
 export interface IAdminMenuProps {
     token: string;
@@ -114,7 +115,10 @@ export default class AdminMenu extends React.Component<IAdminMenuProps, {}> {
                             />
                             <Table>
                                 <TableBody>
-                                    {accounts
+                                    {orderBy(
+                                        accounts,
+                                        a => `${a.first_n} ${a.last_n}`
+                                    )
                                         .slice(
                                             this.state.page *
                                                 this.state.rowsPerPage,
