@@ -3,11 +3,10 @@ import { Button } from "@material-ui/core";
 import { ButtonProps } from "@material-ui/core/Button";
 import { InfoContext } from "../info/InfoProvider";
 
-// Given a template type and name, get the path to the corresponding
-// xlsx file in the static/ folder.
+// Given a template type and name, get the API URL for downloading that template.
 export function nameToURL(type: string, name: string) {
     const fmtedName = name.toLowerCase().replace(" ", "_");
-    return `${process.env.PUBLIC_URL}/static/xlsx/${type}/${fmtedName}_template.xlsx`;
+    return `${process.env.REACT_APP_API_URL}/info/templates/${type}/${fmtedName}`;
 }
 
 export interface ITemplateDownloadButtonProps extends ButtonProps {
