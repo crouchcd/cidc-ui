@@ -1,0 +1,67 @@
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="description" content="" />
+        <meta name="author" content="" />
+
+        <title>Clustergrammer.js</title>
+
+        <link
+            rel="shortcut icon"
+            href="img/graham_cracker.ico"
+            type="image/x-icon"
+        />
+
+        <link rel="stylesheet" href="/static/cg/lib/css/font-awesome.min.css" />
+        <link rel="stylesheet" href="/static/cg/lib/css/bootstrap.min.css" />
+        <link rel="stylesheet" href="/static/cg/clustergrammer.min.css" />
+
+        <!-- Prevent scrolling -->
+        <style>
+            html,
+            body {
+                overflow: hidden;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="cg-root">
+            <div id="cg-loader">
+                Loading Clustergrammer...
+            </div>
+        </div>
+
+        <!-- Required JS Libraries -->
+        <script src="/static/cg/lib/js/d3.min.js"></script>
+        <script src="/static/cg/lib/js/jquery-1.11.2.min.js"></script>
+        <script src="/static/cg/lib/js/underscore-min.js"></script>
+        <script src="/static/cg/lib/js/bootstrap.min.js"></script>
+
+        <!-- Clustergrammer JS -->
+        <script src="/static/cg/clustergrammer.min.js"></script>
+
+        <script>
+            // Add a function for drawing clustergrammer network data
+            // to the document object. This function will be called
+            // by instances of the Clustergrammer component within the CIDC
+            // React app (src/components/visualizations/Clustergrammer.tsx).
+            document.DrawClustergram = function(args) {
+                args.root = "#cg-root";
+
+                d3.select(args.root)
+                    .style("width", window.innerWidth + "px")
+                    .style("height", window.innerHeight - 20 + "px");
+
+                d3.select(window).on("resize", function() {
+                    resize_container(args);
+                    cgm.resize_viz();
+                });
+
+                cgm = Clustergrammer(args);
+                document.getElementById("cg-loader").remove();
+            };
+        </script>
+    </body>
+</html>
