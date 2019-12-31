@@ -76,7 +76,7 @@ const FileFilter: React.FunctionComponent<IDataContext> = props => {
                             options: formats,
                             checked: filters.data_format
                         }}
-                        onChange={updateFilters("protocol_id")}
+                        onChange={updateFilters("data_format")}
                     />
                 </Grid>
             </Grid>
