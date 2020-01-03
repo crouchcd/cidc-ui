@@ -1,10 +1,6 @@
 import * as React from "react";
 import {
     Typography,
-    Table,
-    TableBody,
-    TableRow,
-    TablePagination,
     TextField,
     Card,
     CardHeader,
@@ -16,6 +12,9 @@ import { Account } from "../../model/account";
 import UserTableRow from "./UserTableRow";
 import { List } from "@material-ui/icons";
 import orderBy from "lodash/orderBy";
+import PaginatedTable from "../generic/PaginatedTable";
+
+const ADMIN_TABLE_PAGE_SIZE = 15;
 
 export interface IAdminMenuProps {
     token: string;
@@ -25,9 +24,8 @@ export interface IAdminMenuProps {
 export default class AdminMenu extends React.Component<IAdminMenuProps, {}> {
     state = {
         accounts: undefined,
-        page: 0,
-        rowsPerPage: 10,
-        searchFilter: ""
+        searchFilter: "",
+        page: 0
     };
 
     componentDidMount() {
@@ -45,21 +43,6 @@ export default class AdminMenu extends React.Component<IAdminMenuProps, {}> {
                 )
             });
         });
-    }
-
-    @autobind
-    private handleChangePage(
-        event: React.MouseEvent<HTMLButtonElement> | null,
-        page: number
-    ) {
-        this.setState({ page });
-    }
-
-    @autobind
-    private handleChangeRowsPerPage(
-        event: React.ChangeEvent<HTMLInputElement>
-    ) {
-        this.setState({ rowsPerPage: Number(event.target.value) });
     }
 
     @autobind
@@ -113,44 +96,27 @@ export default class AdminMenu extends React.Component<IAdminMenuProps, {}> {
                                 value={this.state.searchFilter}
                                 onChange={this.handleSearchFilterChange}
                             />
-                            <Table>
-                                <TableBody>
-                                    {orderBy(
-                                        accounts,
-                                        a => `${a.first_n} ${a.last_n}`
-                                    )
-                                        .slice(
-                                            this.state.page *
-                                                this.state.rowsPerPage,
-                                            this.state.page *
-                                                this.state.rowsPerPage +
-                                                this.state.rowsPerPage
-                                        )
-                                        .map((account: Account) => {
-                                            return (
-                                                <TableRow key={account.id}>
-                                                    <UserTableRow
-                                                        token={this.props.token}
-                                                        account={account}
-                                                        reloadUsers={
-                                                            this.reloadUsers
-                                                        }
-                                                    />
-                                                </TableRow>
-                                            );
-                                        })}
-                                </TableBody>
-                            </Table>
-                            <TablePagination
-                                component="div"
-                                rowsPerPageOptions={[5, 10, 25]}
+                            <PaginatedTable
+                                data={orderBy(
+                                    accounts,
+                                    a => `${a.first_n} ${a.last_n}`
+                                ).slice(
+                                    this.state.page * ADMIN_TABLE_PAGE_SIZE,
+                                    (this.state.page + 1) *
+                                        ADMIN_TABLE_PAGE_SIZE
+                                )}
                                 count={accounts.length}
-                                rowsPerPage={this.state.rowsPerPage}
                                 page={this.state.page}
-                                onChangePage={this.handleChangePage}
-                                onChangeRowsPerPage={
-                                    this.handleChangeRowsPerPage
-                                }
+                                rowsPerPage={ADMIN_TABLE_PAGE_SIZE}
+                                onChangePage={page => this.setState({ page })}
+                                getRowKey={account => account.id}
+                                renderRow={account => (
+                                    <UserTableRow
+                                        token={this.props.token}
+                                        account={account}
+                                        reloadUsers={this.reloadUsers}
+                                    />
+                                )}
                             />
                         </CardContent>
                     </Card>

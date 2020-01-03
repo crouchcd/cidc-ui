@@ -2,7 +2,6 @@ import * as React from "react";
 import map from "lodash/map";
 import {
     Table,
-    TableHead,
     TableRow,
     TableCell,
     TableBody,
@@ -26,13 +25,7 @@ const FileDetailsTable: React.FunctionComponent<
         <Card>
             <CardHeader title={props.title} />
             <CardContent style={{ padding: 0 }}>
-                <Table>
-                    <TableHead>
-                        <TableRow>
-                            <TableCell>Attribute Name</TableCell>
-                            <TableCell>Value</TableCell>
-                        </TableRow>
-                    </TableHead>
+                <Table size="small">
                     <TableBody>
                         {props.values.map(({ name, value }) => (
                             <TableRow key={name}>

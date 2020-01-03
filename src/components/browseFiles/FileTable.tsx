@@ -1,241 +1,143 @@
-import {
-    TablePagination,
-    TableSortLabel,
-    Popover,
-    Typography,
-    Theme,
-    createStyles,
-    withStyles,
-    WithStyles
-} from "@material-ui/core";
-import Table from "@material-ui/core/Table";
-import TableBody from "@material-ui/core/TableBody";
-import TableCell from "@material-ui/core/TableCell";
-import TableHead from "@material-ui/core/TableHead";
-import TableRow from "@material-ui/core/TableRow";
-import autobind from "autobind-decorator";
-import _ from "lodash";
-import * as React from "react";
+import React from "react";
 import { DataFile } from "../../model/file";
 import { LOCALE, DATE_OPTIONS } from "../../util/constants";
 import { colors } from "../../rootStyles";
+import PaginatedTable, { IHeader } from "../generic/PaginatedTable";
+import { makeStyles, Grid, Typography } from "@material-ui/core";
+import { filterConfig, Filters } from "./FileFilter";
+import { useQueryParams } from "use-query-params";
+import { getFiles, IDataWithMeta } from "../../api/api";
+import { withIdToken } from "../identity/AuthProvider";
 
-const NAME_KEY = "object_url";
-const TRIAL_ID_KEY = "trial_id";
-const ASSAY_TYPE_KEY = "assay_type";
-const FILE_TYPE_KEY = "data_format";
-const DATETIME_KEY = "uploaded_timestamp";
+const FILE_TABLE_PAGE_SIZE = 15;
 
-const SORT_MAP = {
-    [DATETIME_KEY]: (f: DataFile) => new Date(f.uploaded_timestamp)
-};
-
-const tableStyles = (theme: Theme) =>
-    createStyles({
-        table: {
+const useStyles = makeStyles({
+    root: {
+        "& .MuiTable-root": {
             border: `1px solid ${colors.LIGHT_GREY}`,
             borderRadius: 5,
             borderCollapse: "separate"
         },
-        row: {
+        "& .MuiTableRow-root": {
             cursor: "pointer"
         }
-    });
-const withTableStyles = withStyles(tableStyles);
+    },
+    forwardSlash: {
+        fontSize: "inherit"
+    }
+});
 
-export interface IFileTableProps extends WithStyles<typeof tableStyles> {
-    files: DataFile[];
-    trials: string[];
+export interface IFileTableProps {
     history: any;
 }
 
-export interface IFileTableState {
-    rowsPerPage: number;
-    page: number;
-    sortBy: string;
-    sortDirection: "asc" | "desc";
-    anchorEl: any;
-}
+export const filtersToWhereClause = (filters: Filters): string => {
+    const arraySubclause = (ids: any, key: string) =>
+        !!ids && `(${ids.map((id: string) => `${key}=="${id}"`).join(" or ")})`;
+    const subclauses = [
+        arraySubclause(filters.protocol_id, "trial"),
+        arraySubclause(filters.type, "assay_type"),
+        arraySubclause(filters.data_format, "data_format")
+    ];
 
-class FileTable extends React.Component<IFileTableProps, IFileTableState> {
-    state: IFileTableState = {
-        page: 0,
-        rowsPerPage: 10,
-        sortBy: DATETIME_KEY,
-        sortDirection: "desc",
-        anchorEl: null
-    };
+    return subclauses.filter(c => !!c).join(" and ");
+};
 
-    @autobind
-    private handleChangePage(
-        event: React.MouseEvent<HTMLButtonElement> | null,
-        page: number
-    ) {
-        this.setState({ page });
-    }
+export const headerToSortClause = (header: IHeader): string => {
+    return `[("${header.key}", ${header.direction === "asc" ? 1 : -1})]`;
+};
 
-    @autobind
-    private handleClick(fileId: number) {
-        this.props.history.push("/file-details/" + fileId);
-    }
+const FileTable: React.FC<IFileTableProps & { token: string }> = props => {
+    const classes = useStyles();
+    const filters = useQueryParams(filterConfig)[0];
 
-    @autobind
-    private handleChangeRowsPerPage(
-        event: React.ChangeEvent<HTMLInputElement>
-    ) {
-        this.setState({ rowsPerPage: Number(event.target.value) });
-    }
+    const [page, setPage] = React.useState<number>(0);
+    const [data, setData] = React.useState<
+        IDataWithMeta<DataFile[]> | undefined
+    >(undefined);
 
-    private handleChangeSorting(sortBy: string) {
-        const isAsc =
-            this.state.sortBy === sortBy && this.state.sortDirection === "asc";
-        this.setState({ sortBy, sortDirection: isAsc ? "desc" : "asc" });
-    }
+    const [headers, setHeaders] = React.useState<IHeader[]>([
+        {
+            key: "object_url",
+            label: "File",
+            format: (name: string) => {
+                const parts = name.split("/");
+                const lastPartIndex = parts.length - 1;
+                return (
+                    <Grid container spacing={1}>
+                        {parts.flatMap((part, i) => (
+                            <React.Fragment key={part}>
+                                <Grid item>{part}</Grid>
+                                {i !== lastPartIndex && (
+                                    <Grid item>
+                                        <Typography
+                                            className={classes.forwardSlash}
+                                            color="textSecondary"
+                                        >
+                                            /
+                                        </Typography>
+                                    </Grid>
+                                )}
+                            </React.Fragment>
+                        ))}
+                    </Grid>
+                );
+            }
+        },
+        {
+            key: "uploaded_timestamp",
+            label: "Date/Time Uploaded",
+            format: (ts: number) =>
+                new Date(ts).toLocaleString(LOCALE, DATE_OPTIONS),
+            active: true,
+            direction: "desc"
+        } as IHeader
+    ]);
+    const sortHeader = headers.filter(h => h.active)[0];
 
-    public render() {
-        return (
-            <div>
-                <Table className={this.props.classes.table}>
-                    <TableHead>
-                        <TableRow>
-                            <TableCell>
-                                <TableSortLabel
-                                    active={this.state.sortBy === NAME_KEY}
-                                    direction={this.state.sortDirection}
-                                    // tslint:disable-next-line:jsx-no-lambda
-                                    onClick={() =>
-                                        this.handleChangeSorting(NAME_KEY)
-                                    }
-                                >
-                                    File Name
-                                </TableSortLabel>
-                            </TableCell>
-                            <TableCell>
-                                <TableSortLabel
-                                    active={this.state.sortBy === TRIAL_ID_KEY}
-                                    direction={this.state.sortDirection}
-                                    // tslint:disable-next-line:jsx-no-lambda
-                                    onClick={() =>
-                                        this.handleChangeSorting(TRIAL_ID_KEY)
-                                    }
-                                >
-                                    Protocol Identifier
-                                </TableSortLabel>
-                            </TableCell>
-                            <TableCell>
-                                <TableSortLabel
-                                    active={
-                                        this.state.sortBy === ASSAY_TYPE_KEY
-                                    }
-                                    direction={this.state.sortDirection}
-                                    // tslint:disable-next-line:jsx-no-lambda
-                                    onClick={() =>
-                                        this.handleChangeSorting(ASSAY_TYPE_KEY)
-                                    }
-                                >
-                                    Type
-                                </TableSortLabel>
-                            </TableCell>
-                            <TableCell>
-                                <TableSortLabel
-                                    active={this.state.sortBy === FILE_TYPE_KEY}
-                                    direction={this.state.sortDirection}
-                                    // tslint:disable-next-line:jsx-no-lambda
-                                    onClick={() =>
-                                        this.handleChangeSorting(FILE_TYPE_KEY)
-                                    }
-                                >
-                                    Format
-                                </TableSortLabel>
-                            </TableCell>
-                            <TableCell>
-                                <TableSortLabel
-                                    active={this.state.sortBy === DATETIME_KEY}
-                                    direction={this.state.sortDirection}
-                                    // tslint:disable-next-line:jsx-no-lambda
-                                    onClick={() =>
-                                        this.handleChangeSorting(DATETIME_KEY)
-                                    }
-                                >
-                                    Date/Time Uploaded
-                                </TableSortLabel>
-                            </TableCell>
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {_.orderBy(
-                            this.props.files,
-                            this.state.sortBy in SORT_MAP
-                                ? SORT_MAP[this.state.sortBy]
-                                : this.state.sortBy,
-                            this.state.sortDirection
-                        )
-                            .slice(
-                                this.state.page * this.state.rowsPerPage,
-                                this.state.page * this.state.rowsPerPage +
-                                    this.state.rowsPerPage
-                            )
-                            .map((file: DataFile) => {
-                                // NOTE: remove the concept of "locked" trials for now,
-                                // but evaluate adding it back as necessary.
-                                return (
-                                    <TableRow
-                                        className={this.props.classes.row}
-                                        key={file.id}
-                                        hover={true}
-                                        // tslint:disable-next-line:jsx-no-lambda
-                                        onClick={() =>
-                                            this.handleClick(file.id)
-                                        }
-                                    >
-                                        <TableCell>{file.object_url}</TableCell>
-                                        <TableCell>{file.trial}</TableCell>
-                                        <TableCell>{file.assay_type}</TableCell>
-                                        <TableCell>
-                                            {file.data_format}
-                                        </TableCell>
-                                        <TableCell>
-                                            {new Date(
-                                                file.uploaded_timestamp
-                                            ).toLocaleString(
-                                                LOCALE,
-                                                DATE_OPTIONS
-                                            )}
-                                        </TableCell>
-                                    </TableRow>
-                                );
-                            })}
-                    </TableBody>
-                </Table>
-                <TablePagination
-                    component="div"
-                    rowsPerPageOptions={[5, 10, 25]}
-                    count={this.props.files.length}
-                    rowsPerPage={this.state.rowsPerPage}
-                    page={this.state.page}
-                    onChangePage={this.handleChangePage}
-                    onChangeRowsPerPage={this.handleChangeRowsPerPage}
-                />
-                <Popover
-                    style={{ pointerEvents: "none" }}
-                    open={Boolean(this.state.anchorEl)}
-                    anchorEl={this.state.anchorEl}
-                    anchorOrigin={{
-                        vertical: "top",
-                        horizontal: "left"
-                    }}
-                    transformOrigin={{
-                        vertical: "bottom",
-                        horizontal: "left"
-                    }}
-                >
-                    <Typography style={{ margin: 5 }}>
-                        This trial is currently locked
-                    </Typography>
-                </Popover>
-            </div>
-        );
-    }
-}
+    React.useEffect(() => {
+        getFiles(props.token, {
+            page: page + 1, // eve-sqlalchemy pagination starts at 1
+            where: filtersToWhereClause(filters),
+            max_results: FILE_TABLE_PAGE_SIZE,
+            sort: headerToSortClause(sortHeader)
+        }).then(files => setData(files));
+    }, [filters, page, props.token, sortHeader]);
 
-export default withTableStyles(FileTable);
+    return (
+        <div className={classes.root}>
+            <PaginatedTable
+                count={data ? data.meta.total : 0}
+                page={page}
+                onChangePage={p => setPage(p)}
+                rowsPerPage={FILE_TABLE_PAGE_SIZE}
+                headers={headers}
+                data={data && data.data}
+                getRowKey={row => row.id}
+                onClickRow={row =>
+                    props.history.push("/file-details/" + row.id)
+                }
+                onClickHeader={header => {
+                    const newHeaders = headers.map(h => {
+                        const newHeader = { ...h };
+                        if (h.key === header.key) {
+                            if (h.active) {
+                                newHeader.direction =
+                                    h.direction === "desc" ? "asc" : "desc";
+                            } else {
+                                newHeader.active = true;
+                                newHeader.direction = "desc";
+                            }
+                        } else {
+                            newHeader.active = false;
+                        }
+                        return newHeader;
+                    });
+                    setHeaders(newHeaders);
+                }}
+            />
+        </div>
+    );
+};
+
+export default withIdToken<IFileTableProps>(FileTable);

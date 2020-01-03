@@ -1,52 +1,90 @@
-import { Grid } from "@material-ui/core";
 import * as React from "react";
-import FileFilterCheckboxGroup, {
-    IFilterConfig
-} from "./FileFilterCheckboxGroup";
-import { colors } from "../../rootStyles";
+import {
+    Grid,
+    Card,
+    CardHeader,
+    Typography,
+    CardContent
+} from "@material-ui/core";
+import uniq from "lodash/uniq";
+import FileFilterCheckboxGroup from "./FileFilterCheckboxGroup";
+import { withData, IDataContext } from "../data/DataProvider";
+import { StringParam, ArrayParam, useQueryParams } from "use-query-params";
+import { DataFile } from "../../model/file";
+import { FilterList } from "@material-ui/icons";
 
-export interface IFileFilterProps {
-    trialIds: IFilterConfig;
-    experimentalStrategies: IFilterConfig;
-    dataFormats: IFilterConfig;
-    onTrialIdChange: (trialId: string) => void;
-    onExperimentalStrategyChange: (experimentalStrategy: string) => void;
-    onDataFormatChange: (dataFormat: string) => void;
-}
+export const filterConfig = {
+    search: StringParam,
+    protocol_id: ArrayParam,
+    data_format: ArrayParam,
+    type: ArrayParam
+};
+export type Filters = ReturnType<typeof useQueryParams>[0];
 
-const FileFilter: React.FunctionComponent<IFileFilterProps> = props => {
+const FileFilter: React.FunctionComponent<IDataContext> = props => {
+    const [filters, setFilters] = useQueryParams(filterConfig);
+    const updateFilters = (k: keyof typeof filterConfig) => (v: string) => {
+        if (k === "search") {
+            setFilters({ search: v });
+        } else {
+            const current = filters[k];
+            const updated = current
+                ? current.includes(v)
+                    ? current.filter(f => f !== v)
+                    : [...current, v]
+                : [v];
+            setFilters({ [k]: updated });
+        }
+    };
+
+    const extractDistinct = (column: keyof DataFile) =>
+        uniq(props.files.map(f => f[column] as string));
+    const trialIds = extractDistinct("trial");
+    const types = extractDistinct("assay_type");
+    const formats = extractDistinct("data_format");
+
     return (
-        <div
-            style={{
-                border: `1px solid ${colors.DARK_BLUE_GREY}`,
-                borderRadius: 5
-            }}
-        >
-            <Grid container={true}>
-                <Grid item={true} xs={12}>
-                    <FileFilterCheckboxGroup
-                        title="Protocol Identifier"
-                        config={props.trialIds}
-                        onChange={props.onTrialIdChange}
-                    />
+        <Card>
+            <CardHeader
+                avatar={<FilterList />}
+                title={<Typography variant="h6">Filters</Typography>}
+            />
+            <CardContent>
+                <Grid container direction="column" spacing={2}>
+                    <Grid item xs={12}>
+                        <FileFilterCheckboxGroup
+                            title="Protocol Identifiers"
+                            config={{
+                                options: trialIds,
+                                checked: filters.protocol_id
+                            }}
+                            onChange={updateFilters("protocol_id")}
+                        />
+                    </Grid>
+                    <Grid item xs={12}>
+                        <FileFilterCheckboxGroup
+                            title="Data Categories"
+                            config={{
+                                options: types,
+                                checked: filters.type
+                            }}
+                            onChange={updateFilters("type")}
+                        />
+                    </Grid>
+                    <Grid item xs={12}>
+                        <FileFilterCheckboxGroup
+                            title="File Formats"
+                            config={{
+                                options: formats,
+                                checked: filters.data_format
+                            }}
+                            onChange={updateFilters("data_format")}
+                        />
+                    </Grid>
                 </Grid>
-                <Grid item={true} xs={12}>
-                    <FileFilterCheckboxGroup
-                        title="Type"
-                        config={props.experimentalStrategies}
-                        onChange={props.onExperimentalStrategyChange}
-                    />
-                </Grid>
-                <Grid item={true} xs={12}>
-                    <FileFilterCheckboxGroup
-                        title="Format"
-                        config={props.dataFormats}
-                        onChange={props.onDataFormatChange}
-                    />
-                </Grid>
-            </Grid>
-        </div>
+            </CardContent>
+        </Card>
     );
 };
 
-export default FileFilter;
+export default withData(FileFilter);
