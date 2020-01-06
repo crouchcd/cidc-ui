@@ -11,6 +11,12 @@ import { withIdToken } from "../identity/AuthProvider";
 
 const FILE_TABLE_PAGE_SIZE = 15;
 
+// Columns to omit from `getFiles` queries
+const FILE_TABLE_QUERY_PROJECTION = {
+    clustergrammer: 0,
+    additional_metadata: 0
+};
+
 const useStyles = makeStyles({
     root: {
         "& .MuiTable-root": {
@@ -100,7 +106,8 @@ const FileTable: React.FC<IFileTableProps & { token: string }> = props => {
             page: page + 1, // eve-sqlalchemy pagination starts at 1
             where: filtersToWhereClause(filters),
             max_results: FILE_TABLE_PAGE_SIZE,
-            sort: headerToSortClause(sortHeader)
+            sort: headerToSortClause(sortHeader),
+            projection: FILE_TABLE_QUERY_PROJECTION
         }).then(files => setData(files));
     }, [filters, page, props.token, sortHeader]);
 
