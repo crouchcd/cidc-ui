@@ -33,7 +33,7 @@ getPermissionsForUser.mockResolvedValue(PERMISSIONS);
 function doRender() {
     const infoContext = {
         supportedTemplates: {
-            metadata: ["cytof", "wes", "olink"],
+            metadata: ["cytof", "wes", "olink", "ihc"],
             manifests: []
         },
         extraDataTypes: []

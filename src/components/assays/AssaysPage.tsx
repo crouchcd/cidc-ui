@@ -15,14 +15,16 @@ const paths = {
     cli: "cli-instructions",
     wes: "wes",
     olink: "olink",
-    cytof: "cytof"
+    cytof: "cytof",
+    ihc: "ihc"
 };
 
 const pathTitleMap = {
     [paths.cli]: "The CIDC Command-Line Interface",
     [paths.wes]: "WES upload",
     [paths.olink]: "Olink upload",
-    [paths.cytof]: "CyTOF upload"
+    [paths.cytof]: "CyTOF upload",
+    [paths.ihc]: "IHC upload"
 };
 
 const AssaysPage: React.FunctionComponent<RouteComponentProps> = props => {
@@ -69,6 +71,10 @@ const AssaysPage: React.FunctionComponent<RouteComponentProps> = props => {
                         <AssayListItem
                             title="WES"
                             path={`/assays/${paths.wes}`}
+                        />
+                        <AssayListItem
+                            title="IHC"
+                            path={`/assays/${paths.ihc}`}
                         />
                     </List>
                 </Grid>
