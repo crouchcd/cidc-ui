@@ -11,7 +11,9 @@ import { withIdToken } from "../identity/AuthProvider";
 
 const FILE_TABLE_PAGE_SIZE = 15;
 
-// Columns to omit from `getFiles` queries
+// Columns to omit from `getFiles` queries.
+// These columns may contain large JSON blobs
+// that would slow the query down.
 const FILE_TABLE_QUERY_PROJECTION = {
     clustergrammer: 0,
     additional_metadata: 0
