@@ -46,13 +46,18 @@ export interface IUserPermissionsDialogState {
 const UserPermissionsDialogWithInfo: React.FunctionComponent<
     IUserPermissionsDialogProps
 > = props => {
-    const { supportedTemplates, extraDataTypes } = React.useContext(
-        InfoContext
-    )!;
+    const info = React.useContext(InfoContext);
+
+    if (!info) {
+        return null;
+    }
+
+    const { supportedTemplates, extraDataTypes } = info;
 
     const supportedTypes = [
         ...supportedTemplates.metadata,
         ...supportedTemplates.manifests,
+        ...supportedTemplates.analyses,
         ...extraDataTypes
     ];
 
@@ -196,7 +201,10 @@ class UserPermissionsDialog extends React.Component<
                                             <TableCell>Trial</TableCell>
                                             {this.props.supportedTypes.map(
                                                 typ => (
-                                                    <TableCell key={typ}>
+                                                    <TableCell
+                                                        key={typ}
+                                                        size="small"
+                                                    >
                                                         {typ}
                                                     </TableCell>
                                                 )
