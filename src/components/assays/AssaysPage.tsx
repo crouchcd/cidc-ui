@@ -16,7 +16,8 @@ const paths = {
     wes: "wes",
     olink: "olink",
     cytof: "cytof",
-    ihc: "ihc"
+    ihc: "ihc",
+    elisa: "elisa"
 };
 
 const pathTitleMap = {
@@ -24,7 +25,8 @@ const pathTitleMap = {
     [paths.wes]: "WES upload",
     [paths.olink]: "Olink upload",
     [paths.cytof]: "CyTOF upload",
-    [paths.ihc]: "IHC upload"
+    [paths.ihc]: "IHC upload",
+    [paths.elisa]: "ELISA upload"
 };
 
 const AssaysPage: React.FunctionComponent<RouteComponentProps> = props => {
@@ -75,6 +77,10 @@ const AssaysPage: React.FunctionComponent<RouteComponentProps> = props => {
                         <AssayListItem
                             title="IHC"
                             path={`/assays/${paths.ihc}`}
+                        />
+                        <AssayListItem
+                            title="ELISA"
+                            path={`/assays/${paths.elisa}`}
                         />
                     </List>
                 </Grid>
