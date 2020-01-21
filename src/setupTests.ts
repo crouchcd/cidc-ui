@@ -7,3 +7,6 @@ const localStorageMock = {
 (global as any).localStorage = localStorageMock;
 
 import "@testing-library/jest-dom/extend-expect";
+
+window.URL.createObjectURL = jest.fn();
+HTMLCanvasElement.prototype.getContext = jest.fn();

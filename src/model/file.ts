@@ -1,3 +1,5 @@
+import { Dictionary } from "lodash";
+
 // tslint:disable-next-line:interface-name
 export interface DataFile {
     id: number;
@@ -13,4 +15,5 @@ export interface DataFile {
         [prop: string]: any;
     };
     clustergrammer?: JSON;
+    ihc_combined_plot: Array<Dictionary<string | number>>;
 }
