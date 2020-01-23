@@ -1,5 +1,5 @@
 import { Account } from "../model/account";
-import { Trial } from "../model/trial";
+import { Trial, NewTrial } from "../model/trial";
 import { DataFile } from "../model/file";
 import axios, { AxiosInstance, AxiosResponse, AxiosError } from "axios";
 import Permission from "../model/permission";
@@ -105,7 +105,33 @@ function getAccountInfo(token: string): Promise<Account | undefined> {
 }
 
 function getTrials(token: string): Promise<Trial[]> {
-    return _getItems(token, "trial_metadata");
+    return getApiClient(token)
+        .get("trial_metadata", {
+            params: { sort: '[("trial_id", 1)]' }
+        })
+        .then(_extractItems);
+}
+
+function createTrial(token: string, trial: NewTrial): Promise<Trial> {
+    return getApiClient(token)
+        .post("trial_metadata", trial)
+        .then(_extractItem);
+}
+
+function updateTrialMetadata(
+    token: string,
+    etag: string,
+    trial: Trial
+): Promise<Trial> {
+    return getApiClient(token)
+        .patch(
+            `trial_metadata/${trial.trial_id}`,
+            { metadata_json: trial.metadata_json },
+            {
+                headers: { "if-match": etag }
+            }
+        )
+        .then(_extractItem);
 }
 
 function createUser(token: string, newUser: any): Promise<Account | undefined> {
@@ -268,6 +294,8 @@ export {
     getDownloadURL,
     getAccountInfo,
     getTrials,
+    createTrial,
+    updateTrialMetadata,
     createUser,
     getAllAccounts,
     updateRole,
