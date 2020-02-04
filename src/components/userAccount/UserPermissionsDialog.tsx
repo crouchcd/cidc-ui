@@ -27,10 +27,11 @@ import { Account } from "../../model/account";
 import Permission from "../../model/permission";
 import { InfoContext } from "../info/InfoProvider";
 import Loader from "../generic/Loader";
+import { UserContext } from "../identity/UserProvider";
 
 export interface IUserPermissionsDialogProps {
     open: boolean;
-    user: Account;
+    grantee: Account;
     token: string;
     onCancel: () => void;
 }
@@ -47,8 +48,9 @@ const UserPermissionsDialogWithInfo: React.FunctionComponent<
     IUserPermissionsDialogProps
 > = props => {
     const info = React.useContext(InfoContext);
+    const granter = React.useContext(UserContext);
 
-    if (!info) {
+    if (!info || !granter) {
         return null;
     }
 
@@ -61,11 +63,20 @@ const UserPermissionsDialogWithInfo: React.FunctionComponent<
         ...extraDataTypes
     ];
 
-    return <UserPermissionsDialog {...props} supportedTypes={supportedTypes} />;
+    return (
+        <UserPermissionsDialog
+            {...props}
+            supportedTypes={supportedTypes}
+            granter={granter}
+        />
+    );
 };
 
 class UserPermissionsDialog extends React.Component<
-    IUserPermissionsDialogProps & { supportedTypes: string[] },
+    IUserPermissionsDialogProps & {
+        supportedTypes: string[];
+        granter: Account;
+    },
     IUserPermissionsDialogState
 > {
     state: IUserPermissionsDialogState = {
@@ -95,7 +106,7 @@ class UserPermissionsDialog extends React.Component<
     @autobind
     refreshPermissions() {
         this.setState({ isRefreshing: true });
-        getPermissionsForUser(this.props.token, this.props.user.id).then(
+        getPermissionsForUser(this.props.token, this.props.grantee.id).then(
             permissions => {
                 this.setState({ permissions, isRefreshing: false });
             }
@@ -108,7 +119,10 @@ class UserPermissionsDialog extends React.Component<
             const checked = e.currentTarget.checked;
             if (checked) {
                 // Add to local state
-                const tempNewPerm = { trial, upload_type: assay } as Permission;
+                const tempNewPerm = {
+                    trial_id: trial,
+                    upload_type: assay
+                } as Permission;
                 this.setState(({ permissions }) => ({
                     permissions: permissions
                         ? [...permissions, tempNewPerm]
@@ -118,7 +132,8 @@ class UserPermissionsDialog extends React.Component<
                 // Add to API
                 grantPermission(
                     this.props.token,
-                    this.props.user,
+                    this.props.granter.id,
+                    this.props.grantee.id,
                     trial,
                     assay
                 ).then(() => this.refreshPermissions());
@@ -128,7 +143,11 @@ class UserPermissionsDialog extends React.Component<
                     permissions:
                         permissions &&
                         permissions.filter(
-                            p => !(p.trial === trial && p.upload_type === assay)
+                            p =>
+                                !(
+                                    p.trial_id === trial &&
+                                    p.upload_type === assay
+                                )
                         )
                 }));
 
@@ -161,13 +180,13 @@ class UserPermissionsDialog extends React.Component<
     }
 
     public render() {
-        const userName = `${this.props.user.first_n} ${this.props.user.last_n}`;
+        const userName = `${this.props.grantee.first_n} ${this.props.grantee.last_n}`;
         if (!this.state.permissions) {
             return null;
         }
         // Create a mapping from trial ID -> assay type -> permission
         const permissionsMap = mapValues(
-            groupBy(this.state.permissions, p => p.trial),
+            groupBy(this.state.permissions, p => p.trial_id),
             trialGroup =>
                 trialGroup.reduce(
                     (acc, p) => ({ ...acc, [p.upload_type]: p }),
