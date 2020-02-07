@@ -229,35 +229,6 @@ const FileTable: React.FC<IFileTableProps & { token: string }> = props => {
     const formatUploadTimestamp = (row: DataFile) =>
         new Date(row.uploaded_timestamp).toLocaleString(LOCALE, DATE_OPTIONS);
 
-    const formatObjectURL = (row: DataFile) => {
-        const parts = row.object_url.split("/");
-        const lastPartIndex = parts.length - 1;
-        return (
-            <MuiRouterLink
-                to={`/file-details/${row.id}`}
-                LinkProps={{ color: "initial" }}
-            >
-                {parts.flatMap((part, i) => (
-                    <React.Fragment key={part}>
-                        {part}
-                        {i !== lastPartIndex && (
-                            <Typography
-                                className={classes.forwardSlash}
-                                color="textSecondary"
-                            >
-                                {" "}
-                                /{" "}
-                            </Typography>
-                        )}
-                    </React.Fragment>
-                ))}
-            </MuiRouterLink>
-        );
-    };
-
-    const formatUploadTimestamp = (row: DataFile) =>
-        new Date(row.uploaded_timestamp).toLocaleString(LOCALE, DATE_OPTIONS);
-
     return (
         <div className={classes.root}>
             <Grid container direction="column" spacing={1}>
