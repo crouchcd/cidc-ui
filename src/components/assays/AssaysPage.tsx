@@ -14,6 +14,7 @@ import { useRootStyles } from "../../rootStyles";
 const paths = {
     cli: "cli-instructions",
     wes: "wes",
+    rna: "rna",
     olink: "olink",
     cytof: "cytof",
     ihc: "ihc",
@@ -23,6 +24,7 @@ const paths = {
 const pathTitleMap = {
     [paths.cli]: "The CIDC Command-Line Interface",
     [paths.wes]: "WES upload",
+    [paths.rna]: "RNA Expression upload",
     [paths.olink]: "Olink upload",
     [paths.cytof]: "CyTOF upload",
     [paths.ihc]: "IHC upload",
@@ -73,6 +75,10 @@ const AssaysPage: React.FunctionComponent<RouteComponentProps> = props => {
                         <AssayListItem
                             title="WES"
                             path={`/assays/${paths.wes}`}
+                        />
+                        <AssayListItem
+                            title="RNA Expression"
+                            path={`/assays/${paths.rna}`}
                         />
                         <AssayListItem
                             title="IHC"

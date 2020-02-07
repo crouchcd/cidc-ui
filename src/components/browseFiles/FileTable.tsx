@@ -13,20 +13,21 @@ import {
     Grid
 } from "@material-ui/core";
 import { filterConfig, Filters } from "./FileFilter";
-import { useQueryParams } from "use-query-params";
+import { useQueryParams, useQueryParam, NumberParam } from "use-query-params";
 import { getFiles, IDataWithMeta, getDownloadURL } from "../../api/api";
 import { withIdToken } from "../identity/AuthProvider";
 import MuiRouterLink from "../generic/MuiRouterLink";
 import { CloudDownload } from "@material-ui/icons";
 
-const FILE_TABLE_PAGE_SIZE = 15;
-
-// Columns to omit from `getFiles` queries.
-// These columns may contain large JSON blobs
-// that would slow the query down.
-const FILE_TABLE_QUERY_PROJECTION = {
-    clustergrammer: 0,
-    additional_metadata: 0
+const fileQueryDefaults = {
+    max_results: 15,
+    // Columns to omit from `getFiles` queries.
+    // These columns may contain large JSON blobs
+    // that would slow the query down.
+    projection: {
+        clustergrammer: 0,
+        additional_metadata: 0
+    }
 };
 
 const useStyles = makeStyles({
@@ -126,9 +127,15 @@ const BatchDownloadButton: React.FC<{
 
 const FileTable: React.FC<IFileTableProps & { token: string }> = props => {
     const classes = useStyles();
-    const filters = useQueryParams(filterConfig)[0];
 
-    const [page, setPage] = React.useState<number>(0);
+    const filters = useQueryParams(filterConfig)[0];
+    const whereClause = filtersToWhereClause(filters);
+
+    const [maybeQueryPage, setQueryPage] = useQueryParam("page", NumberParam);
+    const queryPage = maybeQueryPage || 0;
+    const [tablePage, setTablePage] = React.useState<number>(0);
+    const [prevPage, setPrevPage] = React.useState<number | null>();
+
     const [data, setData] = React.useState<
         IDataWithMeta<DataFile[]> | undefined
     >(undefined);
@@ -146,20 +153,52 @@ const FileTable: React.FC<IFileTableProps & { token: string }> = props => {
             direction: "desc"
         } as IHeader
     ]);
-    const sortHeader = headers.filter(h => h.active)[0];
+    const sortClause = headerToSortClause(headers.filter(h => h.active)[0]);
 
     React.useEffect(() => {
-        getFiles(props.token, {
-            page: page + 1, // eve-sqlalchemy pagination starts at 1
-            where: filtersToWhereClause(filters),
-            max_results: FILE_TABLE_PAGE_SIZE,
-            sort: headerToSortClause(sortHeader),
-            projection: FILE_TABLE_QUERY_PROJECTION
-        }).then(files => {
-            setData(files);
-            setChecked([]);
-        });
-    }, [filters, page, props.token, sortHeader]);
+        if (queryPage === prevPage && prevPage !== 0) {
+            // Reset the query page to 0, since the user has either
+            // changed the filtering or the sorting.
+            // NOTE: This change doesn't update the file table.
+            setQueryPage(0);
+        } else if (queryPage < 0) {
+            // A negative queryPage is invalid
+            setQueryPage(0);
+        } else {
+            getFiles(props.token, {
+                page: queryPage + 1, // eve-sqlalchemy pagination starts at 1
+                where: whereClause,
+                sort: sortClause,
+                ...fileQueryDefaults
+            }).then(files => {
+                // Check if queryPage is too high for the current filters.
+                if (
+                    queryPage * fileQueryDefaults.max_results >
+                    files.meta.total
+                ) {
+                    // queryPage is out of bounds, so reset to 0.
+                    setQueryPage(0);
+                } else {
+                    // De-select all selected files.
+                    setChecked([]);
+
+                    // Update the page in the file table.
+                    setTablePage(queryPage);
+
+                    // Push the new data to the table.
+                    setData(files);
+                }
+            });
+        }
+        // Track which page we're switching from.
+        setPrevPage(queryPage);
+
+        // If we include prevPage in the useEffect dependencies, this
+        // effect will rerun until queryPage == prevPage, preventing
+        // the component from remaining in a state where queryPage != 0.
+        // TODO: maybe there's a refactor that prevents this issue.
+        // eslint-disable-next-line
+    }, [props.token, whereClause, sortClause, queryPage, setQueryPage]);
 
     const formatObjectURL = (row: DataFile) => {
         const parts = row.object_url.split("/");
@@ -203,9 +242,9 @@ const FileTable: React.FC<IFileTableProps & { token: string }> = props => {
                 <Grid item>
                     <PaginatedTable
                         count={data ? data.meta.total : 0}
-                        page={page}
-                        onChangePage={p => setPage(p)}
-                        rowsPerPage={FILE_TABLE_PAGE_SIZE}
+                        page={tablePage}
+                        onChangePage={p => setQueryPage(p)}
+                        rowsPerPage={fileQueryDefaults.max_results}
                         headers={headers}
                         data={data && data.data}
                         getRowKey={row => row.id}
