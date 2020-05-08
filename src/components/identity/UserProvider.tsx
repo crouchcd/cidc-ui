@@ -10,6 +10,7 @@ import Permission from "../../model/permission";
 export interface IAccountWithExtraContext extends Account {
     permissions?: Permission[];
     showAssays?: boolean;
+    showAnalyses?: boolean;
     showManifests?: boolean;
 }
 
@@ -78,12 +79,22 @@ const UserProvider: React.FunctionComponent<RouteComponentProps> = props => {
         user &&
         user.role &&
         ["nci-biobank-user", "cidc-admin"].includes(user.role);
+    const showAnalyses =
+        user &&
+        user.role &&
+        ["cidc-biofx-user", "cidc-admin"].includes(user.role);
 
     const isUnactivatedPath = UNACTIVATED_PATHS.includes(
         props.location.pathname
     );
 
-    const value = user && { ...user, permissions, showAssays, showManifests };
+    const value = user && {
+        ...user,
+        permissions,
+        showAssays,
+        showManifests,
+        showAnalyses
+    };
 
     return (
         <UserContext.Provider value={value}>
