@@ -5,7 +5,6 @@ import { Router, Switch, Route } from "react-router-dom";
 import Header from "./components/header/Header";
 import Footer from "./components/footer/Footer";
 import HomePage from "./components/home/HomePage";
-import TransferDataPage from "./components/assays/AssaysPage";
 import ManifestsPage from "./components/manifests/ManifestsPage";
 import PrivacyAndSecurityPage from "./components/privacyAndSecurity/PrivacyAndSecurityPage";
 import UserAccountPage from "./components/userAccount/UserAccountPage";
@@ -19,6 +18,10 @@ import InfoProvider from "./components/info/InfoProvider";
 import { createMuiTheme, MuiThemeProvider } from "@material-ui/core";
 import { useRootStyles } from "./rootStyles";
 import { QueryParamProvider } from "use-query-params";
+import {
+    AssayDocsPage,
+    AnalysesDocsPage
+} from "./components/uploadDocs/UploadDocsPages";
 
 const theme = createMuiTheme({
     overrides: {
@@ -61,7 +64,11 @@ export default function App() {
                                                 />
                                                 <Route
                                                     path="/assays"
-                                                    component={TransferDataPage}
+                                                    component={AssayDocsPage}
+                                                />
+                                                <Route
+                                                    path="/analyses"
+                                                    component={AnalysesDocsPage}
                                                 />
                                                 <Route
                                                     path="/browse-files"

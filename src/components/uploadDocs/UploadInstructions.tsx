@@ -1,5 +1,4 @@
 import * as React from "react";
-import { RouteComponentProps } from "react-router";
 import CIDCGithubMarkdown from "./CIDCGithubMarkdown";
 import TemplateDownloadButton from "../generic/TemplateDownloadButton";
 import { withIdToken, AuthContext } from "../identity/AuthProvider";
@@ -7,10 +6,12 @@ import { Grid, Typography, Divider } from "@material-ui/core";
 import { CloudDownload, Fingerprint } from "@material-ui/icons";
 import CopyToClipboardButton from "../generic/CopyToClipboardButton";
 import { widths } from "../../rootStyles";
+import { IUploadDocsPageProps } from "./UploadDocsPages";
 
-export interface IAssayInstructionsProps
-    extends RouteComponentProps<{ assay: string }> {
+export interface IUploadInstructionsProps {
     title: string;
+    docPath: string;
+    uploadType: IUploadDocsPageProps["uploadType"];
     token?: string;
     tokenButton?: boolean;
 }
@@ -30,9 +31,10 @@ const CopyIdToken: React.FunctionComponent = () => {
     );
 };
 
-const AssayInstructions: React.FunctionComponent<IAssayInstructionsProps> = props => {
-    const assay = props.match.params.assay;
-    const path = `cidc-documentation/master/assays/${assay}.md`;
+const UploadInstructions: React.FunctionComponent<IUploadInstructionsProps> = props => {
+    const path = `cidc-documentation/master/${props.docPath}`;
+    const pathParts = props.docPath.split("/");
+    const name = pathParts[pathParts.length - 1].slice(0, -3);
 
     return (
         <Grid container direction="column">
@@ -56,8 +58,8 @@ const AssayInstructions: React.FunctionComponent<IAssayInstructionsProps> = prop
                                 fullWidth
                                 verboseLabel
                                 color="primary"
-                                templateName={assay}
-                                templateType="metadata"
+                                templateName={name}
+                                templateType={props.uploadType}
                                 variant="contained"
                                 startIcon={<CloudDownload />}
                             />
@@ -79,4 +81,4 @@ const AssayInstructions: React.FunctionComponent<IAssayInstructionsProps> = prop
     );
 };
 
-export default withIdToken<IAssayInstructionsProps>(AssayInstructions);
+export default withIdToken<IUploadInstructionsProps>(UploadInstructions);
