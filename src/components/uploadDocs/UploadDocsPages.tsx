@@ -21,7 +21,7 @@ interface IDocPathConfig {
     analyses?: boolean;
 }
 
-const CLIInstructionsPath = "/cli-instructions";
+const CLIInstructionsPath = "cli-instructions";
 
 const pathConfigs: Dictionary<IDocPathConfig> = {
     wes: {
