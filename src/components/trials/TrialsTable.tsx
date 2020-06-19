@@ -11,6 +11,7 @@ import {
     CardHeader,
     Button
 } from "@material-ui/core";
+import { styled } from "@material-ui/core/styles";
 import { Trial } from "../../model/trial";
 import { getTrials } from "../../api/api";
 import { AuthContext } from "../identity/AuthProvider";
@@ -27,6 +28,10 @@ interface ITrialRowProps extends IWithHistory {
     trial: Trial;
 }
 
+const TrialRow = styled(TableRow)({
+    cursor: "pointer"
+});
+
 const TrialRow: React.FC<ITrialRowProps> = ({ trial, history }) => {
     const navigateToEditForm = () => {
         history.push(`trials/edit/${trial.trial_id}`);
@@ -35,14 +40,14 @@ const TrialRow: React.FC<ITrialRowProps> = ({ trial, history }) => {
     const org = trial.metadata_json.trial_organization;
 
     return (
-        <TableRow hover onClick={navigateToEditForm}>
+        <TrialRow hover onClick={navigateToEditForm}>
             <TableCell>{trial.trial_id}</TableCell>
             <TableCell>
                 <Typography color={org ? "textPrimary" : "textSecondary"}>
                     {org || "none specified"}
                 </Typography>
             </TableCell>
-        </TableRow>
+        </TrialRow>
     );
 };
 
