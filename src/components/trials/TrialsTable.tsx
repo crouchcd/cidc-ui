@@ -28,10 +28,6 @@ interface ITrialRowProps extends IWithHistory {
     trial: Trial;
 }
 
-const TrialRow = styled(TableRow)({
-    cursor: "pointer"
-});
-
 const TrialRow: React.FC<ITrialRowProps> = ({ trial, history }) => {
     const navigateToEditForm = () => {
         history.push(`trials/edit/${trial.trial_id}`);
@@ -39,15 +35,19 @@ const TrialRow: React.FC<ITrialRowProps> = ({ trial, history }) => {
 
     const org = trial.metadata_json.trial_organization;
 
+    const ClicableRow = styled(TableRow)({
+        cursor: "pointer"
+    });
+
     return (
-        <TrialRow hover onClick={navigateToEditForm}>
+        <ClicableRow hover onClick={navigateToEditForm}>
             <TableCell>{trial.trial_id}</TableCell>
             <TableCell>
                 <Typography color={org ? "textPrimary" : "textSecondary"}>
                     {org || "none specified"}
                 </Typography>
             </TableCell>
-        </TrialRow>
+        </ClicableRow>
     );
 };
 
