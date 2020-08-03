@@ -1,9 +1,14 @@
 import { Account } from "../model/account";
 import { Trial, NewTrial } from "../model/trial";
 import { DataFile } from "../model/file";
-import axios, { AxiosInstance, AxiosResponse, AxiosError } from "axios";
+import axios, {
+    AxiosInstance,
+    AxiosResponse,
+    AxiosError,
+    CancelToken
+} from "axios";
 import Permission from "../model/permission";
-import { Dictionary } from "lodash";
+import { IFacets } from "../components/browseFiles/FileFilter";
 
 const URL: string = process.env.REACT_APP_API_URL!;
 
@@ -69,10 +74,11 @@ export interface IDataWithMeta<D> {
 
 function getFiles(
     token: string,
-    params?: any
+    params?: any,
+    cancelToken?: CancelToken
 ): Promise<IDataWithMeta<DataFile[]>> {
     return getApiClient(token)
-        .get("downloadable_files", { params })
+        .get("downloadable_files", { params, cancelToken })
         .then(res => {
             const { _items, _meta: meta } = _extractItem(res);
             return { data: _items.map(_transformFile), meta };
@@ -113,6 +119,10 @@ function getTrials(token: string): Promise<Trial[]> {
         .then(_extractItems);
 }
 
+function getTrial(token: string, trialId: string): Promise<Trial> {
+    return _getItem<Trial>(token, "trial_metadata", trialId);
+}
+
 function createTrial(token: string, trial: NewTrial): Promise<Trial> {
     return getApiClient(token)
         .post("trial_metadata", trial)
@@ -122,7 +132,7 @@ function createTrial(token: string, trial: NewTrial): Promise<Trial> {
 function updateTrialMetadata(
     token: string,
     etag: string,
-    trial: Trial
+    trial: Pick<Trial, "trial_id" | "metadata_json">
 ): Promise<Trial> {
     return getApiClient(token)
         .patch(
@@ -252,7 +262,7 @@ function revokePermission(token: string, permissionID: number): Promise<any> {
     );
 }
 
-function getFilterFacets(token: string): Promise<Dictionary<string[]>> {
+function getFilterFacets(token: string): Promise<IFacets> {
     return getApiClient(token)
         .get("downloadable_files/filter_facets")
         .then(_extractItem);
@@ -303,6 +313,7 @@ export {
     getDownloadURL,
     getAccountInfo,
     getTrials,
+    getTrial,
     createTrial,
     updateTrialMetadata,
     createUser,

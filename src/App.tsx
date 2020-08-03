@@ -22,6 +22,7 @@ import {
     AssayDocsPage,
     AnalysesDocsPage
 } from "./components/uploadDocs/UploadDocsPages";
+import TrialsPage from "./components/trials/TrialsPage";
 
 const theme = createMuiTheme({
     overrides: {
@@ -52,8 +53,8 @@ export default function App() {
                     <MuiThemeProvider theme={theme}>
                         <ErrorGuard>
                             <AuthProvider>
-                                <UserProvider>
-                                    <InfoProvider>
+                                <InfoProvider>
+                                    <UserProvider>
                                         <Header />
                                         <div className={classes.content}>
                                             <Switch>
@@ -77,6 +78,10 @@ export default function App() {
                                                 <Route
                                                     path="/manifests"
                                                     component={ManifestsPage}
+                                                />
+                                                <Route
+                                                    path="/trials"
+                                                    component={TrialsPage}
                                                 />
                                                 <Route
                                                     path="/privacy-security"
@@ -103,8 +108,8 @@ export default function App() {
                                             </Switch>
                                         </div>
                                         <Footer />
-                                    </InfoProvider>
-                                </UserProvider>
+                                    </UserProvider>
+                                </InfoProvider>
                             </AuthProvider>
                         </ErrorGuard>
                     </MuiThemeProvider>

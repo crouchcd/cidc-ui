@@ -18,6 +18,8 @@ import { getFiles, IDataWithMeta, getDownloadURL } from "../../api/api";
 import { withIdToken } from "../identity/AuthProvider";
 import MuiRouterLink from "../generic/MuiRouterLink";
 import { CloudDownload } from "@material-ui/icons";
+import axios, { CancelTokenSource } from "axios";
+import filesize from "filesize";
 
 const fileQueryDefaults = {
     page_size: 15
@@ -57,16 +59,14 @@ export interface IFileTableProps {
     history: any;
 }
 
-export const filterParamsFromFilters = (filters: Filters) => {
+export const filterParams = (filters: Filters) => {
     return {
-        trial_ids: filters.trial_id?.join(","),
-        upload_types: filters.upload_type?.join(","),
-        analysis_friendly:
-            filters.raw_files === undefined ? true : !filters.raw_files
+        trial_ids: filters.trial_ids?.join(","),
+        facets: filters.facets?.join(",")
     };
 };
 
-export const sortParamsFromHeader = (header?: IHeader) => {
+export const sortParams = (header?: IHeader) => {
     return (
         header && {
             sort_field: header?.key,
@@ -120,8 +120,11 @@ const BatchDownloadButton: React.FC<{
     );
 };
 
+const CANCEL_MESSAGE = "cancelling stale filter request";
+
 const FileTable: React.FC<IFileTableProps & { token: string }> = props => {
     const classes = useStyles();
+    const axiosCanceller = React.useRef<CancelTokenSource | undefined>();
 
     const filters = useQueryParams(filterConfig)[0];
 
@@ -139,6 +142,10 @@ const FileTable: React.FC<IFileTableProps & { token: string }> = props => {
         {
             key: "object_url",
             label: "File"
+        },
+        {
+            key: "file_size_bytes",
+            label: "Size"
         },
         {
             key: "uploaded_timestamp",
@@ -159,30 +166,50 @@ const FileTable: React.FC<IFileTableProps & { token: string }> = props => {
             // A negative queryPage is invalid
             setQueryPage(0);
         } else {
-            getFiles(props.token, {
-                page_num: queryPage,
-                ...filterParamsFromFilters(filters),
-                ...sortParamsFromHeader(sortHeader),
-                ...fileQueryDefaults
-            }).then(files => {
-                // Check if queryPage is too high for the current filters.
-                if (
-                    queryPage * fileQueryDefaults.page_size >
-                    files.meta.total
-                ) {
-                    // queryPage is out of bounds, so reset to 0.
-                    setQueryPage(0);
-                } else {
-                    // De-select all selected files.
-                    setChecked([]);
+            // Clear existing data, so the table shows a loading indicator
+            setData(undefined);
 
-                    // Update the page in the file table.
-                    setTablePage(queryPage);
+            // Cancel the previous request, if one is ongoing
+            if (axiosCanceller.current) {
+                axiosCanceller.current.cancel(CANCEL_MESSAGE);
+            }
 
-                    // Push the new data to the table.
-                    setData(files);
-                }
-            });
+            axiosCanceller.current = axios.CancelToken.source();
+
+            getFiles(
+                props.token,
+                {
+                    page_num: queryPage,
+                    ...filterParams(filters),
+                    ...sortParams(sortHeader),
+                    ...fileQueryDefaults
+                },
+                axiosCanceller.current.token
+            )
+                .then(files => {
+                    // Check if queryPage is too high for the current filters.
+                    if (
+                        queryPage * fileQueryDefaults.page_size >
+                        files.meta.total
+                    ) {
+                        // queryPage is out of bounds, so reset to 0.
+                        setQueryPage(0);
+                    } else {
+                        // De-select all selected files.
+                        setChecked([]);
+
+                        // Update the page in the file table.
+                        setTablePage(queryPage);
+
+                        // Push the new data to the table.
+                        setData(files);
+                    }
+                })
+                .catch(err => {
+                    if (err.message !== CANCEL_MESSAGE) {
+                        console.error(err.message);
+                    }
+                });
         }
         // Track which page we're switching from.
         setPrevPage(queryPage);
@@ -200,7 +227,7 @@ const FileTable: React.FC<IFileTableProps & { token: string }> = props => {
         return (
             <MuiRouterLink
                 to={`/file-details/${row.id}`}
-                LinkProps={{ color: "initial" }}
+                LinkProps={{ color: "inherit" }}
             >
                 {parts.flatMap((part, i) => (
                     <React.Fragment key={part}>
@@ -254,6 +281,9 @@ const FileTable: React.FC<IFileTableProps & { token: string }> = props => {
                                     </TableCell>
                                     <TableCell>
                                         {formatObjectURL(row)}
+                                    </TableCell>
+                                    <TableCell>
+                                        {filesize(row.file_size_bytes)}
                                     </TableCell>
                                     <TableCell>
                                         {formatUploadTimestamp(row)}
