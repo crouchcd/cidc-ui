@@ -5,7 +5,6 @@ import { colors } from "../../rootStyles";
 import PaginatedTable, { IHeader } from "../generic/PaginatedTable";
 import {
     makeStyles,
-    Typography,
     TableCell,
     Checkbox,
     Button,
@@ -42,10 +41,6 @@ const useStyles = makeStyles({
         "& .MuiTableRow-root": {
             cursor: "pointer"
         }
-    },
-    forwardSlash: {
-        fontSize: "inherit",
-        display: "inline"
     },
     checkbox: {
         padding: 0
@@ -141,7 +136,17 @@ const FileTable: React.FC<IFileTableProps & { token: string }> = props => {
         { key: "", label: "", disableSort: true },
         {
             key: "object_url",
-            label: "File"
+            label: "File Name"
+        },
+        {
+            key: "trial_id",
+            label: "Protocol ID"
+        },
+        { key: "file_ext", label: "Format" },
+        { key: "data_category", label: "Category" },
+        {
+            key: "file_size_bytes",
+            label: "Size"
         },
         {
             key: "file_size_bytes",
@@ -222,27 +227,15 @@ const FileTable: React.FC<IFileTableProps & { token: string }> = props => {
     }, [props.token, filters, sortHeader, queryPage, setQueryPage]);
 
     const formatObjectURL = (row: DataFile) => {
-        const parts = row.object_url.split("/");
-        const lastPartIndex = parts.length - 1;
+        const paths = row.object_url.split("/");
+        const fileName = paths[paths.length - 1];
+        const prefix = paths.slice(0, paths.length - 1).join("/");
         return (
-            <MuiRouterLink
-                to={`/file-details/${row.id}`}
-                LinkProps={{ color: "inherit" }}
-            >
-                {parts.flatMap((part, i) => (
-                    <React.Fragment key={part}>
-                        {part}
-                        {i !== lastPartIndex && (
-                            <Typography
-                                className={classes.forwardSlash}
-                                color="textSecondary"
-                            >
-                                {" "}
-                                /{" "}
-                            </Typography>
-                        )}
-                    </React.Fragment>
-                ))}
+            <MuiRouterLink to={`/file-details/${row.id}`}>
+                <div style={{ textDecoration: "underline" }}>
+                    <div>{prefix}/</div>
+                    <div>{fileName}</div>
+                </div>
             </MuiRouterLink>
         );
     };
@@ -281,6 +274,12 @@ const FileTable: React.FC<IFileTableProps & { token: string }> = props => {
                                     </TableCell>
                                     <TableCell>
                                         {formatObjectURL(row)}
+                                    </TableCell>
+                                    <TableCell>{row.trial_id}</TableCell>
+                                    <TableCell>{row.file_ext}</TableCell>
+                                    <TableCell>{row.data_category}</TableCell>
+                                    <TableCell>
+                                        {filesize(row.file_size_bytes)}
                                     </TableCell>
                                     <TableCell>
                                         {filesize(row.file_size_bytes)}

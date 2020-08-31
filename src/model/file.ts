@@ -11,6 +11,8 @@ export interface DataFile {
     artifact_category: string;
     upload_type: string;
     data_format: string;
+    file_ext?: string;
+    data_category?: string;
     additional_metadata?: {
         [prop: string]: any;
     };
