@@ -21,7 +21,13 @@ import { useUserContext } from "../identity/UserProvider";
 import { colors, widths } from "../../rootStyles";
 import { theme } from "../../App";
 import MuiRouterLink from "../generic/MuiRouterLink";
-import { TableChart, Search, AccountCircle } from "@material-ui/icons";
+import {
+    TableChart,
+    Search,
+    AccountCircle,
+    DeviceHub,
+    Code
+} from "@material-ui/icons";
 
 const ENV = process.env.REACT_APP_ENV;
 
@@ -120,22 +126,15 @@ const Header: React.FunctionComponent<RouteComponentProps> = props => {
     }
 
     let selectedTab: string | false = props.location.pathname;
-    if (selectedTab.startsWith("/assays")) {
-        selectedTab = "/assays";
-    } else if (selectedTab.startsWith("/analyses")) {
-        selectedTab = "/analyses";
-    } else if (selectedTab.startsWith("/trials")) {
-        selectedTab = "/trials";
-    } else if (selectedTab.startsWith("/browse-files")) {
-        selectedTab = "/browse-files";
-    } else if (selectedTab.startsWith("/manifests")) {
-        selectedTab = "/manifests";
-    } else if (["/", "/privacy-security"].includes(selectedTab)) {
+
+    if (["/", "/privacy-security"].includes(selectedTab)) {
         selectedTab = false;
     } else if (
         ["/register", "/unactivated", "/callback"].includes(selectedTab)
     ) {
         return null;
+    } else {
+        selectedTab = `/${selectedTab.split("/")[1]}`;
     }
 
     return (
@@ -197,6 +196,18 @@ const Header: React.FunctionComponent<RouteComponentProps> = props => {
                                     icon={<TableChart />}
                                 />
                             )} */}
+                            <Tab
+                                disableRipple={true}
+                                value="/pipelines"
+                                label="Pipelines"
+                                icon={<DeviceHub />}
+                            />
+                            <Tab
+                                disableRipple={true}
+                                value="/schema"
+                                label="Schema"
+                                icon={<Code />}
+                            />
                             <Tab
                                 disableRipple={true}
                                 value="/user-account"
