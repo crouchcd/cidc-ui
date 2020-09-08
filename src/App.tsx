@@ -76,7 +76,7 @@ export default function App() {
                                                 />
                                                 <Route
                                                     exact
-                                                    path="/browse-files/:fileId(\\d+)"
+                                                    path="/browse-files/:fileId"
                                                     component={FileDetailsPage}
                                                 />
                                                 <Route
