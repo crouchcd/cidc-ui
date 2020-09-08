@@ -23,8 +23,11 @@ import {
     AnalysesDocsPage
 } from "./components/uploadDocs/UploadDocsPages";
 import TrialsPage from "./components/trials/TrialsPage";
+import SchemaPage from "./components/schema/SchemaPage";
+import PipelinesPage from "./components/pipelines/PipelinesPage";
+import NotFoundRoute from "./components/generic/NotFoundRoute";
 
-const theme = createMuiTheme({
+export const theme = createMuiTheme({
     overrides: {
         MuiCard: {
             root: {
@@ -59,8 +62,8 @@ export default function App() {
                                         <div className={classes.content}>
                                             <Switch>
                                                 <Route
+                                                    exact
                                                     path="/"
-                                                    exact={true}
                                                     component={HomePage}
                                                 />
                                                 <Route
@@ -72,38 +75,59 @@ export default function App() {
                                                     component={AnalysesDocsPage}
                                                 />
                                                 <Route
+                                                    exact
+                                                    path="/browse-files/:fileId(\\d+)"
+                                                    component={FileDetailsPage}
+                                                />
+                                                <Route
+                                                    exact
                                                     path="/browse-files"
                                                     component={BrowseFilesPage}
                                                 />
                                                 <Route
+                                                    exact
                                                     path="/manifests"
                                                     component={ManifestsPage}
                                                 />
                                                 <Route
+                                                    exact
                                                     path="/trials"
                                                     component={TrialsPage}
                                                 />
                                                 <Route
+                                                    path="/pipelines"
+                                                    component={PipelinesPage}
+                                                />
+                                                <Route
+                                                    exact
+                                                    path="/schema"
+                                                    component={SchemaPage}
+                                                />
+                                                <Route
+                                                    exact
                                                     path="/privacy-security"
                                                     component={
                                                         PrivacyAndSecurityPage
                                                     }
                                                 />
                                                 <Route
+                                                    exact
                                                     path="/user-account"
                                                     component={UserAccountPage}
                                                 />
                                                 <Route
-                                                    path="/file-details/:fileId"
-                                                    component={FileDetailsPage}
-                                                />
-                                                <Route
+                                                    exact
                                                     path="/register"
                                                     component={Register}
                                                 />
                                                 <Route
+                                                    exact
                                                     path="/unactivated"
                                                     component={Unactivated}
+                                                />
+                                                <Route
+                                                    path="*"
+                                                    component={NotFoundRoute}
                                                 />
                                             </Switch>
                                         </div>
