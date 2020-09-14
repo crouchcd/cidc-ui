@@ -25,7 +25,6 @@ const Footer: React.FC = () => {
                             >
                                 About
                             </MuiLink>
-                            =
                         </Grid>
                         <Grid item>
                             <MuiRouterLink
