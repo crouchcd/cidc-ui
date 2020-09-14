@@ -9,7 +9,6 @@ import {
     OutlinedInput,
     MenuItem,
     Typography,
-    CircularProgress,
     makeStyles
 } from "@material-ui/core";
 import { ORGANIZATION_NAME_MAP } from "../../util/constants";
@@ -17,6 +16,7 @@ import { createUser } from "../../api/api";
 import { AuthContext } from "./AuthProvider";
 import history from "./History";
 import { colors } from "../../rootStyles";
+import Loader from "../generic/Loader";
 
 export const useRegisterStyles = makeStyles({
     header: {
@@ -26,10 +26,6 @@ export const useRegisterStyles = makeStyles({
         backgroundColor: colors.LIGHT_BLUE,
         height: 48,
         fontSize: 24
-    },
-    progress: {
-        textAlign: "center",
-        paddingTop: 30
     },
     body: { width: 700, margin: "auto", paddingTop: 25 },
     text: { fontSize: 18 }
@@ -111,9 +107,7 @@ export default function Register() {
         return (
             <>
                 <div className={classes.header}>CIDC Registration Request</div>
-                <div className={classes.progress}>
-                    <CircularProgress />
-                </div>
+                <Loader />
             </>
         );
     }
