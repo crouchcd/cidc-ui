@@ -8,7 +8,7 @@ import axios, {
     CancelToken
 } from "axios";
 import Permission from "../model/permission";
-import { IFacets } from "../components/browseFiles/FileFilter";
+import { IFacets } from "../components/browse-files/FileFilter";
 
 const URL: string = process.env.REACT_APP_API_URL!;
 
@@ -19,7 +19,7 @@ function getApiClient(token?: string): AxiosInstance {
     });
 }
 
-function _itemURL(endpoint: string, itemID: string): string {
+function _itemURL(endpoint: string, itemID: number): string {
     return `${endpoint}/${itemID}`;
 }
 
@@ -48,10 +48,10 @@ function _extractErrorMessage(error: AxiosError): never {
 function _getItem<T>(
     token: string,
     endpoint: string,
-    itemID: string | number
+    itemID: number
 ): Promise<T> {
     return getApiClient(token)
-        .get(_itemURL(endpoint, itemID.toString()))
+        .get(_itemURL(endpoint, itemID))
         .then(_extractItem);
 }
 
@@ -59,10 +59,6 @@ function _getItems<T>(token: string, endpoint: string): Promise<T[]> {
     return getApiClient(token)
         .get(endpoint)
         .then(_extractItems);
-}
-
-function _transformFile(file: DataFile): DataFile {
-    return { ...file, data_format: file.data_format.toLowerCase() };
 }
 
 export interface IDataWithMeta<D> {
@@ -81,17 +77,15 @@ function getFiles(
         .get("downloadable_files", { params, cancelToken })
         .then(res => {
             const { _items, _meta: meta } = _extractItem(res);
-            return { data: _items.map(_transformFile), meta };
+            return { data: _items, meta };
         });
 }
 
 function getSingleFile(
     token: string,
-    itemID: string
+    itemID: number
 ): Promise<DataFile | undefined> {
-    return _getItem<DataFile>(token, "downloadable_files", itemID).then(
-        _transformFile
-    );
+    return _getItem<DataFile>(token, "downloadable_files", itemID);
 }
 
 function getFilelist(token: string, fileIds: number[]): Promise<Blob> {
@@ -132,7 +126,7 @@ function getTrials(token: string): Promise<Trial[]> {
         .then(_extractItems);
 }
 
-function getTrial(token: string, trialId: string): Promise<Trial> {
+function getTrial(token: string, trialId: number): Promise<Trial> {
     return _getItem<Trial>(token, "trial_metadata", trialId);
 }
 
@@ -168,7 +162,7 @@ function getAllAccounts(token: string): Promise<Account[]> {
 
 function updateRole(
     token: string,
-    itemID: string,
+    itemID: number,
     etag: string,
     role: string
 ): Promise<Account> {
@@ -305,21 +299,11 @@ function getExtraDataTypes(): Promise<string[]> {
         .then(_extractItem);
 }
 
-// ----------- Old API methods (not currently supported) ----------- //
-
-async function deleteUser(
-    token: string,
-    itemID: string,
-    etag: string
-): Promise<Account | undefined> {
-    console.error("not currently supported");
-    return;
-}
-
 export {
     _getItem,
     _getItems,
     _extractErrorMessage,
+    _makeManifestRequest,
     getApiClient,
     getFiles,
     getSingleFile,
@@ -333,7 +317,6 @@ export {
     createUser,
     getAllAccounts,
     updateRole,
-    deleteUser,
     getUserEtag,
     uploadManifest,
     getManifestValidationErrors,
