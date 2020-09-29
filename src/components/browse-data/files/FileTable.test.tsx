@@ -1,12 +1,12 @@
 import { fireEvent } from "@testing-library/react";
 import { range } from "lodash";
 import React from "react";
-import { renderWithRouter } from "../../../test/helpers";
-import { getFiles, getFilelist } from "../../api/api";
-import { DataFile } from "../../model/file";
-import { AuthContext } from "../identity/AuthProvider";
+import { renderWithRouter } from "../../../../test/helpers";
+import { getFiles, getFilelist } from "../../../api/api";
+import { DataFile } from "../../../model/file";
+import { AuthContext } from "../../identity/AuthProvider";
 import FileTable, { filterParams, sortParams } from "./FileTable";
-jest.mock("../../api/api");
+jest.mock("../../../api/api");
 
 test("filterParams", () => {
     expect(filterParams({})).toEqual({});
@@ -44,21 +44,31 @@ const getFilesResult = {
     data: files,
     meta: { total: 123 }
 };
+const toggleButtonText = "toggle file view";
 const renderFileTable = () => {
     return renderWithRouter(
         <AuthContext.Provider value={{ idToken: "test-token" }}>
-            <FileTable history={history} />
+            <FileTable
+                history={history}
+                viewToggleButton={<button>{toggleButtonText}</button>}
+            />
         </AuthContext.Provider>
     );
 };
 
 it("renders with no filters applied", async () => {
     getFiles.mockResolvedValue(getFilesResult);
-    const { findAllByText, queryByText, queryAllByText } = renderFileTable();
-    expect(queryByText(/loading/i)).toBeInTheDocument();
+    const {
+        findAllByText,
+        queryByText,
+        queryAllByTestId,
+        queryAllByText
+    } = renderFileTable();
+    expect(queryAllByTestId(/placeholder-row/i).length).toBeGreaterThan(0);
     expect((await findAllByText(/file\/url/i)).length).toBe(files.length);
     expect(queryAllByText(/participants info/i).length).toBe(files.length);
     expect(queryAllByText(/csv/i).length).toBe(files.length);
+    expect(queryByText(/toggle file view/i)).toBeInTheDocument();
     // loading indicator gone
     expect(queryByText(/loading/i)).not.toBeInTheDocument();
 });

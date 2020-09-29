@@ -17,11 +17,12 @@ import {
     KeyboardArrowDown,
     KeyboardArrowUp
 } from "@material-ui/icons";
-import { Dictionary, some, partition, sortBy } from "lodash";
-import { useUserContext } from "../identity/UserProvider";
+import { Dictionary, some, partition, sortBy, range } from "lodash";
+import { useUserContext } from "../../identity/UserProvider";
 import { withStyles } from "@material-ui/styles";
-import { IFacetInfo } from "./FileFilter";
-import InfoTooltip from "../generic/InfoTooltip";
+import InfoTooltip from "../../generic/InfoTooltip";
+import { IFacetInfo } from "./FilterProvider";
+import { Skeleton } from "@material-ui/lab";
 
 const searchBoxMargin = 15;
 
@@ -62,14 +63,14 @@ export interface IFilterConfig {
     checked: string[] | undefined;
 }
 
-export interface IFileFilterCheckboxGroupProps {
+export interface IFilterCheckboxGroupProps {
     title: string;
     config: IFilterConfig;
     noTopDivider?: boolean;
     onChange: (option: string | string[]) => void;
 }
 
-function FileFilterCheckboxGroup(props: IFileFilterCheckboxGroupProps) {
+function FilterCheckboxGroup(props: IFilterCheckboxGroupProps) {
     const classes = useFilterStyles();
     const checked = props.config.checked || ([] as string[]);
 
@@ -113,6 +114,35 @@ function FileFilterCheckboxGroup(props: IFileFilterCheckboxGroupProps) {
         </>
     );
 }
+
+export const FilterCheckboxGroupPlaceholder: React.FC = () => {
+    const classes = useFilterStyles();
+
+    return (
+        <Grid
+            className={classes.header}
+            container
+            direction="column"
+            spacing={1}
+        >
+            <Grid item>
+                <Skeleton width={150} />
+            </Grid>
+            {range(5).map(i => (
+                <Grid key={i} item>
+                    <Grid container spacing={1}>
+                        <Grid item>
+                            <Skeleton width={25} />
+                        </Grid>
+                        <Grid item>
+                            <Skeleton width={100} />
+                        </Grid>
+                    </Grid>
+                </Grid>
+            ))}
+        </Grid>
+    );
+};
 
 interface IPermsAwareCheckboxProps extends CheckboxProps {
     facetType: string;
@@ -187,7 +217,7 @@ const PermsAwareCheckbox: React.FC<IPermsAwareCheckboxProps> = ({
 interface IHelperProps<T extends IFilterConfig["options"]> {
     options: T;
     checked: string[];
-    onChange: IFileFilterCheckboxGroupProps["onChange"];
+    onChange: IFilterCheckboxGroupProps["onChange"];
 }
 
 const Checkboxes = ({
@@ -379,4 +409,4 @@ const NestedBoxes = ({
     );
 };
 
-export default FileFilterCheckboxGroup;
+export default FilterCheckboxGroup;
