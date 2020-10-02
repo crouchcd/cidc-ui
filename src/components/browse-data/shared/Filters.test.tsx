@@ -3,13 +3,14 @@ import React from "react";
 import {
     getNativeCheckbox,
     renderWithUserContext
-} from "../../../test/helpers";
-import { getFilterFacets } from "../../api/api";
-import FileFilter, { IFacets } from "./FileFilter";
+} from "../../../../test/helpers";
+import { getFilterFacets } from "../../../api/api";
+import Filters from "./Filters";
 import { QueryParamProvider } from "use-query-params";
-import history from "../identity/History";
+import history from "../../identity/History";
 import { Route, Router } from "react-router-dom";
-jest.mock("../../api/api");
+import FilterProvider, { IFacets } from "./FilterProvider";
+jest.mock("../../../api/api");
 
 const facets: IFacets = {
     trial_ids: ["test-trial-1", "test-trial-2"],
@@ -41,10 +42,15 @@ const facets: IFacets = {
 
 it("renders expected facets based on getFilterFacets", async () => {
     getFilterFacets.mockResolvedValue(facets);
-    const { findByText, queryByText } = renderWithUserContext(<FileFilter />, {
-        id: 1,
-        role: "cidc-admin"
-    });
+    const { findByText, queryByText } = renderWithUserContext(
+        <FilterProvider>
+            <Filters />
+        </FilterProvider>,
+        {
+            id: 1,
+            role: "cidc-admin"
+        }
+    );
     expect(await findByText(/protocol id/i)).toBeInTheDocument();
     expect(queryByText(/test-trial-1/i)).toBeInTheDocument();
     expect(queryByText(/test-trial-2/i)).toBeInTheDocument();
@@ -60,7 +66,9 @@ it("handles checkbox selection as expected", async () => {
     const { findByTestId, getByTestId, getByText } = renderWithUserContext(
         <Router history={history}>
             <QueryParamProvider ReactRouterRoute={Route}>
-                <FileFilter />
+                <FilterProvider>
+                    <Filters />
+                </FilterProvider>
             </QueryParamProvider>
         </Router>,
         {

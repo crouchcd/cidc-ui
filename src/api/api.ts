@@ -8,7 +8,7 @@ import axios, {
     CancelToken
 } from "axios";
 import Permission from "../model/permission";
-import { IFacets } from "../components/browse-files/FileFilter";
+import { IFacets } from "../components/browse-data/shared/FilterProvider";
 
 const URL: string = process.env.REACT_APP_API_URL!;
 
@@ -112,16 +112,16 @@ function getDownloadURL(
         .then(_extractItem);
 }
 
-function getAccountInfo(token: string): Promise<Account | undefined> {
+function getAccountInfo(token: string): Promise<Account> {
     return getApiClient(token)
         .get("users/self")
         .then(_extractItem);
 }
 
-function getTrials(token: string): Promise<Trial[]> {
+function getTrials(token: string, params: any = {}): Promise<Trial[]> {
     return getApiClient(token)
         .get("trial_metadata", {
-            params: { sort_field: "trial_id", sort_direction: "asc" }
+            params: { sort_field: "trial_id", sort_direction: "asc", ...params }
         })
         .then(_extractItems);
 }

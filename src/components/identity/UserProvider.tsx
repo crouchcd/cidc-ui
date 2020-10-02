@@ -1,5 +1,5 @@
 import * as React from "react";
-import { AuthContext, AuthLoader } from "./AuthProvider";
+import { AuthContext } from "./AuthProvider";
 import { Account } from "../../model/account";
 import { RouteComponentProps, withRouter } from "react-router";
 import { getAccountInfo, getPermissionsForUser } from "../../api/api";
@@ -25,8 +25,6 @@ export function useUserContext() {
     return user;
 }
 
-const UNACTIVATED_PATHS = ["/callback", "/register", "/unactivated"];
-
 const UserProvider: React.FunctionComponent<RouteComponentProps> = props => {
     const authData = React.useContext(AuthContext);
     const setError = React.useCallback(React.useContext(ErrorContext), []);
@@ -43,23 +41,21 @@ const UserProvider: React.FunctionComponent<RouteComponentProps> = props => {
                 getAccountInfo(idToken)
                     .then(userAccount => {
                         setUser(userAccount);
-                        if (userAccount) {
-                            if (!userAccount.approval_date) {
-                                history.replace("/unactivated");
-                            }
-                        } else {
-                            history.replace("/register");
+                        if (!userAccount.approval_date) {
+                            history.replace("/unactivated");
                         }
                     })
                     .catch(error => {
-                        if (error.response === undefined) {
-                            setError({
-                                type: "Network Error",
-                                message:
-                                    "could not load user account information"
-                            });
-                        } else {
+                        const message = error.response?.data?._error?.message;
+                        // If the user isn't registered, send them to the registration page.
+                        // Otherwise, give up and display an error.
+                        if (message?.includes("not registered")) {
                             history.replace("/register");
+                        } else {
+                            setError({
+                                type: "Request Error",
+                                message: "error loading account information"
+                            });
                         }
                     });
             } else if (!permissions && user.role) {
@@ -85,23 +81,14 @@ const UserProvider: React.FunctionComponent<RouteComponentProps> = props => {
     }, [idToken, setError, user, permissions]);
 
     const showAssays =
-        user &&
-        user.role &&
+        user?.role &&
         ["cimac-biofx-user", "cidc-biofx-user", "cidc-admin"].includes(
             user.role
         );
     const showManifests =
-        user &&
-        user.role &&
-        ["nci-biobank-user", "cidc-admin"].includes(user.role);
+        user?.role && ["nci-biobank-user", "cidc-admin"].includes(user.role);
     const showAnalyses =
-        user &&
-        user.role &&
-        ["cidc-biofx-user", "cidc-admin"].includes(user.role);
-
-    const isUnactivatedPath = UNACTIVATED_PATHS.includes(
-        props.location.pathname
-    );
+        user?.role && ["cidc-biofx-user", "cidc-admin"].includes(user.role);
 
     const value = user && {
         ...user,
@@ -110,14 +97,9 @@ const UserProvider: React.FunctionComponent<RouteComponentProps> = props => {
         showManifests,
         showAnalyses
     };
-
     return (
         <UserContext.Provider value={value}>
-            {((user || isUnactivatedPath) && <>{props.children}</>) || (
-                <div>
-                    <AuthLoader />
-                </div>
-            )}
+            {props.children}
         </UserContext.Provider>
     );
 };
