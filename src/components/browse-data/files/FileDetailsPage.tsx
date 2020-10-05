@@ -172,7 +172,7 @@ const FileDescription: React.FC<{ file: DataFile }> = ({ file }) => {
                 ) : (
                     <Typography color="textSecondary">
                         There's no description available for this file type -
-                        yet! We're working on it, and we hope to have one soon.
+                        yet! We're working on it, and we should have one soon.
                     </Typography>
                 )}
             </CardContent>
