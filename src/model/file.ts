@@ -17,14 +17,9 @@ export interface DataFile {
     };
     clustergrammer?: JSON;
     ihc_combined_plot?: IHCPlotData;
-    details?: FileDetails;
+    long_description?: string;
+    short_description?: string;
+    purpose: "miscellaneous" | "source" | "analysis" | "clinical";
 }
 
 export type IHCPlotData = Array<Dictionary<string | number>>;
-
-// tslint:disable-next-line:interface-name
-export interface FileDetails {
-    purpose: "miscellaneous" | "source" | "analysis" | "clinical";
-    short_description?: string;
-    long_description?: string;
-}

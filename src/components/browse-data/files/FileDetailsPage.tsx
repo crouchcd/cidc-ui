@@ -161,15 +161,14 @@ const FileHeader: React.FC<{ file: DataFile; token: string }> = ({
 };
 
 const FileDescription: React.FC<{ file: DataFile }> = ({ file }) => {
-    const description = file.details?.long_description;
     return (
         <Card>
             <CardHeader
                 title={<Typography variant="h6">About This File</Typography>}
             />
             <CardContent>
-                {description ? (
-                    <Typography>{description}</Typography>
+                {file.long_description ? (
+                    <Typography>{file.long_description}</Typography>
                 ) : (
                     <Typography color="textSecondary">
                         There's no description available for this file type -

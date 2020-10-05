@@ -52,7 +52,7 @@ it("shows file descriptions when available and a message if not", async () => {
     const description = "a test description";
     getSingleFile.mockResolvedValueOnce(file).mockResolvedValueOnce({
         ...file,
-        details: { long_description: description }
+        long_description: description
     });
 
     const noDescription = renderFileDetails();
