@@ -17,6 +17,7 @@ import { AccountCircle, FolderShared } from "@material-ui/icons";
 import Loader from "../generic/Loader";
 import { useRootStyles } from "../../rootStyles";
 import AdminTrialManager from "./AdminTrialManager";
+import { formatDate } from "../../util/formatters";
 
 export default function ProfilePage() {
     const classes = useRootStyles();
@@ -88,9 +89,9 @@ export default function ProfilePage() {
                                             <Grid item>
                                                 <Typography paragraph>
                                                     Joined on{" "}
-                                                    {new Date(
+                                                    {formatDate(
                                                         userAccount._created
-                                                    ).toLocaleDateString()}
+                                                    )}
                                                 </Typography>
                                             </Grid>
                                         </Grid>

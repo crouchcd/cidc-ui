@@ -6,7 +6,7 @@ export interface DataFile {
     trial_id: string;
     file_name: string;
     object_url: string;
-    uploaded_timestamp: Date;
+    uploaded_timestamp: string;
     file_size_bytes: number;
     artifact_category: string;
     upload_type: string;
@@ -16,5 +16,15 @@ export interface DataFile {
         [prop: string]: any;
     };
     clustergrammer?: JSON;
-    ihc_combined_plot: Array<Dictionary<string | number>>;
+    ihc_combined_plot?: IHCPlotData;
+    details?: FileDetails;
+}
+
+export type IHCPlotData = Array<Dictionary<string | number>>;
+
+// tslint:disable-next-line:interface-name
+export interface FileDetails {
+    purpose: "miscellaneous" | "source" | "analysis" | "clinical";
+    short_description?: string;
+    long_description?: string;
 }

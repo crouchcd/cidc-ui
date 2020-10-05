@@ -3,7 +3,7 @@ import Plot from "react-plotly.js";
 import chroma from "chroma-js";
 import groupBy from "lodash/groupBy";
 import map from "lodash/map";
-import { DataFile } from "../../model/file";
+import { IHCPlotData } from "../../model/file";
 import {
     Grid,
     Card,
@@ -21,7 +21,7 @@ import {
 import ContactAnAdmin from "../generic/ContactAnAdmin";
 
 export interface IHCBarplotProps {
-    data: DataFile["ihc_combined_plot"];
+    data: IHCPlotData;
 }
 
 const IHC_CONFIG = {
