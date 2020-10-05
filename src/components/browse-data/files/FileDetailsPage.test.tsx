@@ -1,8 +1,8 @@
 import React from "react";
 import { getSingleFile, getDownloadURL } from "../../../api/api";
-import FileDetailsPage from "./FileDetailsPage";
+import FileDetailsPage, { AdditionalMetadataTable } from "./FileDetailsPage";
 import { renderAsRouteComponent } from "../../../../test/helpers";
-import { fireEvent, act } from "@testing-library/react";
+import { fireEvent, act, render, cleanup } from "@testing-library/react";
 jest.mock("../../../api/api");
 jest.mock("../../../util/useRawFile");
 
@@ -46,6 +46,34 @@ it("renders details when a file is provided", async () => {
     expect(queryByText(/clustergrammer/i)).not.toBeInTheDocument();
     expect(queryByText(/ihc expression plot/i)).not.toBeInTheDocument();
     expect(queryByText(/additional metadata/i)).not.toBeInTheDocument();
+});
+
+it("shows file descriptions when available and a message if not", async () => {
+    const description = "a test description";
+    getSingleFile.mockResolvedValueOnce(file).mockResolvedValueOnce({
+        ...file,
+        long_description: description
+    });
+
+    const noDescription = renderFileDetails();
+    expect(
+        await noDescription.findByText(/about this file/i)
+    ).toBeInTheDocument();
+    expect(
+        noDescription.queryByText(/no description available/i)
+    ).toBeInTheDocument();
+    cleanup();
+
+    const hasDescription = renderFileDetails();
+    expect(
+        await hasDescription.findByText(/about this file/i)
+    ).toBeInTheDocument();
+    expect(
+        hasDescription.queryByText(new RegExp(description, "i"))
+    ).toBeInTheDocument();
+    expect(
+        hasDescription.queryByText(/no description available/i)
+    ).not.toBeInTheDocument();
 });
 
 it("generates download URLs and performs direct downloads", async done => {
@@ -124,4 +152,26 @@ it("shows additional metadata when a file has some", async () => {
     await findByText(new RegExp(file.object_url));
     expect(queryByText(/someProperty/i)).toBeInTheDocument();
     expect(queryByText(/some value/i)).toBeInTheDocument();
+});
+
+test("AdditionalMetadataTable renders metadata with expected formatting", () => {
+    const { queryByText } = render(
+        <AdditionalMetadataTable
+            file={{
+                additional_metadata: {
+                    "assays.wes.assay_creator": "DFCI",
+                    protocol_identifier: "10021",
+                    // array for the sake of the test (unrealistic)
+                    "wes.records.quality_flag": [1, 2, 3, 4]
+                }
+            }}
+        />
+    );
+
+    // "assays" prefix removed from property names
+    expect(queryByText(/assays\.wes\.assay_creator/i)).not.toBeInTheDocument();
+    expect(queryByText(/wes\.assay_creator/i)).toBeInTheDocument();
+
+    // arrays concatenated into a string
+    expect(queryByText(/1, 2, 3, 4/i)).toBeInTheDocument();
 });
