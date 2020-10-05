@@ -11,3 +11,6 @@ checks:
   # Don't complain if files are too long
   file-lines:
     enabled: false
+  # Don't complain about similar blocks of code
+  identical-code:
+    enabled: false
