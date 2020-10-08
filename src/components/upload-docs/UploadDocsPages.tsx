@@ -51,14 +51,30 @@ const pathConfigs: Dictionary<IDocPathConfig> = {
         title: "Olink upload",
         assays: true
     },
-    ihc: { path: "ihc", label: "IHC", title: "IHC upload", assays: true },
+    ihc: {
+        path: "ihc",
+        label: "IHC",
+        title: "IHC upload",
+        assays: true
+    },
     elisa: {
         path: "elisa",
         label: "ELISA",
         title: "ELISA upload",
         assays: true
     },
-    mif: { path: "mif", label: "mIF", title: "mIF upload", assays: true }
+    mif: {
+        path: "mif",
+        label: "mIF",
+        title: "mIF upload",
+        assays: true
+    },
+    tcr: {
+        path: "tcr",
+        label: "TCR",
+        title: "TCR upload",
+        assays: true
+    }
 };
 
 export interface IUploadDocsPageProps extends RouteComponentProps {
