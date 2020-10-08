@@ -1,5 +1,9 @@
 import * as React from "react";
-import { getSingleFile, getDownloadURL } from "../../../api/api";
+import {
+    getSingleFile,
+    getDownloadURL,
+    getRelatedFiles
+} from "../../../api/api";
 import {
     Grid,
     Button,
@@ -28,8 +32,14 @@ import Loader from "../../generic/Loader";
 import IHCBarplot from "../../visualizations/IHCBarplot";
 import ClustergrammerCard from "../../visualizations/ClustergrammerCard";
 import TextWithIcon from "../../generic/TextWithIcon";
-import { formatDate, formatFileSize } from "../../../util/formatters";
-import { map } from "lodash";
+import {
+    formatDataCategory,
+    formatDate,
+    formatFileSize
+} from "../../../util/formatters";
+import { isEmpty, map, range, sortBy } from "lodash";
+import BatchDownloadDialog from "../shared/BatchDownloadDialog";
+import { Skeleton } from "@material-ui/lab";
 
 const DownloadURL: React.FunctionComponent<{
     fileId: number;
@@ -117,7 +127,7 @@ const FileHeader: React.FC<{ file: DataFile; token: string }> = ({
                                 icon={<Category />}
                                 variant="subtitle1"
                             >
-                                {file.data_category}
+                                {formatDataCategory(file.data_category)}
                             </TextWithIcon>
                         </Grid>
                     )}
@@ -227,6 +237,107 @@ export const AdditionalMetadataTable: React.FunctionComponent<{
     );
 };
 
+const RelatedFiles: React.FC<{ file: DataFile; token: string }> = ({
+    token,
+    file
+}) => {
+    const [batchDownloadOpen, setBatchDownloadOpen] = React.useState<boolean>(
+        false
+    );
+    const [relatedFiles, setRelatedFiles] = React.useState<
+        DataFile[] | undefined
+    >();
+    React.useEffect(() => {
+        getRelatedFiles(token, file.id).then(files => setRelatedFiles(files));
+    }, [token, file.id]);
+
+    const header = (
+        <Grid
+            container
+            direction="row"
+            justify="space-between"
+            alignItems="center"
+        >
+            <Grid item>
+                <Typography variant="h6">
+                    Related {file.data_category_prefix} files within{" "}
+                    {file.trial_id}
+                </Typography>
+            </Grid>
+            <Grid item>
+                <Button
+                    variant="outlined"
+                    color="primary"
+                    disabled={!relatedFiles || relatedFiles.length === 0}
+                    startIcon={<CloudDownload />}
+                    onClick={() => setBatchDownloadOpen(true)}
+                >
+                    download all related files
+                </Button>
+            </Grid>
+        </Grid>
+    );
+
+    const noRelatedFilesMessage = (
+        <Grid item>
+            <Typography color="textSecondary">
+                This file has no directly related files, but you can still{" "}
+                <a
+                    href={`/browse-data?file_view=1&trial_ids=${file.trial_id}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                >
+                    browse all files in this trial{" "}
+                </a>
+                .
+            </Typography>
+        </Grid>
+    );
+
+    const relatedFilesList = relatedFiles && (
+        <>
+            {sortBy(relatedFiles, "object_url").map(({ id, object_url }) => {
+                return (
+                    <Grid item key={object_url}>
+                        <a
+                            href={`/browse-data/${id}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                        >
+                            {object_url}
+                        </a>
+                    </Grid>
+                );
+            })}
+        </>
+    );
+
+    return (
+        <Card>
+            <CardHeader title={header} />
+            <CardContent>
+                <BatchDownloadDialog
+                    token={token}
+                    ids={[file.id, ...map(relatedFiles, "id")]}
+                    open={batchDownloadOpen}
+                    onClose={() => setBatchDownloadOpen(false)}
+                />
+                <Grid container direction="column" spacing={1}>
+                    {relatedFiles
+                        ? relatedFiles.length > 0
+                            ? relatedFilesList
+                            : noRelatedFilesMessage
+                        : range(5).map(i => (
+                              <Grid item key={i}>
+                                  <Skeleton width="100%" height={25} />
+                              </Grid>
+                          ))}
+                </Grid>
+            </CardContent>
+        </Card>
+    );
+};
+
 const FileDetailsPage: React.FC<RouteComponentProps<{
     fileId: string;
 }>> = props => {
@@ -269,11 +380,14 @@ const FileDetailsPage: React.FC<RouteComponentProps<{
                             <ClustergrammerCard file={file} />
                         </Grid>
                     )}
-                    {file.additional_metadata && (
+                    {!isEmpty(file.additional_metadata) && (
                         <Grid item xs={12}>
                             <AdditionalMetadataTable file={file} />
                         </Grid>
                     )}
+                    <Grid item xs={12}>
+                        <RelatedFiles file={file} token={idToken} />
+                    </Grid>
                 </Grid>
             )}
         </div>
