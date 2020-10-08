@@ -24,10 +24,10 @@ const pipelineMarkdowns = {
             />
         </div>
     ),
-    rna_level1: (
+    rna: (
         <div role="document" id="rna-docs">
             <CIDCGithubMarkdown
-                path={`cidc-ngs-pipeline-api/master/rna/rna_level1.md`}
+                path={`cidc-ngs-pipeline-api/master/rna/rna.md`}
             />
         </div>
     )
@@ -58,7 +58,7 @@ const PipelinesPage: React.FC<RouteComponentProps> = props => {
                         </ListSubheader>
                         <DocsListItem
                             label={"RIMA (RNA-seq IMmune Analysis)"}
-                            path={`/pipelines/rna_level1`}
+                            path={`/pipelines/rna`}
                         />
                         <DocsListItem label={"WES"} path={`/pipelines/wes`} />
                     </List>
@@ -70,7 +70,7 @@ const PipelinesPage: React.FC<RouteComponentProps> = props => {
                     <div style={{ padding: "1em" }}>
                         <Redirect
                             from="/pipelines"
-                            to="/pipelines/rna_level1"
+                            to="/pipelines/rna"
                         />
                         <Route
                             path={`/pipelines/:docPath`}
