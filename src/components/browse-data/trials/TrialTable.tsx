@@ -243,7 +243,6 @@ const TrialCard: React.FC<ITrialCardProps> = ({ trial, token }) => {
             </Grid>
             <Grid container spacing={2} wrap="nowrap">
                 {[
-                    // ["principal investigator(s)", ]
                     ["status", trial_status],
                     ["participants", participants.length],
                     ["samples", sampleCount],
