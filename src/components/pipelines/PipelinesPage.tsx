@@ -24,10 +24,24 @@ const pipelineMarkdowns = {
             />
         </div>
     ),
-    rna_level1: (
+    rna: (
         <div role="document" id="rna-docs">
             <CIDCGithubMarkdown
-                path={`cidc-ngs-pipeline-api/master/rna/rna_level1.md`}
+                path={`cidc-ngs-pipeline-api/master/rna/rna.md`}
+            />
+        </div>
+    ),
+    tcr: (
+        <div role="document" id="tcr-docs">
+            <CIDCGithubMarkdown
+                path={`cidc-ngs-pipeline-api/master/tcr/tcr.md`}
+            />
+        </div>
+    ),
+    chips: (
+        <div role="document" id="chips-docs">
+            <CIDCGithubMarkdown
+                path={`cidc-ngs-pipeline-api/master/chips/chips.md`}
             />
         </div>
     )
@@ -58,9 +72,20 @@ const PipelinesPage: React.FC<RouteComponentProps> = props => {
                         </ListSubheader>
                         <DocsListItem
                             label={"RIMA (RNA-seq IMmune Analysis)"}
-                            path={`/pipelines/rna_level1`}
+                            path={`/pipelines/rna`}
                         />
-                        <DocsListItem label={"WES"} path={`/pipelines/wes`} />
+                        <DocsListItem
+                            label={"WES (Whole Exome Sequencing"}
+                            path={`/pipelines/wes`}
+                        />
+                        <DocsListItem
+                            label={"TCR (T-cell Receptor Repertoire Analysis)"}
+                            path={`/pipelines/tcr`}
+                        />
+                        <DocsListItem
+                            label={"CHIPS ATAC-seq Analysis"}
+                            path={`/pipelines/chips`}
+                        />
                     </List>
                 </Grid>
                 <Grid item>
@@ -70,7 +95,7 @@ const PipelinesPage: React.FC<RouteComponentProps> = props => {
                     <div style={{ padding: "1em" }}>
                         <Redirect
                             from="/pipelines"
-                            to="/pipelines/rna_level1"
+                            to="/pipelines/rna"
                         />
                         <Route
                             path={`/pipelines/:docPath`}

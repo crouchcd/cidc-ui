@@ -1,6 +1,5 @@
 import React from "react";
 import { DataFile } from "../../../model/file";
-import { LOCALE, DATE_OPTIONS } from "../../../util/constants";
 import { colors } from "../../../rootStyles";
 import PaginatedTable, { IHeader } from "../../generic/PaginatedTable";
 import {
@@ -15,9 +14,13 @@ import { getFiles, IDataWithMeta } from "../../../api/api";
 import { withIdToken } from "../../identity/AuthProvider";
 import MuiRouterLink from "../../generic/MuiRouterLink";
 import axios, { CancelTokenSource } from "axios";
-import filesize from "filesize";
 import { IFilters, useFilterFacets } from "../shared/FilterProvider";
 import BatchDownloadDialog from "../shared/BatchDownloadDialog";
+import {
+    formatDataCategory,
+    formatDate,
+    formatFileSize
+} from "../../../util/formatters";
 
 const fileQueryDefaults = {
     page_size: 15
@@ -231,9 +234,6 @@ const FileTable: React.FC<IFileTableProps & { token: string }> = props => {
         );
     };
 
-    const formatUploadTimestamp = (row: DataFile) =>
-        new Date(row.uploaded_timestamp).toLocaleString(LOCALE, DATE_OPTIONS);
-
     return (
         <Grid container direction="column" spacing={1}>
             <Grid item>
@@ -283,12 +283,16 @@ const FileTable: React.FC<IFileTableProps & { token: string }> = props => {
                                     </TableCell>
                                     <TableCell>{row.trial_id}</TableCell>
                                     <TableCell>{row.file_ext}</TableCell>
-                                    <TableCell>{row.data_category}</TableCell>
                                     <TableCell>
-                                        {filesize(row.file_size_bytes)}
+                                        {formatDataCategory(
+                                            row.data_category || ""
+                                        )}
                                     </TableCell>
                                     <TableCell>
-                                        {formatUploadTimestamp(row)}
+                                        {formatFileSize(row.file_size_bytes)}
+                                    </TableCell>
+                                    <TableCell>
+                                        {formatDate(row.uploaded_timestamp)}
                                     </TableCell>
                                 </>
                             );

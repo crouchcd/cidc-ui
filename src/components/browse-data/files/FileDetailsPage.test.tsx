@@ -1,8 +1,12 @@
 import React from "react";
-import { getSingleFile, getDownloadURL } from "../../../api/api";
-import FileDetailsPage from "./FileDetailsPage";
+import {
+    getSingleFile,
+    getDownloadURL,
+    getRelatedFiles
+} from "../../../api/api";
+import FileDetailsPage, { AdditionalMetadataTable } from "./FileDetailsPage";
 import { renderAsRouteComponent } from "../../../../test/helpers";
-import { fireEvent, act } from "@testing-library/react";
+import { fireEvent, act, render, cleanup } from "@testing-library/react";
 jest.mock("../../../api/api");
 jest.mock("../../../util/useRawFile");
 
@@ -15,8 +19,10 @@ const file = {
     upload_type: "wes",
     file_ext: "bam",
     file_size_bytes: 100,
-    uploaded_timestamp: Date.now()
+    uploaded_timestamp: Date.now(),
+    data_category_prefix: "WES"
 };
+getRelatedFiles.mockResolvedValue([]);
 
 it("renders a loader at first", () => {
     const { queryByTestId } = renderAsRouteComponent(FileDetailsPage);
@@ -25,8 +31,8 @@ it("renders a loader at first", () => {
 
 const renderFileDetails = () =>
     renderAsRouteComponent(FileDetailsPage, {
-        path: "/:fileId",
-        route: `/${file.id}`,
+        path: "/browse-data/:fileId",
+        route: `/browse-data/${file.id}`,
         authData: { idToken }
     });
 
@@ -46,6 +52,34 @@ it("renders details when a file is provided", async () => {
     expect(queryByText(/clustergrammer/i)).not.toBeInTheDocument();
     expect(queryByText(/ihc expression plot/i)).not.toBeInTheDocument();
     expect(queryByText(/additional metadata/i)).not.toBeInTheDocument();
+});
+
+it("shows file descriptions when available and a message if not", async () => {
+    const description = "a test description";
+    getSingleFile.mockResolvedValueOnce(file).mockResolvedValueOnce({
+        ...file,
+        long_description: description
+    });
+
+    const noDescription = renderFileDetails();
+    expect(
+        await noDescription.findByText(/about this file/i)
+    ).toBeInTheDocument();
+    expect(
+        noDescription.queryByText(/no description available/i)
+    ).toBeInTheDocument();
+    cleanup();
+
+    const hasDescription = renderFileDetails();
+    expect(
+        await hasDescription.findByText(/about this file/i)
+    ).toBeInTheDocument();
+    expect(
+        hasDescription.queryByText(new RegExp(description, "i"))
+    ).toBeInTheDocument();
+    expect(
+        hasDescription.queryByText(/no description available/i)
+    ).not.toBeInTheDocument();
 });
 
 it("generates download URLs and performs direct downloads", async done => {
@@ -124,4 +158,79 @@ it("shows additional metadata when a file has some", async () => {
     await findByText(new RegExp(file.object_url));
     expect(queryByText(/someProperty/i)).toBeInTheDocument();
     expect(queryByText(/some value/i)).toBeInTheDocument();
+});
+
+test("AdditionalMetadataTable renders metadata with expected formatting", () => {
+    const { queryByText } = render(
+        <AdditionalMetadataTable
+            file={{
+                additional_metadata: {
+                    "assays.wes.assay_creator": "DFCI",
+                    protocol_identifier: "10021",
+                    // array for the sake of the test (unrealistic)
+                    "wes.records.quality_flag": [1, 2, 3, 4]
+                }
+            }}
+        />
+    );
+
+    // "assays" prefix removed from property names
+    expect(queryByText(/assays\.wes\.assay_creator/i)).not.toBeInTheDocument();
+    expect(queryByText(/wes\.assay_creator/i)).toBeInTheDocument();
+
+    // arrays concatenated into a string
+    expect(queryByText(/1, 2, 3, 4/i)).toBeInTheDocument();
+});
+
+describe("related files", () => {
+    const sectionHeader = new RegExp(
+        `related ${file.data_category_prefix} files`,
+        "i"
+    );
+    const noRelatedFilesText = /no directly related files/i;
+    const downloadButtonText = /download all related files/i;
+    it("handles no related files", async () => {
+        getRelatedFiles.mockResolvedValue([]);
+        const { findByText, queryByText, getByText } = renderFileDetails();
+        expect(await findByText(sectionHeader)).toBeInTheDocument();
+
+        // provides a message about no related files
+        expect(queryByText(noRelatedFilesText)).toBeInTheDocument();
+
+        // provides link to browse all files
+        const browseAllFilesLink = getByText(/browse all files in this trial/i);
+        expect(browseAllFilesLink.getAttribute("href")).toBe(
+            `/browse-data?file_view=1&trial_ids=${file.trial_id}`
+        );
+
+        // download button is disabled
+        const downloadButton = getByText(downloadButtonText).closest("button");
+        expect(downloadButton?.disabled).toBe(true);
+    });
+
+    const files = [
+        { id: 1, object_url: "url/1" },
+        { id: 2, object_url: "url/2" },
+        { id: 3, object_url: "url/3" }
+    ];
+
+    it("displays related files and makes them downloadable", async () => {
+        getRelatedFiles.mockResolvedValue(files);
+
+        const { findByText, queryByText, getByText } = renderFileDetails();
+        expect(await findByText(sectionHeader)).toBeInTheDocument();
+
+        // doesn't display the "no related files message"
+        expect(queryByText(noRelatedFilesText)).not.toBeInTheDocument();
+
+        // displays all files
+        files.forEach(({ id, object_url }) => {
+            const fileLink = getByText(object_url).closest("a");
+            expect(fileLink?.href).toContain(`/browse-data/${id}`);
+        });
+
+        // makes all files batch downloadable
+        const downloadButton = getByText(downloadButtonText).closest("button");
+        expect(downloadButton?.disabled).toBe(false);
+    });
 });
