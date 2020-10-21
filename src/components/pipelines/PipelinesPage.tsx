@@ -20,28 +20,28 @@ const pipelineMarkdowns = {
     wes: (
         <div role="document" id="wes-docs">
             <CIDCGithubMarkdown
-                path={`cidc-ngs-pipeline-api/master/wes/wes.md`}
+                path={`cidc-ngs-pipeline-api/master/cidc_ngs_pipeline_api/wes/wes.md`}
             />
         </div>
     ),
     rna: (
         <div role="document" id="rna-docs">
             <CIDCGithubMarkdown
-                path={`cidc-ngs-pipeline-api/master/rna/rna.md`}
+                path={`cidc-ngs-pipeline-api/master/cidc_ngs_pipeline_api/rna/rna.md`}
             />
         </div>
     ),
     tcr: (
         <div role="document" id="tcr-docs">
             <CIDCGithubMarkdown
-                path={`cidc-ngs-pipeline-api/master/tcr/tcr.md`}
+                path={`cidc-ngs-pipeline-api/master/cidc_ngs_pipeline_api/tcr/tcr.md`}
             />
         </div>
     ),
     chips: (
         <div role="document" id="chips-docs">
             <CIDCGithubMarkdown
-                path={`cidc-ngs-pipeline-api/master/chips/chips.md`}
+                path={`cidc-ngs-pipeline-api/master/cidc_ngs_pipeline_api/chips/chips.md`}
             />
         </div>
     )
