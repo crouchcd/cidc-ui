@@ -20,28 +20,28 @@ const pipelineMarkdowns = {
     wes: (
         <div role="document" id="wes-docs">
             <CIDCGithubMarkdown
-                path={`cidc-ngs-pipeline-api/master/wes/wes.md`}
+                path={`cidc-ngs-pipeline-api/master/cidc_ngs_pipeline_api/wes/wes.md`}
             />
         </div>
     ),
     rna: (
         <div role="document" id="rna-docs">
             <CIDCGithubMarkdown
-                path={`cidc-ngs-pipeline-api/master/rna/rna.md`}
+                path={`cidc-ngs-pipeline-api/master/cidc_ngs_pipeline_api/rna/rna.md`}
             />
         </div>
     ),
     tcr: (
         <div role="document" id="tcr-docs">
             <CIDCGithubMarkdown
-                path={`cidc-ngs-pipeline-api/master/tcr/tcr.md`}
+                path={`cidc-ngs-pipeline-api/master/cidc_ngs_pipeline_api/tcr/tcr.md`}
             />
         </div>
     ),
     chips: (
         <div role="document" id="chips-docs">
             <CIDCGithubMarkdown
-                path={`cidc-ngs-pipeline-api/master/chips/chips.md`}
+                path={`cidc-ngs-pipeline-api/master/cidc_ngs_pipeline_api/chips/chips.md`}
             />
         </div>
     )
@@ -64,7 +64,7 @@ const PipelinesPage: React.FC<RouteComponentProps> = props => {
     const classes = useRootStyles();
     return (
         <div className={classes.centeredPage}>
-            <Grid container direction="row">
+            <Grid container justify="center" direction="row" wrap="nowrap">
                 <Grid item style={{ width: 200 }}>
                     <List style={{ paddingTop: 0 }}>
                         <ListSubheader disableSticky>
@@ -93,15 +93,17 @@ const PipelinesPage: React.FC<RouteComponentProps> = props => {
                 </Grid>
                 <Grid item>
                     <div style={{ padding: "1em" }}>
-                        <Redirect
-                            from="/pipelines"
-                            to="/pipelines/rna"
-                        />
                         <Route
                             path={`/pipelines/:docPath`}
                             render={({ match }) =>
-                                pipelineMarkdowns[match.params.docPath]
+                                pipelineMarkdowns[match.params.docPath] ||
+                                pipelineMarkdowns.rna
                             }
+                        />
+                        <Route
+                            path="/pipelines"
+                            exact
+                            render={() => <Redirect to="pipelines/rna" />}
                         />
                     </div>
                 </Grid>

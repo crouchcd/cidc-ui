@@ -73,7 +73,8 @@ const pathConfigs: Dictionary<IDocPathConfig> = {
         path: "tcr",
         label: "TCR",
         title: "TCR upload",
-        assays: true
+        assays: true,
+        analyses: true
     }
 };
 
@@ -137,7 +138,7 @@ const UploadDocsPage: React.FunctionComponent<IUploadDocsPageProps> = props => {
 
     return (
         <div className={classes.centeredPage}>
-            <Grid container direction="row">
+            <Grid container justify="center" direction="row" wrap="nowrap">
                 <Grid item style={{ width: 200 }}>
                     <List style={{ paddingTop: 0 }}>
                         <ListSubheader disableSticky>

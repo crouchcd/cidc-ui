@@ -6,24 +6,18 @@ import { RouteComponentProps } from "react-router";
 import TrialTable from "./trials/TrialTable";
 import FilterProvider from "./shared/FilterProvider";
 import { BooleanParam, useQueryParam } from "use-query-params";
+import { useRootStyles } from "../../rootStyles";
 
 const filterWidth = 300;
-const maxTableWidth = 1500;
-const minTableWidth = 850;
 const useStyles = makeStyles({
-    container: {
-        margin: "auto",
-        minWidth: filterWidth + minTableWidth
-    },
-    filters: { width: filterWidth },
+    filters: { width: filterWidth, paddingRight: "1em" },
     data: {
-        minWidth: minTableWidth,
-        maxWidth: maxTableWidth,
         width: `calc(100% - ${filterWidth}px)`
     }
 });
 
 const BrowseDataPage: React.FC<RouteComponentProps> = props => {
+    const rootClasses = useRootStyles();
     const classes = useStyles();
 
     const [showFileView, setShowFileView] = useQueryParam(
@@ -32,7 +26,7 @@ const BrowseDataPage: React.FC<RouteComponentProps> = props => {
     );
 
     const viewToggleButton = (
-        <ButtonGroup size="small" color="primary">
+        <ButtonGroup size="small" color="primary" disableElevation>
             <Button
                 variant={showFileView ? "outlined" : "contained"}
                 onClick={() => setShowFileView(false)}
@@ -51,9 +45,9 @@ const BrowseDataPage: React.FC<RouteComponentProps> = props => {
     return (
         <FilterProvider trialView={!showFileView}>
             <Grid
-                className={classes.container}
+                className={rootClasses.centeredPage}
                 container
-                spacing={3}
+                justify="space-between"
                 wrap="nowrap"
             >
                 <Grid item className={classes.filters}>

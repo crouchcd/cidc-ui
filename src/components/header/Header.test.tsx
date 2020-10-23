@@ -1,10 +1,6 @@
 import React from "react";
-import { render, cleanup, fireEvent } from "@testing-library/react";
-import Header, {
-    EnvBanner,
-    CIDCBreadcrumbs,
-    DONT_RENDER_PATHS
-} from "./Header";
+import { cleanup, fireEvent } from "@testing-library/react";
+import Header, { EnvBanner, DONT_RENDER_PATHS } from "./Header";
 import {
     IAccountWithExtraContext,
     UserContext
@@ -21,7 +17,8 @@ const user: Account = {
     _updated: "",
     email: "",
     disabled: false,
-    organization: "DFCI"
+    organization: "DFCI",
+    picture: "some-url"
 };
 const renderWithUserContext = (u: IAccountWithExtraContext) => {
     return renderWithRouter(
@@ -46,23 +43,17 @@ describe("Header", () => {
         });
     };
 
-    it("renders with minimal tab visibility by default", () => {
-        const { queryByText } = renderWithRouter(<Header />);
-        checkVisibility(
-            queryByText,
-            ["browse data", "pipelines", "schema", "profile"],
-            ["manifests", "assays", "analyses"]
-        );
+    it("renders null if no user is provided", () => {
+        const { queryByAltText } = renderWithRouter(<Header />);
+        expect(queryByAltText(/home/i)).not.toBeInTheDocument();
     });
 
     it("renders correct tabs based on the user context configuration", () => {
         // cidc user
-        const { queryByText: q1 } = renderWithUserContext({
-            ...user
-        });
+        const { queryByText: q1 } = renderWithUserContext(user);
         checkVisibility(
             q1,
-            ["browse data", "pipelines", "schema", "profile"],
+            ["browse data", "pipelines", "schema"],
             ["manifests", "assays", "analyses"]
         );
         cleanup();
@@ -74,7 +65,7 @@ describe("Header", () => {
         });
         checkVisibility(
             q2,
-            ["browse data", "pipelines", "schema", "profile", "assays"],
+            ["browse data", "pipelines", "schema", "assays"],
             ["manifests", "analyses"]
         );
         cleanup();
@@ -86,7 +77,7 @@ describe("Header", () => {
         });
         checkVisibility(
             q3,
-            ["browse data", "pipelines", "schema", "profile", "manifests"],
+            ["browse data", "pipelines", "schema", "manifests"],
             ["assays", "analyses"]
         );
         cleanup();
@@ -99,14 +90,7 @@ describe("Header", () => {
         });
         checkVisibility(
             q4,
-            [
-                "browse data",
-                "pipelines",
-                "schema",
-                "profile",
-                "assays",
-                "analyses"
-            ],
+            ["browse data", "pipelines", "schema", "assays", "analyses"],
             ["manifests"]
         );
         cleanup();
@@ -124,7 +108,6 @@ describe("Header", () => {
                 "browse data",
                 "pipelines",
                 "schema",
-                "profile",
                 "assays",
                 "analyses",
                 "manifests"
@@ -146,7 +129,6 @@ describe("Header", () => {
             "browse-data",
             "pipelines",
             "schema",
-            "profile",
             "assays",
             "analyses",
             "manifests"
@@ -198,57 +180,5 @@ describe("EnvBanner", () => {
 
         // reset the ENV
         process.env.REACT_APP_ENV = oldENV;
-    });
-});
-
-describe("CIDCBreadcrumbs", () => {
-    const checkPath = (queryByText: (re: RegExp) => void, path: string[]) => {
-        path.forEach(p => {
-            expect(queryByText(new RegExp(p, "i"))).toBeInTheDocument();
-        });
-    };
-
-    it("handles the index path", () => {
-        const { queryByText } = renderWithRouter(<CIDCBreadcrumbs />, {
-            route: "/"
-        });
-
-        checkPath(queryByText, ["cidc"]);
-    });
-
-    it("handles a nested path", () => {
-        const { queryByText } = renderWithRouter(<CIDCBreadcrumbs />, {
-            route: "/assays/wes"
-        });
-
-        checkPath(queryByText, ["cidc", "assays", "wes"]);
-    });
-
-    it("handles a path with dashed parts", () => {
-        const { queryByText } = renderWithRouter(<CIDCBreadcrumbs />, {
-            route: "/browse-data"
-        });
-
-        checkPath(queryByText, ["cidc", "browse data"]);
-    });
-
-    it("provides links in the breadcrumb hierarchy", () => {
-        history.replace("/browse-data/123");
-        const { getByText, queryByText } = renderWithRouter(
-            <CIDCBreadcrumbs />,
-            { history }
-        );
-
-        // navigate up one level
-        fireEvent.click(getByText(/browse data/i));
-        expect(history.location.pathname).toBe("/browse-data");
-        expect(queryByText(/123/i)).not.toBeInTheDocument();
-
-        // navigate up two levels
-        history.goBack();
-        fireEvent.click(getByText(/cidc/i));
-        expect(history.location.pathname).toBe("/");
-        expect(queryByText(/browse data/i)).not.toBeInTheDocument();
-        expect(queryByText(/123/i)).not.toBeInTheDocument();
     });
 });

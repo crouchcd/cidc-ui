@@ -1,4 +1,5 @@
 import * as React from "react";
+import { Link } from "react-router-dom";
 import {
     getSingleFile,
     getDownloadURL,
@@ -20,10 +21,11 @@ import { AuthContext } from "../../identity/AuthProvider";
 import { DataFile } from "../../../model/file";
 import { RouteComponentProps } from "react-router";
 import {
+    ArrowLeft,
     Category,
     CloudDownload,
     CloudUpload,
-    Link,
+    Link as LinkIcon,
     Save
 } from "@material-ui/icons";
 import CopyToClipboardButton from "../../generic/CopyToClipboardButton";
@@ -40,6 +42,7 @@ import {
 import { isEmpty, map, range, sortBy } from "lodash";
 import BatchDownloadDialog from "../shared/BatchDownloadDialog";
 import { Skeleton } from "@material-ui/lab";
+import { useRootStyles } from "../../../rootStyles";
 
 const DownloadURL: React.FunctionComponent<{
     fileId: number;
@@ -57,7 +60,7 @@ const DownloadURL: React.FunctionComponent<{
         return (
             <Button
                 fullWidth
-                startIcon={<Link />}
+                startIcon={<LinkIcon />}
                 onClick={() => {
                     setLoading(true);
                     getDownloadURL(props.idToken, props.fileId).then(urlRes => {
@@ -93,7 +96,7 @@ const DownloadURL: React.FunctionComponent<{
                 <CopyToClipboardButton
                     title="Link"
                     copyValue={url}
-                    startIcon={<Link />}
+                    startIcon={<LinkIcon />}
                     {...buttonProps}
                     style={{ whiteSpace: "nowrap" }}
                 />
@@ -170,23 +173,16 @@ const FileHeader: React.FC<{ file: DataFile; token: string }> = ({
 };
 
 const FileDescription: React.FC<{ file: DataFile }> = ({ file }) => {
-    return (
+    return file.long_description ? (
         <Card>
             <CardHeader
                 title={<Typography variant="h6">About This File</Typography>}
             />
             <CardContent>
-                {file.long_description ? (
-                    <Typography>{file.long_description}</Typography>
-                ) : (
-                    <Typography color="textSecondary">
-                        There's no description available for this file type -
-                        yet! We're working on it, and we should have one soon.
-                    </Typography>
-                )}
+                <Typography>{file.long_description}</Typography>
             </CardContent>
         </Card>
-    );
+    ) : null;
 };
 
 export const AdditionalMetadataTable: React.FunctionComponent<{
@@ -341,6 +337,8 @@ const RelatedFiles: React.FC<{ file: DataFile; token: string }> = ({
 const FileDetailsPage: React.FC<RouteComponentProps<{
     fileId: string;
 }>> = props => {
+    const rootClasses = useRootStyles();
+
     const authData = React.useContext(AuthContext);
     const [file, setFile] = React.useState<DataFile | undefined>(undefined);
 
@@ -354,43 +352,46 @@ const FileDetailsPage: React.FC<RouteComponentProps<{
         }
     }, [idToken, fileIdInt]);
 
-    return (
-        <div>
-            {!file || !idToken ? (
-                <Loader />
-            ) : (
-                <Grid
-                    container
-                    spacing={2}
-                    style={{ width: 1050, margin: "auto" }}
+    return !file || !idToken ? (
+        <Loader />
+    ) : (
+        <Grid container spacing={2} className={rootClasses.centeredPage}>
+            <Grid item xs={12}>
+                <Button
+                    size="small"
+                    variant="outlined"
+                    startIcon={<ArrowLeft />}
+                    component={Link}
+                    to="/browse-data?file_view=1"
                 >
-                    <Grid item xs={12}>
-                        <FileHeader file={file} token={idToken} />
-                    </Grid>
-                    <Grid item xs={12}>
-                        <FileDescription file={file} />
-                    </Grid>
-                    {file.ihc_combined_plot && (
-                        <Grid item xs={12}>
-                            <IHCBarplot data={file.ihc_combined_plot} />
-                        </Grid>
-                    )}
-                    {file.clustergrammer && (
-                        <Grid item xs={12}>
-                            <ClustergrammerCard file={file} />
-                        </Grid>
-                    )}
-                    {!isEmpty(file.additional_metadata) && (
-                        <Grid item xs={12}>
-                            <AdditionalMetadataTable file={file} />
-                        </Grid>
-                    )}
-                    <Grid item xs={12}>
-                        <RelatedFiles file={file} token={idToken} />
-                    </Grid>
+                    back to file browser
+                </Button>
+            </Grid>
+            <Grid item xs={12}>
+                <FileHeader file={file} token={idToken} />
+            </Grid>
+            <Grid item xs={12}>
+                <FileDescription file={file} />
+            </Grid>
+            {file.ihc_combined_plot && (
+                <Grid item xs={12}>
+                    <IHCBarplot data={file.ihc_combined_plot} />
                 </Grid>
             )}
-        </div>
+            {file.clustergrammer && (
+                <Grid item xs={12}>
+                    <ClustergrammerCard file={file} />
+                </Grid>
+            )}
+            {!isEmpty(file.additional_metadata) && (
+                <Grid item xs={12}>
+                    <AdditionalMetadataTable file={file} />
+                </Grid>
+            )}
+            <Grid item xs={12}>
+                <RelatedFiles file={file} token={idToken} />
+            </Grid>
+        </Grid>
     );
 };
 

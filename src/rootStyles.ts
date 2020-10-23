@@ -7,11 +7,12 @@ export const colors = {
 };
 
 export const widths = {
-    pageWidth: 1050,
+    maxPageWidth: 1400,
+    minPageWidth: 1100,
     markdownWidth: 800
 };
 
-export const useRootStyles = makeStyles({
+export const useRootStyles = makeStyles(theme => ({
     root: {
         minWidth: "640px !important",
         height: "100vh"
@@ -21,13 +22,16 @@ export const useRootStyles = makeStyles({
         margin: "auto"
     },
     content: {
-        padding: "1em 3em 3em",
+        paddingTop: "1rem",
+        paddingBottom: "2rem",
         minHeight: 960,
-        background: "white",
-        overflowX: "scroll"
+        background: "white"
     },
     centeredPage: {
-        width: widths.pageWidth,
+        paddingRight: "3rem",
+        paddingLeft: "3rem",
+        minWidth: widths.minPageWidth,
+        maxWidth: widths.maxPageWidth,
         margin: "auto"
     }
-});
+}));
