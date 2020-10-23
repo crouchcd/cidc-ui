@@ -10,7 +10,7 @@ import { useRootStyles } from "../../rootStyles";
 
 const filterWidth = 300;
 const useStyles = makeStyles({
-    filters: { width: filterWidth },
+    filters: { width: filterWidth, paddingRight: "1em" },
     data: {
         width: `calc(100% - ${filterWidth}px)`
     }
@@ -26,7 +26,7 @@ const BrowseDataPage: React.FC<RouteComponentProps> = props => {
     );
 
     const viewToggleButton = (
-        <ButtonGroup size="small" color="primary">
+        <ButtonGroup size="small" color="primary" disableElevation>
             <Button
                 variant={showFileView ? "outlined" : "contained"}
                 onClick={() => setShowFileView(false)}
@@ -47,8 +47,7 @@ const BrowseDataPage: React.FC<RouteComponentProps> = props => {
             <Grid
                 className={rootClasses.centeredPage}
                 container
-                spacing={3}
-                justify="center"
+                justify="space-between"
                 wrap="nowrap"
             >
                 <Grid item className={classes.filters}>

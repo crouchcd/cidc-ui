@@ -1,22 +1,21 @@
 import React from "react";
-import { Card, CardContent, Box } from "@material-ui/core";
-import { widths } from "../../rootStyles";
+import { Grid } from "@material-ui/core";
+import { useRootStyles, widths } from "../../rootStyles";
 
 const SchemaPage: React.FC = () => {
+    const classes = useRootStyles();
     return (
-        <Box margin="auto" maxWidth={widths.minPageWidth}>
-            <Card>
-                <CardContent>
-                    <iframe
-                        title="CIDC Schema"
-                        src="https://cimac-cidc.github.io/cidc-schemas/docs/index.html"
-                        width={widths.minPageWidth - 20}
-                        height={1000}
-                        frameBorder="0"
-                    />
-                </CardContent>
-            </Card>
-        </Box>
+        <Grid container justify="center" className={classes.centeredPage}>
+            <Grid item>
+                <iframe
+                    title="CIDC Schema"
+                    src="https://cimac-cidc.github.io/cidc-schemas/docs/index.html"
+                    width={widths.minPageWidth}
+                    height={900}
+                    frameBorder="0"
+                />
+            </Grid>
+        </Grid>
     );
 };
 
