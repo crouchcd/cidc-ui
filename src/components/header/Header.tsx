@@ -11,7 +11,10 @@ import {
     Divider,
     Avatar,
     Button,
-    TabProps
+    TabProps,
+    Box,
+    Menu,
+    MenuItem
 } from "@material-ui/core";
 import {
     withRouter,
@@ -27,6 +30,8 @@ import {
 import { useRootStyles } from "../../rootStyles";
 import { Person } from "@material-ui/icons";
 import { ORGANIZATION_NAME_MAP } from "../../util/constants";
+import { AuthContext, login, logout } from "../identity/AuthProvider";
+import FadeInOnMount from "../generic/FadeInOnMount";
 
 const ENV = process.env.REACT_APP_ENV;
 
@@ -58,31 +63,73 @@ export const EnvBanner: React.FunctionComponent = () =>
         </Card>
     ) : null;
 
-const UserOverview: React.FC<{ user: IAccountWithExtraContext }> = ({
+const UserProfileMenu: React.FC<{ user: IAccountWithExtraContext }> = ({
     user
 }) => {
-    return (
-        <Grid container spacing={2} alignItems="center">
-            <Grid item>
-                {user.picture ? (
-                    <Avatar
-                        alt={`${user.first_n} ${user.last_n}'s avatar`}
-                        src={user.picture}
-                    />
-                ) : (
-                    <Person fontSize="large" />
+    const [
+        menuAnchor,
+        setMenuAnchor
+    ] = React.useState<HTMLButtonElement | null>();
+
+    const userProfileButton = (
+        <>
+            <Button
+                disableRipple
+                style={{ textTransform: "none", textAlign: "left", width: 225 }}
+                aria-controls="profile-menu"
+                aria-haspopup="true"
+                onClick={e => setMenuAnchor(e.currentTarget)}
+            >
+                <Grid
+                    container
+                    spacing={2}
+                    justify="space-between"
+                    alignItems="center"
+                    wrap="nowrap"
+                >
+                    <Grid item>
+                        {user.picture ? (
+                            <Avatar
+                                alt={`${user.first_n} ${user.last_n}'s avatar`}
+                                src={user.picture}
+                            />
+                        ) : (
+                            <Person fontSize="large" />
+                        )}
+                    </Grid>
+                    <Grid item style={{ maxWidth: 150 }}>
+                        <Typography variant="subtitle2">
+                            {user.first_n} {user.last_n}
+                        </Typography>
+                        <Typography variant="caption" color="textSecondary">
+                            {ORGANIZATION_NAME_MAP[user.organization]}
+                        </Typography>
+                    </Grid>
+                </Grid>
+            </Button>
+            <Menu
+                id="profile-menu"
+                anchorEl={menuAnchor}
+                getContentAnchorEl={null}
+                anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+                transformOrigin={{ vertical: "top", horizontal: "center" }}
+                open={!!menuAnchor}
+                onClick={() => setMenuAnchor(null)}
+                onClose={() => setMenuAnchor(null)}
+            >
+                {user.approval_date && (
+                    <MenuItem component={Link} to="profile">
+                        Profile
+                    </MenuItem>
                 )}
-            </Grid>
-            <Grid item style={{ maxWidth: 150 }}>
-                <Typography variant="subtitle2">
-                    {user.first_n} {user.last_n}
-                </Typography>
-                <Typography variant="caption" color="textSecondary">
-                    {ORGANIZATION_NAME_MAP[user.organization]}
-                </Typography>
-            </Grid>
-        </Grid>
+                <MenuItem style={{ width: 225 }} onClick={() => logout()}>
+                    Log Out
+                </MenuItem>
+            </Menu>
+        </>
     );
+
+    return <FadeInOnMount>{userProfileButton}</FadeInOnMount>;
 };
 
 interface IStyledTabsProps {
@@ -115,50 +162,54 @@ const NavTabs: React.FC<{ selectedTab: string | false; tabs: TabProps[] }> = ({
     tabs
 }) => {
     return (
-        <StyledTabs role="navigation" value={selectedTab}>
-            {tabs.map(tab => {
-                return (
-                    <StyledTab
-                        key={tab.value}
-                        component={Link}
-                        disableRipple
-                        to={tab.value}
-                        value={tab.value}
-                        label={tab.label}
-                    />
-                );
-            })}
-        </StyledTabs>
+        <FadeInOnMount>
+            <StyledTabs role="navigation" value={selectedTab}>
+                {tabs.map(tab => {
+                    return (
+                        <StyledTab
+                            key={tab.value}
+                            component={Link}
+                            disableRipple
+                            to={tab.value}
+                            value={tab.value}
+                            label={tab.label}
+                        />
+                    );
+                })}
+            </StyledTabs>
+        </FadeInOnMount>
     );
 };
 
 const useHeaderStyles = makeStyles({
     tabs: {
         paddingTop: 10,
-        margin: 0
+        margin: 0,
+        height: 134
     },
     logo: { height: 80, padding: 5, marginBottom: -40 }
 });
 
-export const DONT_RENDER_PATHS = ["/register", "/unactivated", "/callback"];
+export const DONT_RENDER_PATHS = ["/callback"];
 
 const Header: React.FunctionComponent<RouteComponentProps> = props => {
     const rootClasses = useRootStyles();
     const classes = useHeaderStyles();
+    const { state: authState } = React.useContext(AuthContext);
     const user = useUserContext();
 
     let selectedTab: string | false = props.location.pathname;
 
-    if (["/", "/privacy-security"].includes(selectedTab)) {
+    if (
+        ["/", "/register", "/privacy-security", "/profile"].includes(
+            selectedTab
+        )
+    ) {
         selectedTab = false;
     } else if (DONT_RENDER_PATHS.includes(selectedTab)) {
         return null;
     } else {
         selectedTab = `/${selectedTab.split("/")[1]}`;
-    }
-
-    if (!user) {
-        return null;
     }
 
     return (
@@ -187,42 +238,56 @@ const Header: React.FunctionComponent<RouteComponentProps> = props => {
                                 </RouterLink>
                             </Grid>
                             <Grid item>
-                                <Button
-                                    component={Link}
-                                    to={"/profile"}
-                                    disableRipple
-                                >
-                                    <UserOverview user={user} />
-                                </Button>
+                                {authState === "logged-in" && user && (
+                                    <UserProfileMenu user={user} />
+                                )}
+                                {authState === "logged-out" && (
+                                    <Button
+                                        size="large"
+                                        color="primary"
+                                        variant="outlined"
+                                        onClick={() => login()}
+                                    >
+                                        sign up / log in
+                                    </Button>
+                                )}
                             </Grid>
                         </Grid>
                     </Grid>
                     <Grid item style={{ padding: 0 }}>
-                        <NavTabs
-                            selectedTab={selectedTab}
-                            tabs={
-                                [
-                                    {
-                                        label: "browse data",
-                                        value: "/browse-data"
-                                    },
-                                    user.showAssays && {
-                                        label: "assays",
-                                        value: "/assays"
-                                    },
-                                    user.showAnalyses && {
-                                        label: "analyses",
-                                        value: "/analyses"
-                                    },
-                                    user.showManifests && {
-                                        label: "manifests",
-                                        value: "/manifests"
-                                    },
-                                    { label: "pipelines", value: "/pipelines" },
-                                    { label: "schema", value: "/schema" }
-                                ].filter(t => !!t) as TabProps[]
-                            }
-                        />
+                        {// only show tabs to approved users
+                        user && user.approval_date ? (
+                            <NavTabs
+                                selectedTab={selectedTab}
+                                tabs={
+                                    [
+                                        {
+                                            label: "browse data",
+                                            value: "/browse-data"
+                                        },
+                                        user.showAssays && {
+                                            label: "assays",
+                                            value: "/assays"
+                                        },
+                                        user.showAnalyses && {
+                                            label: "analyses",
+                                            value: "/analyses"
+                                        },
+                                        user.showManifests && {
+                                            label: "manifests",
+                                            value: "/manifests"
+                                        },
+                                        {
+                                            label: "pipelines",
+                                            value: "/pipelines"
+                                        },
+                                        { label: "schema", value: "/schema" }
+                                    ].filter(t => !!t) as TabProps[]
+                                }
+                            />
+                        ) : (
+                            <Box height={40} />
+                        )}
                     </Grid>
                 </Grid>
             </div>

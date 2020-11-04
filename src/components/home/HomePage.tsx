@@ -5,12 +5,10 @@ import {
     Button,
     Box,
     Link,
-    Divider,
     makeStyles
 } from "@material-ui/core";
 import { useRootStyles } from "../../rootStyles";
 import { getDataOverview, IDataOverview } from "../../api/api";
-import filesize from "filesize";
 import {
     AssessmentOutlined,
     AssignmentOutlined,
@@ -24,15 +22,22 @@ import { RouteComponentProps } from "react-router-dom";
 import pactLogo from "../../pact_logo.svg";
 import fnihLogo from "../../fnih_logo.svg";
 import nciLogo from "../../nci_logo.svg";
+import { formatFileSize } from "../../util/formatters";
+import FadeInOnMount from "../generic/FadeInOnMount";
+import { Alert } from "@material-ui/lab";
+import ContactAnAdmin from "../generic/ContactAnAdmin";
+import { useUserContext } from "../identity/UserProvider";
 
 const usePortalStatStyles = makeStyles(theme => ({
+    container: {
+        minHeight: "4.8rem"
+    },
     icon: {
         fontSize: "4.5rem",
-        color: theme.palette.primary.main
+        color: theme.palette.primary.light
     },
     value: {
-        fontSize: "1.6rem",
-        fontWeight: "bold"
+        fontSize: "1.6rem"
     },
     label: {
         fontSize: "1rem"
@@ -46,27 +51,60 @@ const PortalStat: React.FC<{
 }> = ({ label, value, Icon }) => {
     const classes = usePortalStatStyles();
     return (
-        <Grid container alignItems="center" spacing={1}>
-            <Grid item>
-                <Icon className={classes.icon} />
-            </Grid>
-            <Grid item>
-                <Typography
-                    aria-labelledby={label}
-                    className={classes.value}
-                    variant="h4"
-                >
-                    {value || "-"}
-                </Typography>
-                <Typography
-                    id={label}
-                    className={classes.label}
-                    variant="overline"
-                >
-                    {label}
-                </Typography>
-            </Grid>
-        </Grid>
+        <div className={classes.container}>
+            {value ? (
+                <FadeInOnMount>
+                    <Grid
+                        container
+                        alignItems="center"
+                        wrap="nowrap"
+                        spacing={1}
+                    >
+                        <Grid item>
+                            <Icon className={classes.icon} />
+                        </Grid>
+                        <Grid item>
+                            <Typography
+                                noWrap
+                                aria-labelledby={label}
+                                className={classes.value}
+                                variant="h4"
+                            >
+                                {value}
+                            </Typography>
+                            <Typography
+                                id={label}
+                                className={classes.label}
+                                variant="overline"
+                            >
+                                {label}
+                            </Typography>
+                        </Grid>
+                    </Grid>
+                </FadeInOnMount>
+            ) : null}
+        </div>
+    );
+};
+
+const PendingRegistrationAlert: React.FC = () => {
+    return (
+        <Alert severity="success">
+            <Typography paragraph>
+                Thank you for submitting a registration request for the
+                CIMAC-CIDC Data Portal.
+            </Typography>
+            <Typography paragraph>
+                If you are a member of the CIMAC Network, we will issue an
+                "@cimac-network.org" email account to you that you can use to
+                access the CIDC Portal once data for your trial(s) become
+                available on the site.
+            </Typography>
+            <Typography paragraph>
+                In the meantime, feel free to <ContactAnAdmin lower /> with any
+                questions you may have.
+            </Typography>
+        </Alert>
     );
 };
 
@@ -74,6 +112,7 @@ const HomePage: React.FunctionComponent<RouteComponentProps> = ({
     history
 }) => {
     const classes = useRootStyles();
+    const user = useUserContext();
 
     const [dataOverview, setDataOverview] = React.useState<
         IDataOverview | undefined
@@ -89,6 +128,9 @@ const HomePage: React.FunctionComponent<RouteComponentProps> = ({
             direction="column"
             alignItems="stretch"
         >
+            {user && !user.approval_date && (
+                <Grid item>{<PendingRegistrationAlert />}</Grid>
+            )}
             <Grid item>
                 <Box paddingTop={6} paddingBottom={10}>
                     <Typography
@@ -157,8 +199,11 @@ const HomePage: React.FunctionComponent<RouteComponentProps> = ({
                             label="data"
                             value={
                                 dataOverview
-                                    ? filesize(dataOverview.num_bytes, {
-                                          round: 1
+                                    ? formatFileSize(dataOverview.num_bytes, {
+                                          round:
+                                              dataOverview.num_bytes < 1e12
+                                                  ? 0
+                                                  : 1
                                       })
                                     : undefined
                             }
@@ -169,8 +214,7 @@ const HomePage: React.FunctionComponent<RouteComponentProps> = ({
                 <Button
                     disableElevation
                     fullWidth
-                    color="primary"
-                    variant="contained"
+                    variant="outlined"
                     onClick={() => history.push("/browse-data")}
                     endIcon={<OpenInNewOutlined />}
                     style={{ marginTop: "1rem", fontSize: "1.2rem" }}
@@ -179,17 +223,8 @@ const HomePage: React.FunctionComponent<RouteComponentProps> = ({
                 </Button>
             </Grid>
             <Grid item>
-                <Box paddingTop={8} paddingBottom={5}>
-                    <Divider />
-                </Box>
-                <Box textAlign="center" paddingBottom={10}>
-                    <Typography
-                        variant="overline"
-                        style={{ fontSize: "1.2rem" }}
-                    >
-                        What is the CIDC?
-                    </Typography>
-                    <Typography paragraph variant="h5" align="left">
+                <Box textAlign="center" py={8}>
+                    <Typography paragraph variant="h6" align="left">
                         The CIDC serves as the central data coordination portal
                         for the{" "}
                         <Link

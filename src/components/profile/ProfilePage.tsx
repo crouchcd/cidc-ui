@@ -11,7 +11,7 @@ import {
 import AdminUserManager from "./AdminUserManager";
 import { ORGANIZATION_NAME_MAP } from "../../util/constants";
 import ContactAnAdmin from "../generic/ContactAnAdmin";
-import { AuthContext } from "../identity/AuthProvider";
+import { withIdToken } from "../identity/AuthProvider";
 import { useUserContext } from "../identity/UserProvider";
 import { AccountCircle, FolderShared } from "@material-ui/icons";
 import Loader from "../generic/Loader";
@@ -19,18 +19,16 @@ import { useRootStyles } from "../../rootStyles";
 import AdminTrialManager from "./AdminTrialManager";
 import { formatDate } from "../../util/formatters";
 
-export default function ProfilePage() {
+const ProfilePage: React.FC<{ token: string }> = ({ token }) => {
     const classes = useRootStyles();
 
-    const authData = React.useContext(AuthContext);
     const userAccount = useUserContext();
 
-    const isAdmin = userAccount && userAccount.role === "cidc-admin";
-    const isNCI = userAccount && userAccount.role === "nci-biobank-user";
-    const permissions = userAccount && userAccount.permissions;
-    const hasPerms = permissions && permissions.length > 0;
+    const isAdmin = userAccount?.role === "cidc-admin";
+    const isNCI = userAccount?.role === "nci-biobank-user";
+    const permissions = userAccount?.permissions || [];
 
-    return !userAccount || !permissions ? (
+    return !userAccount?.approval_date ? (
         <Loader />
     ) : (
         <Grid
@@ -40,8 +38,8 @@ export default function ProfilePage() {
             className={classes.centeredPage}
         >
             <Grid item>
-                <Grid container spacing={3}>
-                    <Grid item>
+                <Grid container spacing={3} alignItems="stretch" wrap="nowrap">
+                    <Grid item xs={5}>
                         <Card style={{ height: "100%" }}>
                             <CardHeader
                                 avatar={<AccountCircle />}
@@ -62,23 +60,20 @@ export default function ProfilePage() {
                                 }
                             />
                             <CardContent>
-                                <Grid
-                                    container
-                                    justify="flex-start"
-                                    direction="column"
-                                >
+                                <Grid container direction="column" spacing={1}>
                                     <Grid item>
-                                        <Typography paragraph>
-                                            {`${userAccount.first_n} ${userAccount.last_n}`}
+                                        <Typography>
+                                            {userAccount.first_n}{" "}
+                                            {userAccount.last_n}
                                         </Typography>
                                     </Grid>
                                     <Grid item>
-                                        <Typography paragraph>
+                                        <Typography>
                                             {userAccount.email}
                                         </Typography>
                                     </Grid>
                                     <Grid item>
-                                        <Typography paragraph>
+                                        <Typography>
                                             {
                                                 ORGANIZATION_NAME_MAP[
                                                     userAccount.organization
@@ -87,16 +82,18 @@ export default function ProfilePage() {
                                         </Typography>
                                     </Grid>
                                     <Grid item>
-                                        <Typography paragraph>
+                                        <Typography>
                                             Joined on{" "}
-                                            {formatDate(userAccount._created)}
+                                            {formatDate(
+                                                userAccount.approval_date
+                                            )}
                                         </Typography>
                                     </Grid>
                                 </Grid>
                             </CardContent>
                         </Card>
                     </Grid>
-                    <Grid item>
+                    <Grid item xs={7}>
                         <Card style={{ height: "100%" }}>
                             <CardHeader
                                 avatar={<FolderShared />}
@@ -110,62 +107,50 @@ export default function ProfilePage() {
                                 }
                             />
                             <CardContent>
-                                <div>
+                                {isAdmin || isNCI ? (
+                                    <Typography>
+                                        Your role (
+                                        <code>{userAccount.role}</code>) gives
+                                        you access to all datasets.
+                                    </Typography>
+                                ) : permissions.length ? (
                                     <Grid container spacing={2}>
-                                        {isAdmin || isNCI ? (
-                                            <Grid item>
-                                                <Typography paragraph>
-                                                    Your role (
-                                                    <code>
-                                                        {userAccount.role}
-                                                    </code>
-                                                    ) gives you access to all
-                                                    datasets.
-                                                </Typography>
-                                            </Grid>
-                                        ) : hasPerms ? (
-                                            permissions.map(perm => {
-                                                return (
-                                                    <Grid
-                                                        item
-                                                        key={
-                                                            perm.trial_id +
-                                                            perm.upload_type
-                                                        }
-                                                    >
-                                                        <Chip
-                                                            label={`${perm.trial_id}: ${perm.upload_type}`}
-                                                        />
-                                                    </Grid>
-                                                );
-                                            })
-                                        ) : (
-                                            <Grid item>
-                                                <Typography
-                                                    variant="h5"
-                                                    color="textSecondary"
-                                                    paragraph
+                                        {permissions.map(perm => {
+                                            return (
+                                                <Grid
+                                                    item
+                                                    key={
+                                                        perm.trial_id +
+                                                        perm.upload_type
+                                                    }
                                                 >
-                                                    You do not have access to
-                                                    any datasets.
-                                                    <br />
-                                                    <ContactAnAdmin /> if you
-                                                    believe this is a mistake.
-                                                </Typography>
-                                            </Grid>
-                                        )}
+                                                    <Chip
+                                                        label={`${perm.trial_id}: ${perm.upload_type}`}
+                                                    />
+                                                </Grid>
+                                            );
+                                        })}
                                     </Grid>
-                                </div>
+                                ) : (
+                                    <Typography>
+                                        You haven't been granted access to any
+                                        datasets yet. Please{" "}
+                                        <ContactAnAdmin lower /> with what
+                                        trials and assay types you need to
+                                        access, and we'll configure your
+                                        permissions accordingly.
+                                    </Typography>
+                                )}
                             </CardContent>
                         </Card>
                     </Grid>
                 </Grid>
             </Grid>
-            {authData && userAccount?.role === "cidc-admin" && (
+            {token && userAccount?.role === "cidc-admin" && (
                 <>
                     <Grid item>
                         <AdminUserManager
-                            token={authData.idToken}
+                            token={token}
                             userId={userAccount.id}
                         />
                     </Grid>
@@ -176,4 +161,6 @@ export default function ProfilePage() {
             )}
         </Grid>
     );
-}
+};
+
+export default withIdToken(ProfilePage);
