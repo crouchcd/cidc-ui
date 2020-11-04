@@ -134,9 +134,10 @@ const ProfilePage: React.FC<{ token: string }> = ({ token }) => {
                                 ) : (
                                     <Typography>
                                         You haven't been granted access to any
-                                        datasets yet. Please <ContactAnAdmin />{" "}
-                                        with what trials and assay types you
-                                        need to access, and we'll configure your
+                                        datasets yet. Please{" "}
+                                        <ContactAnAdmin lower /> with what
+                                        trials and assay types you need to
+                                        access, and we'll configure your
                                         permissions accordingly.
                                     </Typography>
                                 )}
