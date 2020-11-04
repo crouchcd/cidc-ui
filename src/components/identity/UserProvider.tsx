@@ -42,7 +42,7 @@ const UserProvider: React.FunctionComponent<RouteComponentProps> = props => {
                     .then(userAccount => {
                         setUser({ ...authUser, ...userAccount });
                         if (!userAccount.approval_date) {
-                            history.replace("/unactivated");
+                            history.replace("/");
                         }
                     })
                     .catch(error => {
@@ -78,7 +78,13 @@ const UserProvider: React.FunctionComponent<RouteComponentProps> = props => {
                 )
             });
         }
-    }, [authData, setError, user, permissions]);
+    }, [
+        authData,
+        setError,
+        user,
+        permissions,
+        props.history.location.pathname
+    ]);
 
     const showAssays =
         user?.role &&

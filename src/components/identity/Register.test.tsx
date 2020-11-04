@@ -1,19 +1,18 @@
 import React from "react";
 import { createUser } from "../../api/api";
-import { IAuthData, AuthContext } from "./AuthProvider";
+import { IAuthData } from "./AuthProvider";
 import Register from "./Register";
-import history from "./History";
-import { render, fireEvent } from "@testing-library/react";
-import { renderWithRouter } from "../../../test/helpers";
+import { fireEvent } from "@testing-library/react";
+import { renderAsRouteComponent } from "../../../test/helpers";
 jest.mock("../../api/api");
 
 const renderRegister = (authData?: IAuthData) => {
-    return renderWithRouter(<Register />, authData && { authData });
+    return renderAsRouteComponent(Register, authData && { authData });
 };
 
-it("renders progress indicator when no auth data has loaded", () => {
-    const { queryByTestId } = renderRegister({ state: "loading" });
-    expect(queryByTestId("loader")).toBeInTheDocument();
+it("renders nothing when no auth data has loaded", () => {
+    const { queryByText } = renderRegister({ state: "loading" });
+    expect(queryByText(/sign up for the cidc portal/i)).not.toBeInTheDocument();
 });
 
 it("works as expected when auth data is provided", async () => {
