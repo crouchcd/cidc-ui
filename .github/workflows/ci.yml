@@ -52,7 +52,7 @@ jobs:
           npm run build
       - name: Archive the build artifacts
         uses: actions/upload-artifact@v2
-        if: ${{ github.ref == 'refs/heads/production'  || github.ref == 'refs/heads/staging'  }}
+        if: ${{ github.ref == 'refs/heads/production'  || github.ref == 'refs/heads/master'  }}
         with:
           name: build-artifacts
           path: build
@@ -60,7 +60,7 @@ jobs:
   gcs-deploy:
     needs: [test, build]
     runs-on: ubuntu-latest
-    if: ${{ github.ref == 'refs/heads/production'  || github.ref == 'refs/heads/staging'  }}
+    if: ${{ github.ref == 'refs/heads/production'  || github.ref == 'refs/heads/master'  }}
     steps:
       - uses: actions/checkout@v2
       - name: Download build artifacts
