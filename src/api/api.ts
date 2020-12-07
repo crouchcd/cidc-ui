@@ -1,3 +1,4 @@
+import * as React from "react";
 import { Account } from "../model/account";
 import { Trial, NewTrial } from "../model/trial";
 import { DataFile } from "../model/file";
@@ -5,7 +6,8 @@ import axios, {
     AxiosInstance,
     AxiosResponse,
     AxiosError,
-    CancelToken
+    CancelToken,
+    CancelTokenSource
 } from "axios";
 import Permission from "../model/permission";
 import { IFacets } from "../components/browse-data/shared/FilterProvider";
@@ -96,9 +98,7 @@ function getRelatedFiles(token: string, fileId: number): Promise<DataFile[]> {
 
 function getFilelist(token: string, fileIds: number[]): Promise<Blob> {
     return getApiClient(token)
-        .get("downloadable_files/filelist", {
-            params: { file_ids: fileIds.join(",") }
-        })
+        .post("downloadable_files/filelist", { file_ids: fileIds })
         .then(
             ({ data }) =>
                 new Blob([data], {
@@ -124,10 +124,19 @@ function getAccountInfo(token: string): Promise<Account> {
         .then(_extractItem);
 }
 
-function getTrials(token: string, params: any = {}): Promise<Trial[]> {
+function getTrials(
+    token: string,
+    params: any = {},
+    cancelToken?: CancelToken
+): Promise<Trial[]> {
     return getApiClient(token)
         .get("trial_metadata", {
-            params: { sort_field: "trial_id", sort_direction: "asc", ...params }
+            params: {
+                sort_field: "trial_id",
+                sort_direction: "asc",
+                ...params
+            },
+            cancelToken
         })
         .then(_extractItems);
 }
@@ -318,6 +327,25 @@ function getDataOverview(): Promise<IDataOverview> {
         .get("/info/data_overview")
         .then(_extractItem);
 }
+
+export const useCancelToken = (message = "cancelling stale request") => {
+    const cancellerRef = React.useRef<CancelTokenSource | undefined>();
+
+    return {
+        get: () => {
+            if (cancellerRef.current) {
+                cancellerRef.current.cancel(message);
+            }
+            cancellerRef.current = axios.CancelToken.source();
+            return cancellerRef.current.token;
+        },
+        catchCancellation: (err: any) => {
+            if (err.message !== message) {
+                throw err;
+            }
+        }
+    };
+};
 
 export {
     _getItem,
