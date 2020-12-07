@@ -16,7 +16,7 @@ import {
     withStyles,
     Link
 } from "@material-ui/core";
-import { getTrials } from "../../../api/api";
+import { getTrials, useCancelToken } from "../../../api/api";
 import { IFileBundle, Trial } from "../../../model/trial";
 import { withIdToken } from "../../identity/AuthProvider";
 import { flatMap, flatten, isEmpty, map, omitBy, pickBy, range } from "lodash";
@@ -301,7 +301,9 @@ export const TrialCard: React.FC<ITrialCardProps> = ({ trial, token }) => {
 };
 
 const TRIALS_PER_PAGE = 10;
-const usePaginatedTrials = (token: string) => {
+export const usePaginatedTrials = (token: string) => {
+    const cancelToken = useCancelToken();
+
     const { filters } = useFilterFacets();
 
     const [trials, setTrials] = React.useState<Trial[] | undefined>();
@@ -313,36 +315,42 @@ const usePaginatedTrials = (token: string) => {
     const loadMore = React.useCallback(() => {
         if (!allLoaded) {
             setIsLoading(true);
-            getTrials(token, {
-                include_file_bundles: true,
-                page_size: TRIALS_PER_PAGE,
-                page_num: page,
-                trial_ids: filters.trial_ids?.join(",")
-            }).then(results => {
-                setTrials(ts => [...(ts || []), ...results]);
-                if (results.length === TRIALS_PER_PAGE) {
+            getTrials(
+                token,
+                {
+                    include_file_bundles: true,
+                    page_size: TRIALS_PER_PAGE,
+                    page_num: page,
+                    trial_ids: filters.trial_ids?.join(",")
+                },
+                cancelToken.get()
+            )
+                .then(results => {
+                    setTrials(ts =>
+                        page > 0 ? [...(ts || []), ...results] : results
+                    );
+                    if (results.length < TRIALS_PER_PAGE) {
+                        setAllLoaded(true);
+                    }
                     setPage(p => p + 1);
-                } else {
-                    setAllLoaded(true);
-                }
-                setIsLoading(false);
-            });
+                    setIsLoading(false);
+                })
+                .catch(cancelToken.catchCancellation);
         }
-    }, [allLoaded, page, token, filters.trial_ids]);
+    }, [allLoaded, page, token, filters.trial_ids, cancelToken]);
 
     // Clear all results when filters change
     React.useEffect(() => {
         setPage(0);
-        setAllLoaded(false);
         setTrials(undefined);
+        setAllLoaded(false);
     }, [filters.trial_ids]);
 
-    // Load first page of trials on initial render
     React.useEffect(() => {
-        if (page === 0) {
+        if (page === 0 && trials === undefined) {
             loadMore();
         }
-    }, [page, loadMore]);
+    }, [page, trials, loadMore]);
 
     return {
         trials,
