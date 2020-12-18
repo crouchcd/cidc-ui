@@ -1,11 +1,6 @@
 import * as React from "react";
 import { Link as RRLink } from "react-router-dom";
 import {
-    getSingleFile,
-    getDownloadURL,
-    getRelatedFiles
-} from "../../../api/api";
-import {
     Grid,
     Button,
     Card,
@@ -44,13 +39,17 @@ import { isEmpty, map, range, sortBy } from "lodash";
 import BatchDownloadDialog from "../shared/BatchDownloadDialog";
 import { Skeleton } from "@material-ui/lab";
 import { useRootStyles } from "../../../rootStyles";
+import useSWR from "swr";
+import { apiFetch } from "../../../api/api";
+
+const getDownloadUrl = (token: string, fileId: number) =>
+    apiFetch<string>(`/downloadable_files/download_url?id=${fileId}`, token);
 
 const DownloadURL: React.FunctionComponent<{
     fileId: number;
-    idToken: string;
-}> = props => {
-    const [url, setURL] = React.useState<string | undefined>(undefined);
-    const [loading, setLoading] = React.useState<boolean>(false);
+    token: string;
+}> = ({ fileId, token }) => {
+    const [url, setUrl] = React.useState<string | undefined>();
 
     const buttonProps: ButtonProps = {
         variant: "outlined",
@@ -63,13 +62,8 @@ const DownloadURL: React.FunctionComponent<{
                 fullWidth
                 startIcon={<LinkIcon />}
                 onClick={() => {
-                    setLoading(true);
-                    getDownloadURL(props.idToken, props.fileId).then(urlRes => {
-                        setURL(urlRes);
-                        setLoading(false);
-                    });
+                    getDownloadUrl(token, fileId).then(u => setUrl(u));
                 }}
-                disabled={loading}
                 {...buttonProps}
             >
                 temporary download link
@@ -106,13 +100,13 @@ const DownloadURL: React.FunctionComponent<{
     );
 };
 
-const FileHeader: React.FC<{ file: DataFile; token: string }> = ({
-    file,
-    token
-}) => {
+const FileHeader: React.FC<{
+    file: DataFile;
+    token: string;
+}> = ({ file, token }) => {
     const doDownload = () => {
-        if (token && file) {
-            getDownloadURL(token, file.id).then(url => {
+        if (token) {
+            getDownloadUrl(token, file.id).then(url => {
                 window.location.assign(url);
             });
         }
@@ -159,13 +153,12 @@ const FileHeader: React.FC<{ file: DataFile; token: string }> = ({
                             color="primary"
                             startIcon={<CloudDownload />}
                             onClick={() => doDownload()}
-                            disabled={!token}
                         >
                             Direct Download
                         </Button>
                     </Grid>
                     <Grid item>
-                        <DownloadURL idToken={token} fileId={file.id} />
+                        <DownloadURL fileId={file.id} token={token} />
                     </Grid>
                 </Grid>
             </Grid>
@@ -245,12 +238,10 @@ const RelatedFiles: React.FC<{ file: DataFile; token: string }> = ({
     const [batchDownloadOpen, setBatchDownloadOpen] = React.useState<boolean>(
         false
     );
-    const [relatedFiles, setRelatedFiles] = React.useState<
-        DataFile[] | undefined
-    >();
-    React.useEffect(() => {
-        getRelatedFiles(token, file.id).then(files => setRelatedFiles(files));
-    }, [token, file.id]);
+    const { data: relatedFiles } = useSWR<DataFile[]>([
+        `/downloadable_files/${file.id}/related_files`,
+        token
+    ]);
 
     const header = (
         <Grid
@@ -350,16 +341,11 @@ const FileDetailsPage: React.FC<RouteComponentProps<
 > & { token: string }> = ({ token, ...props }) => {
     const rootClasses = useRootStyles();
 
-    const [file, setFile] = React.useState<DataFile | undefined>(undefined);
-
     const fileId = props.match.params.fileId;
-    const fileIdInt = parseInt(fileId, 10);
-
-    React.useEffect(() => {
-        if (token) {
-            getSingleFile(token, fileIdInt).then(fileRes => setFile(fileRes));
-        }
-    }, [token, fileIdInt]);
+    const { data: file } = useSWR<DataFile>([
+        `/downloadable_files/${fileId}`,
+        token
+    ]);
 
     return !file || !token ? (
         <Loader />

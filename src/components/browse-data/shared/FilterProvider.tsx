@@ -1,9 +1,10 @@
 import React from "react";
 import { Dictionary, uniq } from "lodash";
 import { ArrayParam, useQueryParams } from "use-query-params";
-import { getFilterFacets } from "../../../api/api";
 import { withIdToken } from "../../identity/AuthProvider";
 import { filterParams } from "../files/FileTable";
+import useSWR from "swr";
+import { formatQueryString } from "../../../util/formatters";
 
 export interface IFacetInfo {
     label: string;
@@ -52,25 +53,20 @@ const FilterProvider: React.FC<IFilterProviderProps & { token: string }> = ({
     trialView,
     children
 }) => {
+    const [filters, setFilters] = useQueryParams(filterConfig);
+    const { data: newFacets } = useSWR<IFacets>([
+        `/downloadable_files/filter_facets?${formatQueryString(
+            filterParams(filters)
+        )}`,
+        token
+    ]);
     const [facets, setFacets] = React.useState<IFacets | undefined>();
-
-    // For now, only show protocol identifier filters in the trial view
-    const maybeFilteredFacets =
-        trialView && facets
-            ? ({ trial_ids: facets.trial_ids, facets: {} } as IFacets)
-            : facets;
-
-    const [filters, setFiltersInternal] = useQueryParams(filterConfig);
-    const setFilters: typeof setFiltersInternal = updates => {
-        const newFilters = { ...filters, ...updates };
-        getFilterFacets(token, filterParams(newFilters)).then(newFacets => {
+    React.useEffect(() => {
+        if (newFacets) {
             setFacets(newFacets);
-            // If any previously applied filters now have zero results under the
-            // new filter set, remove those filters. This is to ensure a user can't
-            // end up with a set of selected filters that yields empty search results.
-            setFiltersInternal({
-                trial_ids: newFilters.trial_ids,
-                facets: newFilters.facets?.filter(facetString => {
+            setFilters({
+                trial_ids: filters.trial_ids,
+                facets: filters.facets?.filter(facetString => {
                     const [cat, facet, subfacet] = facetString.split("|");
                     if (
                         newFacets.facets &&
@@ -88,17 +84,14 @@ const FilterProvider: React.FC<IFilterProviderProps & { token: string }> = ({
                     return true;
                 })
             });
-        });
-    };
-
-    // Auto-load facets on first render
-    const firstRender = React.useRef<boolean>(true);
-    React.useEffect(() => {
-        if (firstRender.current) {
-            getFilterFacets(token, filterParams(filters)).then(setFacets);
         }
-        firstRender.current = false;
-    }, [token, filters]);
+    }, [filters, newFacets, setFilters]);
+
+    // For now, only show protocol identifier filters in the trial view
+    const maybeFilteredFacets =
+        trialView && facets
+            ? ({ trial_ids: facets.trial_ids, facets: {} } as IFacets)
+            : facets;
 
     const hasFilters =
         Object.values(filters).filter(fs => {
