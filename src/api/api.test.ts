@@ -1,252 +1,176 @@
-import axios, { AxiosPromise } from "axios";
+import axios, { AxiosRequestConfig } from "axios";
 import MockAdapter from "axios-mock-adapter";
-import {
-    _getItem,
-    _extractErrorMessage,
-    getApiClient,
-    getAccountInfo,
-    getManifestValidationErrors,
-    updateUser,
-    getFiles,
-    getSingleFile,
-    getFilelist,
-    getDownloadURL,
-    getTrials,
-    getFilterFacets,
-    getSupportedAssays,
-    getSupportedManifests,
-    getSupportedAnalyses,
-    getExtraDataTypes,
-    updateTrialMetadata,
-    _makeManifestRequest
-} from "./api";
-import { XLSX_MIMETYPE } from "../util/constants";
+import { apiFetch, apiCreate, apiUpdate, apiDelete } from "./api";
 
 const axiosMock = new MockAdapter(axios);
+beforeEach(() => axiosMock.resetHandlers());
 
-const EMAIL = "foo@bar.com";
-// TEST_TOKEN is a JWT with email foo@bar.com (there's nothing sensitive in it; it's just base-64 encoded)
-const TOKEN =
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImZvb0BiYXIuY29tIiwiaWF0IjoxfQ.eyj";
-const OBJECT = { foo: "bar" };
-const ENDPOINT = "some/route";
+const url = "/test-endpoint";
+const token = "test-token";
+const etagErrorCode = 412;
+const data = { foo: "bar" };
 
-beforeEach(() => axiosMock.reset());
+const makeReply = (
+    code: number,
+    result: any,
+    expectedData?: any,
+    exepectedEtag?: string
+) => (config: AxiosRequestConfig) => {
+    try {
+        expect(config.headers.authorization).toBe(`Bearer ${token}`);
+        expect(config.headers["if-match"]).toBe(exepectedEtag);
+        if (expectedData instanceof FormData) {
+            expect([...config.data.entries()]).toEqual([
+                ...expectedData.entries()
+            ]);
+        } else {
+            expect(config.data).toBe(JSON.stringify(expectedData));
+        }
+    } catch (e) {
+        console.log(e);
+        return [500, e];
+    }
+    return [code, result, config.headers];
+};
 
-function respondsWith404(p: Promise<any>) {
-    return p.catch(({ response }) => {
-        expect(response.status).toBe(404);
-    });
-}
+describe("apiFetch", () => {
+    it("handles a successful GET request", async () => {
+        axiosMock.onGet(url).reply(makeReply(200, data));
 
-describe("_getItem", () => {
-    it("handles an existing item", done => {
-        const itemID = "1";
-        const payload = OBJECT;
-        const expectedRoute = ENDPOINT + "/" + itemID;
-
-        axiosMock.onGet(expectedRoute).reply(200, payload);
-        _getItem(TOKEN, ENDPOINT, itemID)
-            .then(item => expect(item).toEqual(payload))
-            .then(done);
-    });
-
-    it("bubbles up a 404 on a non-existent item", done => {
-        respondsWith404(_getItem(TOKEN, ENDPOINT, "2")).then(done);
-    });
-});
-
-describe("_extractErrorMessage", () => {
-    const endpoint = "foo";
-    const client = getApiClient(TOKEN);
-
-    it("handles non-Eve-style error messages", done => {
-        const message = "an error message";
-        axiosMock.onGet(endpoint).reply(() => [401, message]);
-        client
-            .get(endpoint)
-            .catch(_extractErrorMessage)
-            .catch(err => expect(err).toBe(message))
-            .then(done);
+        await expect(apiFetch(url, token)).resolves.toEqual(data);
     });
 
-    it("handles Eve-style error messages", done => {
-        const eveError = {
-            _status: "ERR",
-            _error: { message: "blah" }
-        };
-        axiosMock.onGet(endpoint).reply(() => [401, eveError]);
-        client
-            .get(endpoint)
-            .catch(_extractErrorMessage)
-            .catch(err => expect(err).toBe(eveError._error.message))
-            .then(done);
-    });
+    it("bubbles up errors from a failed GET request", async () => {
+        const error = "uh oh!";
+        axiosMock.onGet(url).reply(makeReply(etagErrorCode, error));
 
-    it("handles empty error messages", done => {
-        axiosMock.onGet(endpoint).reply(() => [401, undefined]);
-        client
-            .get(endpoint)
-            .catch(_extractErrorMessage)
-            .catch(err => expect(err.includes("401")).toBeTruthy())
-            .then(done);
-    });
-});
-
-test("getManifestValidationErrors", done => {
-    const xlsxBlob = new File(["foobar"], "test.xlsx", {
-        type: XLSX_MIMETYPE
-    });
-    const formData = { schema: "foo", template: xlsxBlob };
-    const response = { errors: ["a", "b", "c"] };
-
-    axiosMock.onPost("ingestion/validate").reply(config => {
-        expect(config.data.get("schema")).toBe(formData.schema);
-        expect(config.data.get("template")).toEqual(formData.template);
-        return [200, response];
-    });
-
-    getManifestValidationErrors(TOKEN, formData)
-        .then(errors => expect(errors).toEqual(response.errors))
-        .then(done);
-});
-
-test("getFiles", async () => {
-    const response = {
-        _items: [
-            { id: 1, trial_id: "10021" },
-            { id: 2, trial_id: "E4412" }
-        ],
-        _meta: { total: 10 }
-    };
-    axiosMock.onGet("downloadable_files").reply(200, response);
-
-    const files = await getFiles(TOKEN);
-    expect(files.data).toEqual(response._items);
-    expect(files.meta).toEqual(response._meta);
-});
-
-test("getFileList", async () => {
-    const filelist = "a\tb\nc\td\n";
-    const fileIds = [1, 2, 3, 4, 5, 6];
-    axiosMock.onPost("downloadable_files/filelist").reply(config => {
-        expect(config.data).toBe('{"file_ids":[1,2,3,4,5,6]}');
-        return [200, "a\tb\nc\td\n"];
-    });
-
-    expect(await getFilelist(TOKEN, fileIds)).toBeInstanceOf(Blob);
-});
-
-test("getDownloadURL", async () => {
-    const url = "fake/url";
-    const fileId = 1;
-    axiosMock.onGet("downloadable_files/download_url").reply(config => {
-        expect(config.params?.id).toBe(fileId);
-        return [200, url];
-    });
-
-    expect(await getDownloadURL(TOKEN, fileId)).toBe(url);
-});
-
-test("getTrials", async () => {
-    const response = {
-        _items: [
-            { id: 1, trial_id: "10021" },
-            { id: 2, trial_id: "E4412" }
-        ],
-        _meta: { total: 10 }
-    };
-    axiosMock.onGet("trial_metadata").reply(config => {
-        expect(config.params.sort_field).toBe("trial_id");
-        expect(config.params.sort_direction).toBe("asc");
-        return [200, response];
-    });
-
-    expect(await getTrials(TOKEN)).toEqual(response._items);
-});
-
-test("updateTrialMetadata", async () => {
-    const etag = "test-etag";
-    const trial = { trial_id: "10021", metadata_json: { foo: "bar" } };
-    const response = { id: 1, ...trial };
-    axiosMock.onPatch("trial_metadata/10021").reply(config => {
-        expect(JSON.parse(config.data)).toEqual({
-            metadata_json: trial.metadata_json
+        await apiFetch(url, token).catch(({ response }) => {
+            expect(response.status).toBe(etagErrorCode);
+            expect(response.data).toBe(error);
         });
-        expect(config.headers["if-match"]).toBe(etag);
-        return [200, response];
     });
-    expect(await updateTrialMetadata(TOKEN, etag, trial)).toEqual(response);
 });
 
-test("updateUser", async () => {
+describe("apiCreate", () => {
+    it("handles a successful POST request with JSON data", async () => {
+        axiosMock.onPost(url, data).reply(makeReply(200, data, data));
+        await expect(apiCreate(url, token, { data })).resolves.toEqual(data);
+    });
+
+    it("handles a successful POST request with form data", async () => {
+        const formData = new FormData();
+        formData.append("foo", "bar");
+        axiosMock
+            .onPost(url, formData)
+            .reply(makeReply(200, formData, formData));
+
+        await expect(
+            apiCreate(url, token, { data: formData })
+        ).resolves.toEqual(formData);
+    });
+
+    it("bubbles up errors from a failed POST request", async () => {
+        const error = "uh oh!";
+        axiosMock
+            .onPost(url, data)
+            .reply(makeReply(etagErrorCode, error, data));
+
+        await apiCreate(url, token, { data }).catch(({ response }) => {
+            expect(response.status).toBe(etagErrorCode);
+            expect(response.data).toBe(error);
+        });
+    });
+});
+
+describe("apiUpdate", () => {
     const etag = "test-etag";
-    const user = { id: 1 };
-    const updates = { role: "cidc-biofx-user" };
-    axiosMock.onPatch(`users/${user.id}`).reply(config => {
-        expect(JSON.parse(config.data)).toEqual({ role: user.role });
-        expect(config.headers["if-match"]).toBe(etag);
-        return [200, user];
+    it("handles a successful PATCH with up-to-date etag", async () => {
+        axiosMock.onPatch(url, data).reply(makeReply(200, data, data, etag));
+
+        await expect(apiUpdate(url, token, { data, etag })).resolves.toEqual(
+            data
+        );
     });
-    expect(await updateUser(TOKEN, user.id, etag, {})).toEqual(user);
+
+    it("handles and successfully retries a PATCH with out-of-date etag", async () => {
+        const newEtag = "new-test-etag";
+        axiosMock
+            .onPatch(url, data)
+            .replyOnce(makeReply(etagErrorCode, "stale etag", data, etag))
+            .onGet(url)
+            .replyOnce(makeReply(200, { ...data, _etag: newEtag }))
+            .onPatch(url, data)
+            .replyOnce(makeReply(200, data, data, newEtag));
+
+        await expect(apiUpdate(url, token, { data, etag })).resolves.toEqual(
+            data
+        );
+    });
+
+    it("eventually gives up if etag refreshing isn't working", async () => {
+        axiosMock
+            .onPatch(url, data)
+            .reply(makeReply(etagErrorCode, "stale etag", data, etag))
+            .onGet(url)
+            .reply(makeReply(200, { ...data, _etag: etag }));
+        await apiUpdate(url, token, { data, etag }).catch(({ response }) => {
+            expect(response.status).toBe(412);
+            expect(response.data).toBe("stale etag");
+        });
+    }, 15000); // takes a while because requests are tried with exponential backoff
+
+    it("bubbles up errors from a failed PATCH requests (non-etag-related)", async () => {
+        const error = "uh oh!";
+        axiosMock.onPatch(url, data).reply(makeReply(400, error, data));
+
+        await apiUpdate(url, token, { data }).catch(({ response }) => {
+            expect(response.status).toBe(400);
+            expect(response.data).toBe(error);
+        });
+    });
 });
 
-test("_makeManifestRequest", async () => {
-    const endpoint = "manifest-endpoint";
-    const form = {
-        schema: "plasma",
-        template: new File(["foo"], "plasma.xlsx", { type: XLSX_MIMETYPE })
-    };
-    axiosMock.onPost(endpoint).reply(config => {
-        expect(config.data.get("schema")).toBe(form.schema);
-        expect(config.data.get("template")).toBe(form.template);
-        return [200, "ok"];
+describe("apiDelete", () => {
+    const etag = "test-etag";
+    const success = "ok";
+    it("handles a successful DELETE with up-to-date etag", async () => {
+        axiosMock.onDelete(url).reply(makeReply(200, success, undefined, etag));
+
+        await expect(apiDelete(url, token, { etag })).resolves.toBe(success);
     });
-    await _makeManifestRequest(endpoint, TOKEN, form);
-});
 
-test("getManifestValidationErrors", async () => {
-    const form = { schema: "", template: new File([""], "") };
-    const errors200 = ["some", "errors"];
-    const errors403 = ["some", "other", "errors"];
-    axiosMock
-        .onPost("ingestion/validate")
-        .replyOnce(200, { errors: errors200 });
-    expect(await getManifestValidationErrors(TOKEN, form)).toEqual(errors200);
+    it("handles and successfully retries a DELETE with out-of-date etag", async () => {
+        const newEtag = "new-test-etag";
+        axiosMock
+            .onDelete(url)
+            .replyOnce(makeReply(etagErrorCode, "stale etag", undefined, etag))
+            .onGet(url)
+            .replyOnce(makeReply(200, { ...data, _etag: newEtag }))
+            .onDelete(url)
+            .replyOnce(makeReply(200, success, undefined, newEtag));
 
-    axiosMock.onPost("ingestion/validate").replyOnce(403, {
-        _status: "ERR",
-        _error: { message: { errors: errors403 } }
+        await expect(apiDelete(url, token, { etag })).resolves.toEqual(success);
     });
-    expect(await getManifestValidationErrors(TOKEN, form)).toEqual(errors403);
 
-    axiosMock.onPost("ingestion/validate").replyOnce(403, errors403);
-    expect(await getManifestValidationErrors(TOKEN, form)).toEqual([
-        errors403.toString()
-    ]);
-});
+    it("eventually gives up if etag refreshing isn't working", async () => {
+        axiosMock
+            .onDelete(url, data)
+            .reply(makeReply(etagErrorCode, "stale etag", undefined, etag))
+            .onGet(url)
+            .reply(makeReply(200, { ...data, _etag: etag }));
+        await apiDelete(url, token, { etag }).catch(({ response }) => {
+            expect(response.status).toBe(412);
+            expect(response.data).toBe("stale etag");
+        });
+    }, 15000); // takes a while because requests are tried with exponential backoff
 
-test("simple GET endpoints", async () => {
-    const testConfigs = [
-        { route: "users/self", endpoint: getAccountInfo },
-        { route: "downloadable_files", endpoint: getSingleFile, withId: true },
-        {
-            route: "downloadable_files/filter_facets",
-            endpoint: getFilterFacets
-        },
-        { route: "/info/assays", endpoint: getSupportedAssays },
-        { route: "/info/manifests", endpoint: getSupportedManifests },
-        { route: "/info/analyses", endpoint: getSupportedAnalyses },
-        { route: "/info/extra_data_types", endpoint: getExtraDataTypes }
-    ];
+    it("bubbles up errors from a failed DELETE requests (non-etag-related)", async () => {
+        const error = "uh oh!";
+        axiosMock.onDelete(url).reply(makeReply(400, error, undefined));
 
-    await Promise.all(
-        testConfigs.map(async ({ route, endpoint, withId }: any) => {
-            const data = { some: "data" };
-            const id = 1;
-            axiosMock.onGet(withId ? `${route}/${id}` : route).reply(200, data);
-            const result = await endpoint(TOKEN, id);
-            expect(data).toEqual(data);
-        })
-    );
+        await apiDelete(url, token).catch(({ response }) => {
+            expect(response.status).toBe(400);
+            expect(response.data).toBe(error);
+        });
+    });
 });

@@ -1,16 +1,18 @@
-import { Dictionary, uniq } from "lodash";
 import React from "react";
+import { Dictionary, uniq } from "lodash";
 import { ArrayParam, useQueryParams } from "use-query-params";
-import { getFilterFacets } from "../../../api/api";
 import { withIdToken } from "../../identity/AuthProvider";
+import { filterParams } from "../files/FileTable";
+import useSWR from "swr";
+import { formatQueryString } from "../../../util/formatters";
 
 export interface IFacetInfo {
     label: string;
+    count: number;
     description?: string;
-    count?: number;
 }
 export interface IFacets {
-    trial_ids: Array<string | IFacetInfo>;
+    trial_ids: IFacetInfo[];
     facets: Dictionary<Dictionary<IFacetInfo[]> | IFacetInfo[]>;
 }
 
@@ -51,23 +53,56 @@ const FilterProvider: React.FC<IFilterProviderProps & { token: string }> = ({
     trialView,
     children
 }) => {
+    const [filters, setFilters] = useQueryParams(filterConfig);
+    const { data: newFacets } = useSWR<IFacets>([
+        `/downloadable_files/filter_facets?${formatQueryString(
+            filterParams(filters)
+        )}`,
+        token
+    ]);
     const [facets, setFacets] = React.useState<IFacets | undefined>();
     React.useEffect(() => {
-        getFilterFacets(token).then(setFacets);
-    }, [token]);
+        if (newFacets) {
+            setFacets(newFacets);
+            setFilters({
+                trial_ids: filters.trial_ids,
+                facets: filters.facets?.filter(facetString => {
+                    const [cat, facet, subfacet] = facetString.split("|");
+                    if (
+                        newFacets.facets &&
+                        newFacets.facets[cat] &&
+                        newFacets.facets[cat][facet]
+                    ) {
+                        return (
+                            newFacets.facets[cat][facet].count > 0 ||
+                            newFacets.facets[cat][facet].filter(
+                                (sf: IFacetInfo) =>
+                                    sf.label === subfacet && sf.count > 0
+                            ).length > 0
+                        );
+                    }
+                    return true;
+                })
+            });
+        }
+    }, [filters, newFacets, setFilters]);
+
     // For now, only show protocol identifier filters in the trial view
     const maybeFilteredFacets =
         trialView && facets
             ? ({ trial_ids: facets.trial_ids, facets: {} } as IFacets)
             : facets;
 
-    const [filters, setFilters] = useQueryParams(filterConfig);
     const hasFilters =
         Object.values(filters).filter(fs => {
             return fs && fs.length > 0;
         }).length > 0;
     const clearFilters = () => {
-        Object.keys(filters).forEach(k => setFilters({ [k]: undefined }));
+        const clearedFilters = Object.keys(filters).reduce(
+            (f, k) => ({ ...f, [k]: undefined }),
+            {}
+        );
+        setFilters(clearedFilters);
     };
     const toggleFilter = (k: keyof IFacets, v: string) => {
         const currentValues = filters[k] || [];
@@ -88,11 +123,11 @@ const FilterProvider: React.FC<IFilterProviderProps & { token: string }> = ({
             } else {
                 const keyFilters = filters[k] || [];
                 const facetFamily = [category, facet].join(ARRAY_PARAM_DELIM);
-                const facetsInFamily: string[] = facets[k][category][
-                    facet
-                ].map((f: IFacetInfo) =>
-                    [facetFamily, f.label].join(ARRAY_PARAM_DELIM)
-                );
+                const facetsInFamily: string[] = facets[k][category][facet]
+                    .filter(({ count }: IFacetInfo) => count > 0)
+                    .map((f: IFacetInfo) =>
+                        [facetFamily, f.label].join(ARRAY_PARAM_DELIM)
+                    );
                 const hasAllFilters =
                     keyFilters.filter(f => f.startsWith(facetFamily)).length ===
                     facetsInFamily.length;
