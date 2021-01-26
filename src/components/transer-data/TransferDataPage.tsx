@@ -206,7 +206,7 @@ const TransferDataForm: React.FC = withIdToken(({ token }) => {
                                     </Typography>
                                     <Typography>
                                         Upload data to your transfer destination
-                                        directly from you browser using the{" "}
+                                        directly from your browser using the{" "}
                                         Google Cloud Storage web interface.{" "}
                                         <strong>Note:</strong> be sure to log in
                                         using the Google email associated with
