@@ -39,6 +39,9 @@ const BrowseDataPage = React.lazy(() =>
 const FileDetailsPage = React.lazy(() =>
     import("./components/browse-data/files/FileDetailsPage")
 );
+const TransferDataPage = React.lazy(() =>
+    import("./components/transer-data/TransferDataPage")
+);
 
 export default function App() {
     const classes = useRootStyles();
@@ -85,6 +88,13 @@ export default function App() {
                                                         path="/browse-data"
                                                         component={
                                                             BrowseDataPage
+                                                        }
+                                                    />
+                                                    <Route
+                                                        exact
+                                                        path="/transfer-data"
+                                                        component={
+                                                            TransferDataPage
                                                         }
                                                     />
                                                     <Route

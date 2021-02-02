@@ -14,7 +14,8 @@ import {
     TabProps,
     Box,
     Menu,
-    MenuItem
+    MenuItem,
+    Chip
 } from "@material-ui/core";
 import {
     withRouter,
@@ -183,9 +184,8 @@ const NavTabs: React.FC<{ selectedTab: string | false; tabs: TabProps[] }> = ({
 
 const useHeaderStyles = makeStyles({
     tabs: {
-        paddingTop: 10,
         margin: 0,
-        height: 134
+        paddingTop: 10
     },
     logo: { height: 80, padding: 5, marginBottom: -40 }
 });
@@ -264,6 +264,27 @@ const Header: React.FunctionComponent<RouteComponentProps> = props => {
                                         {
                                             label: "browse data",
                                             value: "/browse-data"
+                                        },
+
+                                        (user.showAssays ||
+                                            user.showAnalyses) && {
+                                            label: (
+                                                <div>
+                                                    transfer data{" "}
+                                                    <Box
+                                                        display="inline"
+                                                        pl={1}
+                                                    >
+                                                        <Chip
+                                                            size="small"
+                                                            label="new"
+                                                            variant="outlined"
+                                                            color="primary"
+                                                        />
+                                                    </Box>
+                                                </div>
+                                            ),
+                                            value: "/transfer-data"
                                         },
                                         user.showAssays && {
                                             label: "transfer assays",
