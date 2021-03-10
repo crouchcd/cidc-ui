@@ -80,7 +80,13 @@ const pathConfigs: Dictionary<IDocPathConfig> = {
         title: "TCR upload",
         assays: true,
         analyses: true
-    }
+    },
+    hande: {
+        path: "hande",
+        label: "H&E",
+        title: "H&E upload",
+        assays: true
+    },
 };
 
 export interface IUploadDocsPageProps extends RouteComponentProps {
