@@ -52,7 +52,8 @@ function doRender() {
                 "ihc",
                 "elisa",
                 "mif",
-                "tcr"
+                "tcr",
+                "hande"
             ],
             manifests: [],
             analyses: []
