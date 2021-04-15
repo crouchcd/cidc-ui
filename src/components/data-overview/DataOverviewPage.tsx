@@ -33,7 +33,7 @@ const nonAssayFields = [
     "trial_id",
     "file_size_bytes",
     "clinical_participants",
-    "total_participant",
+    "total_participants",
     "total_samples"
 ];
 
