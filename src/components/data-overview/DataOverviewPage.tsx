@@ -31,6 +31,7 @@ const HeaderCell = withStyles({
 
 const nonAssayFields = [
     "trial_id",
+    "expected_assays",
     "file_size_bytes",
     "clinical_participants",
     "total_participants",
