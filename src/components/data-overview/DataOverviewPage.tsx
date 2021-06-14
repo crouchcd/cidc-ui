@@ -11,7 +11,8 @@ import {
     Card,
     CardContent,
     withStyles,
-    Chip
+    Chip,
+    Tooltip
 } from "@material-ui/core";
 import { withIdToken } from "../identity/AuthProvider";
 import { ITrialOverview } from "../../model/trial";
@@ -21,6 +22,22 @@ import { RouteComponentProps } from "react-router";
 import { theme, useRootStyles } from "../../rootStyles";
 import { formatFileSize } from "../../util/utils";
 import { IDataOverview } from "../../api/api";
+import { makeStyles } from "@material-ui/core";
+
+const NONASSAY_FIELDS = [
+    "trial_id",
+    "expected_assays",
+    "file_size_bytes",
+    "expected_assays",
+    "clinical_participants",
+    "total_participants",
+    "total_samples",
+    "excluded_samples",
+    // Exclude this for now, pending backend updates
+    "cytof_s1609_gd2car"
+];
+
+const ASSAYS_WITH_ANALYSIS = ["wes", "rna", "tcr", "cytof"];
 
 const HeaderCell = withStyles({
     root: {
@@ -29,67 +46,198 @@ const HeaderCell = withStyles({
     }
 })(TableCell);
 
-const NoAssayCell = withStyles({
+const GreyRow = withStyles({
     root: {
-        background: theme.palette.grey[200]
+        background: theme.palette.grey[50]
     }
-})(TableCell);
+})(TableRow);
 
-const nonAssayFields = [
-    "trial_id",
-    "expected_assays",
-    "file_size_bytes",
-    "expected_assays",
-    "clinical_participants",
-    "total_participants",
-    "total_samples"
-];
+const NAText: React.FC = () => (
+    <Typography color="textSecondary" variant="caption">
+        -
+    </Typography>
+);
+
+type IngestionStatus =
+    | "success"
+    | "approved-failure"
+    | "unapproved-failure"
+    | "upstream-pending";
+
+const commonDataStyles = { minWidth: 40 };
+
+const useDataStyles = makeStyles({
+    success: {
+        ...commonDataStyles,
+        background: `${theme.palette.success.light} !important`
+    },
+    "approved-failure": {
+        ...commonDataStyles,
+        background: `${theme.palette.primary.light} !important`
+    },
+    "unapproved-failure": {
+        ...commonDataStyles,
+        background: `${theme.palette.warning.light} !important`
+    },
+    "upstream-pending": {
+        ...commonDataStyles,
+        background: `${theme.palette.grey.A100} !important`
+    }
+});
+
+const ColoredData: React.FC<{
+    status: IngestionStatus;
+    tooltip?: string;
+}> = ({ status, tooltip, children }) => {
+    const classes = useDataStyles();
+    const chip = (
+        <Chip className={classes[status]} size="small" label={children} />
+    );
+    return tooltip ? (
+        <Tooltip title={<Typography variant="caption">{tooltip}</Typography>}>
+            {chip}
+        </Tooltip>
+    ) : (
+        chip
+    );
+};
+
+const AssayCell: React.FC<{
+    overview: ITrialOverview;
+    assay: string;
+    stage: "received" | "analyzed";
+}> = ({ overview, assay, stage }) => {
+    const received = overview[assay] as number;
+    const excluded =
+        (overview.excluded_samples && overview.excluded_samples[assay]) || [];
+
+    let status: IngestionStatus;
+    let count: number;
+    let tooltip: string;
+    switch (stage) {
+        case "received":
+            count = received;
+            // NOTE: as computed here, status may indicate success if some but not all samples have been received
+            status = count > 0 ? "success" : "unapproved-failure";
+            tooltip =
+                count > 0
+                    ? "All samples have been received."
+                    : "Samples are expected, but none have been received.";
+            break;
+        case "analyzed":
+            count = (assay === "rna"
+                ? overview.rna_level1_analysis
+                : overview[`${assay}_analysis`]) as number;
+            status =
+                count === undefined && received === 0
+                    ? "upstream-pending"
+                    : excluded.length === received - count && count > 0
+                    ? excluded.length === 0
+                        ? "success"
+                        : "approved-failure"
+                    : "unapproved-failure";
+            tooltip = {
+                success: "All received samples have been analyzed.",
+                "approved-failure":
+                    "Some received samples failed during analysis.",
+                "unapproved-failure":
+                    "Some received samples have not been analyzed. Either their analysis is still in progress, or they failed analysis but their failures were not documented.",
+                "upstream-pending":
+                    "Analysis expected once samples are received."
+            }[status];
+            break;
+    }
+
+    return (
+        <TableCell
+            key={assay}
+            align="center"
+            data-testid={`data-${overview.trial_id}-${assay}-${stage}`}
+        >
+            <ColoredData status={status} tooltip={tooltip}>
+                {count || 0}
+            </ColoredData>
+        </TableCell>
+    );
+};
 
 const DataOverviewRow: React.FC<{
     overview: ITrialOverview;
     assays: string[];
 }> = ({ overview, assays }) => {
     return (
-        <TableRow>
-            <TableCell>{overview.trial_id}</TableCell>
-            <TableCell align="right">
-                {formatFileSize(overview.file_size_bytes)}
-            </TableCell>
-            <TableCell align="right">
-                <Chip
-                    style={{ width: "100%" }}
-                    color={
-                        overview.clinical_participants > 0
-                            ? "primary"
-                            : "default"
-                    }
-                    variant="outlined"
-                    label={`${overview.clinical_participants} / ${overview.total_participants} participants`}
-                />
-            </TableCell>
-            {assays.map(assay =>
-                overview.expected_assays.includes(assay) ||
-                overview[assay] > 0 ? (
-                    <TableCell
-                        key={assay}
-                        align="center"
-                        data-testid={`data-${overview.trial_id}-${assay}`}
-                    >
-                        {overview[assay]}
-                    </TableCell>
-                ) : (
-                    <NoAssayCell
-                        key={assay}
-                        align="center"
-                        data-testid={`na-${overview.trial_id}-${assay}`}
-                    >
-                        <Typography color="textSecondary" variant="caption">
-                            n/a
-                        </Typography>
-                    </NoAssayCell>
-                )
-            )}
-        </TableRow>
+        <>
+            <TableRow>
+                <TableCell rowSpan={3}>{overview.trial_id}</TableCell>
+                <TableCell rowSpan={3} align="right">
+                    {formatFileSize(overview.file_size_bytes)}
+                </TableCell>
+                <TableCell rowSpan={3} align="right">
+                    <Chip
+                        style={{ width: "100%" }}
+                        color={
+                            overview.clinical_participants > 0
+                                ? "primary"
+                                : "default"
+                        }
+                        variant="outlined"
+                        label={`${overview.clinical_participants} / ${overview.total_participants} participants`}
+                    />
+                </TableCell>
+            </TableRow>
+            <TableRow>
+                <TableCell>
+                    <Typography variant="overline">
+                        <strong>received</strong>
+                    </Typography>
+                </TableCell>
+                {assays.map(assay =>
+                    overview.expected_assays.includes(assay) ||
+                    overview[assay] > 0 ? (
+                        <AssayCell
+                            key={assay}
+                            assay={assay}
+                            overview={overview}
+                            stage="received"
+                        />
+                    ) : (
+                        <TableCell
+                            key={assay}
+                            align="center"
+                            data-testid={`na-${overview.trial_id}-${assay}-received`}
+                        >
+                            <NAText />
+                        </TableCell>
+                    )
+                )}
+            </TableRow>
+            <GreyRow>
+                <TableCell>
+                    <Typography variant="overline">
+                        <strong>analyzed</strong>
+                    </Typography>
+                </TableCell>
+                {assays.map(assay =>
+                    ASSAYS_WITH_ANALYSIS.includes(assay) &&
+                    overview.expected_assays.includes(assay) ? (
+                        <AssayCell
+                            key={assay}
+                            assay={assay}
+                            overview={overview}
+                            stage="analyzed"
+                        />
+                    ) : (
+                        <TableCell
+                            key={assay}
+                            align="center"
+                            data-testid={`na-${overview.trial_id}-${assay}-analyzed`}
+                        >
+                            <NAText />
+                        </TableCell>
+                    )
+                )}
+            </GreyRow>
+        </>
     );
 };
 
@@ -115,7 +263,7 @@ const DataOverviewTable: React.FC = withIdToken(({ token }) => {
     }
 
     const assays = Object.keys(summary[0]).filter(
-        k => !nonAssayFields.includes(k)
+        k => !NONASSAY_FIELDS.includes(k) && !k.endsWith("analysis")
     );
 
     // List trials with clinical data first, ordered by total file size
@@ -127,9 +275,31 @@ const DataOverviewTable: React.FC = withIdToken(({ token }) => {
     return (
         <Card>
             <CardContent>
-                <Typography variant="subtitle2" align="right">
-                    n/a = assay not expected for this trial
-                </Typography>
+                <Grid container spacing={1} direction="row-reverse">
+                    <Grid item>
+                        <ColoredData status="success">success</ColoredData>
+                    </Grid>
+                    <Grid item>
+                        <ColoredData status="approved-failure">
+                            success with expected failures
+                        </ColoredData>
+                    </Grid>
+                    <Grid item>
+                        <ColoredData status="unapproved-failure">
+                            pending or has unexpected failures
+                        </ColoredData>
+                    </Grid>
+                    <Grid item>
+                        <ColoredData status="upstream-pending">
+                            awaiting upstream ingestion
+                        </ColoredData>
+                    </Grid>
+                    <Grid item>
+                        <Typography variant="subtitle2" align="right">
+                            "<NAText />" = not expected
+                        </Typography>
+                    </Grid>
+                </Grid>
                 <Chip
                     variant="outlined"
                     label={
@@ -163,8 +333,11 @@ const DataOverviewTable: React.FC = withIdToken(({ token }) => {
                             <HeaderCell align="center">
                                 Clinical Data
                             </HeaderCell>
+                            <HeaderCell />
                             {assays.map(assay => (
-                                <HeaderCell key={assay}>{assay}</HeaderCell>
+                                <HeaderCell key={assay} align="center">
+                                    {assay}
+                                </HeaderCell>
                             ))}
                         </TableRow>
                     </TableHead>
