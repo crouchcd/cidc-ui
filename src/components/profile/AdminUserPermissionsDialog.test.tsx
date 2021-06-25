@@ -35,6 +35,7 @@ const INFO = {
         assays: [
             "cytof",
             "wes",
+            "atac",
             "rna",
             "olink",
             "ihc",
