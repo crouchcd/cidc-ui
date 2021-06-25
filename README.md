@@ -19,6 +19,14 @@ Next, install the dependencies:
 npm install
 ```
 
+### Run
+
+To run a local development server:
+
+```
+npm start
+```
+
 ### Build:
 
 To create a new deployment bundle, run `npm run build`
