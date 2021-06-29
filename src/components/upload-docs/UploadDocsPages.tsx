@@ -36,6 +36,12 @@ const pathConfigs: Dictionary<IDocPathConfig> = {
         assays: true,
         analyses: true
     },
+    atac: {
+        path: "atac",
+        label: "ATAC",
+        title: "ATAC upload",
+        assays: true
+    },
     rna: {
         path: "rna",
         label: "RNA Expression",
@@ -86,7 +92,7 @@ const pathConfigs: Dictionary<IDocPathConfig> = {
         label: "H&E",
         title: "H&E upload",
         assays: true
-    },
+    }
 };
 
 export interface IUploadDocsPageProps extends RouteComponentProps {
