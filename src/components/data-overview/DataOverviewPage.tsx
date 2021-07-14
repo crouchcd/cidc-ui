@@ -37,7 +37,7 @@ const NONASSAY_FIELDS = [
     "cytof_s1609_gd2car"
 ];
 
-const ASSAYS_WITH_ANALYSIS = ["wes", "rna", "tcr", "cytof"];
+const ASSAYS_WITH_ANALYSIS = ["wes", "rna", "tcr", "cytof", "wes_tumor_only"];
 
 const HeaderCell = withStyles({
     root: {
@@ -213,8 +213,9 @@ const DataOverviewRow: React.FC<{
                     </Typography>
                 </TableCell>
                 {assays.map(assay =>
-                    overview.expected_assays.includes(assay) ||
-                    overview[assay] > 0 ? (
+                    overview.expected_assays.includes(
+                        assay !== "wes_tumor_only" ? assay : "wes"
+                    ) || overview[assay] > 0 ? (
                         <AssayCell
                             key={assay}
                             assay={assay}
@@ -240,7 +241,9 @@ const DataOverviewRow: React.FC<{
                 </TableCell>
                 {assays.map(assay =>
                     ASSAYS_WITH_ANALYSIS.includes(assay) &&
-                    overview.expected_assays.includes(assay) ? (
+                    overview.expected_assays.includes(
+                        assay !== "wes_tumor_only" ? assay : "wes"
+                    ) ? (
                         <AssayCell
                             key={assay}
                             assay={assay}
