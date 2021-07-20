@@ -15,7 +15,7 @@ export const colors = {
 
 export const widths = {
     maxPageWidth: 1400,
-    minPageWidth: 1100
+    minPageWidth: 1215
 };
 
 export const theme = createMuiTheme({
@@ -63,6 +63,7 @@ export const useRootStyles = makeStyles({
         paddingLeft: "3rem",
         minWidth: widths.minPageWidth,
         maxWidth: widths.maxPageWidth,
-        margin: "auto"
+        margin: "auto",
+        overflowX: "auto"
     }
 });
