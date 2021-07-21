@@ -64,6 +64,7 @@ export const useRootStyles = makeStyles({
         minWidth: widths.minPageWidth,
         maxWidth: widths.maxPageWidth,
         margin: "auto",
-        overflowX: "auto"
+        overflowX: "auto",
+        overflowY: "hidden"
     }
 });
