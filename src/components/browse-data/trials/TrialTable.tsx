@@ -204,6 +204,7 @@ const extractFileIds = (fileBundle: IFileBundle, keys: string[]) =>
 
 const partSampFields = ["Participants Info", "Samples Info"];
 const clinicalFields = ["Clinical Data"];
+const skipSummaryRows = ["other", "Templates"];
 
 export const TrialCard: React.FC<ITrialCardProps> = ({ trial, token }) => {
     const user = useUserContext();
@@ -223,7 +224,7 @@ export const TrialCard: React.FC<ITrialCardProps> = ({ trial, token }) => {
         (v, k) =>
             partSampFields.includes(k) ||
             clinicalFields.includes(k) ||
-            k === "other"
+            skipSummaryRows.includes(k)
     );
 
     const rightPanel =

@@ -38,6 +38,9 @@ const fileBundle = {
     },
     other: {
         source: [1, 2, 3]
+    },
+    Templates: {
+        miscellaneous: [2]
     }
 };
 const metadata = {
@@ -125,6 +128,7 @@ it("renders trials with no filters applied", async () => {
     expect(queryAllByText(/ihc/i).length).toBe(10);
     expect(queryAllByText(/2 files/i).length).toBe(10);
     expect(zeroFileButtons.length).toBe(10);
+    expect(queryByText(/templates/i)).not.toBeInTheDocument();
 
     // buttons with files available are enabled
     expect(partSampButtons[0].closest("button").disabled).toBe(false);
