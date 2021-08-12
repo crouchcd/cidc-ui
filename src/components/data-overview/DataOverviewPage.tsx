@@ -32,9 +32,7 @@ const NONASSAY_FIELDS = [
     "clinical_participants",
     "total_participants",
     "total_samples",
-    "excluded_samples",
-    // Exclude this for now, pending backend updates
-    "cytof_s1609_gd2car"
+    "excluded_samples"
 ];
 
 const ASSAYS_WITH_ANALYSIS = ["wes", "rna", "tcr", "cytof", "wes_tumor_only"];
