@@ -97,8 +97,7 @@ const TrialExpectAssaysField: React.FC<{ width: GridProps["xs"] }> = ({
     } = useInfoContext();
 
     // Hacky way to ensure wes_bam and wes_fastq show up like "wes"
-    // cytof_10021 and cytof_e4412 show up like "cytof", "hande" as
-    // "h&e", etc.
+    // "hande" as "h&e", etc.
     const simplifiedAssays = uniq(
         assays.map(a => {
             if (a === "hande") {

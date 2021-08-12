@@ -55,13 +55,7 @@ const renderTrialManager = () =>
         <InfoContext.Provider
             value={{
                 supportedTemplates: {
-                    assays: [
-                        "wes_bam",
-                        "wes_fastq",
-                        "cytof_10021",
-                        "hande",
-                        "ihc"
-                    ]
+                    assays: ["wes_bam", "wes_fastq", "cytof", "hande", "ihc"]
                 }
             }}
         >
