@@ -35,7 +35,14 @@ const NONASSAY_FIELDS = [
     "excluded_samples"
 ];
 
-const ASSAYS_WITH_ANALYSIS = ["wes", "rna", "tcr", "cytof", "wes_tumor_only"];
+const ASSAYS_WITH_ANALYSIS = [
+    "atacseq",
+    "cytof",
+    "rna",
+    "tcr",
+    "wes",
+    "wes_tumor_only"
+];
 
 const HeaderCell = withStyles({
     root: {
