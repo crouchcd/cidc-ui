@@ -40,7 +40,8 @@ const pathConfigs: Dictionary<IDocPathConfig> = {
         path: "atac",
         label: "ATAC",
         title: "ATAC upload",
-        assays: true
+        assays: true,
+        analyses: true
     },
     rna: {
         path: "rna",
