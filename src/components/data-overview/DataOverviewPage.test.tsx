@@ -25,6 +25,43 @@ it("displays data as expected", async () => {
         switch (url) {
             case "/info/data_overview":
                 return { num_bytes: 1e9 };
+            case "/downloadable_files/facet_groups_for_links":
+                return {
+                    facets: {
+                        atacseq: {
+                            // test multiple values as well as space
+                            received: ["atacseq_assay", "atacseq assay"],
+                            analyzed: ["atacseq_analysis"]
+                        },
+                        cytof: {
+                            received: ["cytof_assay"],
+                            analyzed: ["cytof_analysis"]
+                        },
+                        elisa: { received: ["elisa_assay"] },
+                        // test special character
+                        "h&e": { received: ["h&e_assay"] },
+                        ihc: { received: ["ihc_assay"] },
+                        mif: { received: ["mif_assay"] },
+                        nanostring: { received: ["mif_assay"] },
+                        olink: { received: ["olink_assay"] },
+                        rna: {
+                            received: ["rna_assay"],
+                            analyzed: ["rna_analysis"]
+                        },
+                        tcr: {
+                            received: ["tcr_assay"],
+                            analyzed: ["tcr_analysis"]
+                        },
+                        wes_normal: {
+                            received: ["wes_assay"],
+                            analyzed: ["wes_analysis"]
+                        },
+                        wes_tumor: {
+                            received: ["wes_assay"],
+                            analyzed: ["wes_tumor_only_analysis"]
+                        }
+                    }
+                };
             case "/trial_metadata/summaries":
                 return [
                     {
@@ -32,8 +69,9 @@ it("displays data as expected", async () => {
                         file_size_bytes: 1e3,
                         clinical_participants: 1,
                         total_participants: 2,
-                        expected_assays: ["wes", "h&e", "ihc"],
+                        expected_assays: ["atacseq", "wes", "h&e", "ihc"],
                         "h&e": 11,
+                        atacseq: 3,
                         wes_normal: 5,
                         wes_tumor: 6,
                         wes_analysis: 5,
@@ -46,8 +84,9 @@ it("displays data as expected", async () => {
                         file_size_bytes: 1e6,
                         clinical_participants: 0,
                         total_participants: 3,
-                        expected_assays: ["h&e", "ihc"],
+                        expected_assays: ["atacseq", "h&e", "ihc"],
                         "h&e": 21,
+                        atacseq: 0,
                         wes_normal: 0,
                         wes_tumor: 0,
                         ihc: 22
@@ -75,6 +114,9 @@ it("displays data as expected", async () => {
         innerText(getByTestId("data-tr1-h&e-received"), "11")
     ).toBeInTheDocument();
     expect(
+        innerText(getByTestId("data-tr1-atacseq-received"), "3")
+    ).toBeInTheDocument();
+    expect(
         innerText(getByTestId("data-tr1-wes_tumor-received"), "6")
     ).toBeInTheDocument();
     expect(
@@ -100,6 +142,21 @@ it("displays data as expected", async () => {
     expect(innerText(wesAnalyzed, "5")).toBeInTheDocument();
     const wesTumorOnlyAnalyzed = getByTestId("data-tr1-wes_tumor-analyzed");
     expect(innerText(wesTumorOnlyAnalyzed, "1")).toBeInTheDocument();
+
+    // links to file browser
+    expect(getByTestId("link-tr1-atacseq-received")).toHaveAttribute(
+        "href",
+        "/browse-data?file_view=1&trial_ids=tr1&facets=atacseq_assay&facets=atacseq%20assay"
+    );
+    // wes_tumor and wes_normal assay point to the same place
+    expect(getByTestId("link-tr1-wes_normal-received")).toHaveAttribute(
+        "href",
+        "/browse-data?file_view=1&trial_ids=tr1&facets=wes_assay"
+    );
+    expect(getByTestId("link-tr1-wes_tumor-received")).toHaveAttribute(
+        "href",
+        "/browse-data?file_view=1&trial_ids=tr1&facets=wes_assay"
+    );
 
     // sample exclusions are displayed on hover
     fireEvent.mouseOver(wesAnalyzed.firstElementChild!);

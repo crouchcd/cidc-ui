@@ -10,6 +10,7 @@ import {
     Typography,
     withStyles,
     Chip,
+    Link,
     Tooltip,
     TableContainer,
     Divider
@@ -23,6 +24,7 @@ import { theme, useRootStyles } from "../../rootStyles";
 import { formatFileSize } from "../../util/utils";
 import { IDataOverview } from "../../api/api";
 import { makeStyles } from "@material-ui/core";
+import { IFacetsForLinks } from "../../model/file";
 
 const NONASSAY_FIELDS = [
     "trial_id",
@@ -111,7 +113,8 @@ const AssayCell: React.FC<{
     overview: ITrialOverview;
     assay: string;
     stage: "received" | "analyzed";
-}> = ({ overview, assay, stage }) => {
+    facets: string[];
+}> = ({ overview, assay, stage, facets }) => {
     const received = overview[assay] as number;
 
     let status: IngestionStatus;
@@ -187,6 +190,24 @@ const AssayCell: React.FC<{
             break;
     }
 
+    let linkTarget: string = `/browse-data?file_view=1&trial_ids=${overview.trial_id}`;
+    for (const facet of facets) {
+        linkTarget = linkTarget + `&facets=` + encodeURI(facet);
+    }
+
+    let countWithLink: number | React.ReactElement;
+    countWithLink =
+        !count || count === 0 ? (
+            count
+        ) : (
+            <Link
+                href={linkTarget}
+                data-testid={`link-${overview.trial_id}-${assay}-${stage}`}
+            >
+                {count}
+            </Link>
+        );
+
     return (
         <TableCell
             key={assay}
@@ -194,7 +215,7 @@ const AssayCell: React.FC<{
             data-testid={`data-${overview.trial_id}-${assay}-${stage}`}
         >
             <ColoredData status={status} tooltip={tooltip}>
-                {count || 0}
+                {countWithLink}
             </ColoredData>
         </TableCell>
     );
@@ -203,7 +224,8 @@ const AssayCell: React.FC<{
 const DataOverviewRow: React.FC<{
     overview: ITrialOverview;
     assays: string[];
-}> = ({ overview, assays }) => {
+    facets: IFacetsForLinks;
+}> = ({ overview, assays, facets }) => {
     return (
         <>
             <TableRow>
@@ -241,6 +263,7 @@ const DataOverviewRow: React.FC<{
                             assay={assay}
                             overview={overview}
                             stage="received"
+                            facets={facets.facets[assay][`received`]}
                         />
                     ) : (
                         <TableCell
@@ -271,6 +294,7 @@ const DataOverviewRow: React.FC<{
                             assay={assay}
                             overview={overview}
                             stage="analyzed"
+                            facets={facets.facets[assay][`analyzed`]}
                         />
                     ) : (
                         <TableCell
@@ -298,8 +322,16 @@ const DataOverviewPage: React.FC<RouteComponentProps> = withIdToken(
             "/trial_metadata/summaries",
             token
         ]);
+        const { data: facets } = useSWR<IFacetsForLinks>([
+            "/downloadable_files/facet_groups_for_links",
+            token
+        ]);
 
-        if (summary === undefined || overview === undefined) {
+        if (
+            summary === undefined ||
+            overview === undefined ||
+            facets === undefined
+        ) {
             return (
                 <Grid container justify="center">
                     <Grid item>
@@ -308,6 +340,7 @@ const DataOverviewPage: React.FC<RouteComponentProps> = withIdToken(
                 </Grid>
             );
         }
+        console.log(facets.facets);
 
         if (summary.length === 0) {
             return <Typography>No data found.</Typography>;
@@ -421,6 +454,7 @@ const DataOverviewPage: React.FC<RouteComponentProps> = withIdToken(
                                         key={row.trial_id}
                                         overview={row}
                                         assays={assays}
+                                        facets={facets}
                                     />
                                 ))}
                             </TableBody>
