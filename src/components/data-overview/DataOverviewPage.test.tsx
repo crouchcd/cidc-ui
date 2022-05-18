@@ -34,8 +34,10 @@ it("displays data as expected", async () => {
                         total_participants: 2,
                         expected_assays: ["wes", "h&e", "ihc"],
                         "h&e": 11,
-                        wes: 12,
-                        wes_analysis: 11,
+                        wes_normal: 5,
+                        wes_tumor: 6,
+                        wes_analysis: 5,
+                        wes_tumor_only_analysis: 1,
                         ihc: 0,
                         excluded_samples: { wes_analysis: [excluded] }
                     },
@@ -46,7 +48,8 @@ it("displays data as expected", async () => {
                         total_participants: 3,
                         expected_assays: ["h&e", "ihc"],
                         "h&e": 21,
-                        wes: 0,
+                        wes_normal: 0,
+                        wes_tumor: 0,
                         ihc: 22
                     }
                 ];
@@ -64,14 +67,18 @@ it("displays data as expected", async () => {
     expect(queryByText(/tr1/i)).toBeInTheDocument();
     expect(queryByText(/tr2/i)).toBeInTheDocument();
     expect(queryByText(/h&e/i)).toBeInTheDocument();
-    expect(queryByText(/wes/i)).toBeInTheDocument();
+    expect(queryByText(/wes_normal/i)).toBeInTheDocument();
+    expect(queryByText(/wes_tumor/i)).toBeInTheDocument();
     expect(queryByText(/1 kb/i)).toBeInTheDocument();
     expect(queryByText(/1 mb/i)).toBeInTheDocument();
     expect(
         innerText(getByTestId("data-tr1-h&e-received"), "11")
     ).toBeInTheDocument();
     expect(
-        innerText(getByTestId("data-tr1-wes-received"), "12")
+        innerText(getByTestId("data-tr1-wes_tumor-received"), "6")
+    ).toBeInTheDocument();
+    expect(
+        innerText(getByTestId("data-tr1-wes_normal-received"), "5")
     ).toBeInTheDocument();
     expect(
         innerText(getByTestId("data-tr1-ihc-received"), "0")
@@ -83,11 +90,16 @@ it("displays data as expected", async () => {
         innerText(getByTestId("data-tr2-ihc-received"), "22")
     ).toBeInTheDocument();
     expect(
-        innerText(getByTestId("na-tr2-wes-received"), "-")
+        innerText(getByTestId("na-tr2-wes_tumor-received"), "-")
+    ).toBeInTheDocument();
+    expect(
+        innerText(getByTestId("na-tr2-wes_normal-received"), "-")
     ).toBeInTheDocument();
 
-    const wesAnalyzed = getByTestId("data-tr1-wes-analyzed");
-    expect(innerText(wesAnalyzed, "11")).toBeInTheDocument();
+    const wesAnalyzed = getByTestId("data-tr1-wes_normal-analyzed");
+    expect(innerText(wesAnalyzed, "5")).toBeInTheDocument();
+    const wesTumorOnlyAnalyzed = getByTestId("data-tr1-wes_tumor-analyzed");
+    expect(innerText(wesTumorOnlyAnalyzed, "1")).toBeInTheDocument();
 
     // sample exclusions are displayed on hover
     fireEvent.mouseOver(wesAnalyzed.firstElementChild!);

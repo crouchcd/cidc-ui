@@ -40,8 +40,8 @@ const ASSAYS_WITH_ANALYSIS = [
     "cytof",
     "rna",
     "tcr",
-    "wes",
-    "wes_tumor_only"
+    "wes_normal",
+    "wes_tumor"
 ];
 
 const HeaderCell = withStyles({
@@ -128,8 +128,21 @@ const AssayCell: React.FC<{
                     : "Samples are expected, but none have been received.";
             break;
         case "analyzed":
-            const analysis =
-                assay === "rna" ? "rna_level1_analysis" : `${assay}_analysis`;
+            let analysis: string;
+            switch (assay) {
+                case "wes_tumor":
+                    analysis = "wes_tumor_only_analysis";
+                    break;
+                case "wes_normal":
+                    analysis = "wes_analysis";
+                    break;
+                case "rna":
+                    analysis = "rna_level1_analysis";
+                    break;
+                default:
+                    analysis = `${assay}_analysis`;
+            }
+
             const excluded =
                 (overview.excluded_samples &&
                     overview.excluded_samples[analysis]) ||
@@ -219,7 +232,9 @@ const DataOverviewRow: React.FC<{
                 </TableCell>
                 {assays.map(assay =>
                     overview.expected_assays.includes(
-                        assay !== "wes_tumor_only" ? assay : "wes"
+                        ["wes_normal", "wes_tumor"].includes(assay)
+                            ? "wes"
+                            : assay
                     ) || overview[assay] > 0 ? (
                         <AssayCell
                             key={assay}
@@ -247,7 +262,9 @@ const DataOverviewRow: React.FC<{
                 {assays.map(assay =>
                     ASSAYS_WITH_ANALYSIS.includes(assay) &&
                     overview.expected_assays.includes(
-                        assay !== "wes_tumor_only" ? assay : "wes"
+                        ["wes_normal", "wes_tumor"].includes(assay)
+                            ? "wes"
+                            : assay
                     ) ? (
                         <AssayCell
                             key={assay}
