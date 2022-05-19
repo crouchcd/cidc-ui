@@ -10,6 +10,7 @@ import {
     Typography,
     withStyles,
     Chip,
+    Link,
     Tooltip,
     TableContainer,
     Divider
@@ -23,6 +24,7 @@ import { theme, useRootStyles } from "../../rootStyles";
 import { formatFileSize } from "../../util/utils";
 import { IDataOverview } from "../../api/api";
 import { makeStyles } from "@material-ui/core";
+import { IFacetsForLinks } from "../../model/file";
 
 const NONASSAY_FIELDS = [
     "trial_id",
@@ -40,8 +42,8 @@ const ASSAYS_WITH_ANALYSIS = [
     "cytof",
     "rna",
     "tcr",
-    "wes",
-    "wes_tumor_only"
+    "wes_normal",
+    "wes_tumor"
 ];
 
 const HeaderCell = withStyles({
@@ -111,7 +113,8 @@ const AssayCell: React.FC<{
     overview: ITrialOverview;
     assay: string;
     stage: "received" | "analyzed";
-}> = ({ overview, assay, stage }) => {
+    facets: string[];
+}> = ({ overview, assay, stage, facets }) => {
     const received = overview[assay] as number;
 
     let status: IngestionStatus;
@@ -128,8 +131,21 @@ const AssayCell: React.FC<{
                     : "Samples are expected, but none have been received.";
             break;
         case "analyzed":
-            const analysis =
-                assay === "rna" ? "rna_level1_analysis" : `${assay}_analysis`;
+            let analysis: string;
+            switch (assay) {
+                case "wes_tumor":
+                    analysis = "wes_tumor_only_analysis";
+                    break;
+                case "wes_normal":
+                    analysis = "wes_analysis";
+                    break;
+                case "rna":
+                    analysis = "rna_level1_analysis";
+                    break;
+                default:
+                    analysis = `${assay}_analysis`;
+            }
+
             const excluded =
                 (overview.excluded_samples &&
                     overview.excluded_samples[analysis]) ||
@@ -174,6 +190,24 @@ const AssayCell: React.FC<{
             break;
     }
 
+    let linkTarget: string = `/browse-data?file_view=1&trial_ids=${overview.trial_id}`;
+    for (const facet of facets) {
+        linkTarget = linkTarget + `&facets=` + encodeURI(facet);
+    }
+
+    let countWithLink: number | React.ReactElement;
+    countWithLink =
+        !count || count === 0 ? (
+            count
+        ) : (
+            <Link
+                href={linkTarget}
+                data-testid={`link-${overview.trial_id}-${assay}-${stage}`}
+            >
+                {count}
+            </Link>
+        );
+
     return (
         <TableCell
             key={assay}
@@ -181,7 +215,7 @@ const AssayCell: React.FC<{
             data-testid={`data-${overview.trial_id}-${assay}-${stage}`}
         >
             <ColoredData status={status} tooltip={tooltip}>
-                {count || 0}
+                {countWithLink}
             </ColoredData>
         </TableCell>
     );
@@ -190,7 +224,8 @@ const AssayCell: React.FC<{
 const DataOverviewRow: React.FC<{
     overview: ITrialOverview;
     assays: string[];
-}> = ({ overview, assays }) => {
+    facets: IFacetsForLinks;
+}> = ({ overview, assays, facets }) => {
     return (
         <>
             <TableRow>
@@ -219,13 +254,16 @@ const DataOverviewRow: React.FC<{
                 </TableCell>
                 {assays.map(assay =>
                     overview.expected_assays.includes(
-                        assay !== "wes_tumor_only" ? assay : "wes"
+                        ["wes_normal", "wes_tumor"].includes(assay)
+                            ? "wes"
+                            : assay
                     ) || overview[assay] > 0 ? (
                         <AssayCell
                             key={assay}
                             assay={assay}
                             overview={overview}
                             stage="received"
+                            facets={facets.facets[assay][`received`]}
                         />
                     ) : (
                         <TableCell
@@ -247,13 +285,16 @@ const DataOverviewRow: React.FC<{
                 {assays.map(assay =>
                     ASSAYS_WITH_ANALYSIS.includes(assay) &&
                     overview.expected_assays.includes(
-                        assay !== "wes_tumor_only" ? assay : "wes"
+                        ["wes_normal", "wes_tumor"].includes(assay)
+                            ? "wes"
+                            : assay
                     ) ? (
                         <AssayCell
                             key={assay}
                             assay={assay}
                             overview={overview}
                             stage="analyzed"
+                            facets={facets.facets[assay][`analyzed`]}
                         />
                     ) : (
                         <TableCell
@@ -281,8 +322,16 @@ const DataOverviewPage: React.FC<RouteComponentProps> = withIdToken(
             "/trial_metadata/summaries",
             token
         ]);
+        const { data: facets } = useSWR<IFacetsForLinks>([
+            "/downloadable_files/facet_groups_for_links",
+            token
+        ]);
 
-        if (summary === undefined || overview === undefined) {
+        if (
+            summary === undefined ||
+            overview === undefined ||
+            facets === undefined
+        ) {
             return (
                 <Grid container justify="center">
                     <Grid item>
@@ -291,6 +340,7 @@ const DataOverviewPage: React.FC<RouteComponentProps> = withIdToken(
                 </Grid>
             );
         }
+        console.log(facets.facets);
 
         if (summary.length === 0) {
             return <Typography>No data found.</Typography>;
@@ -404,6 +454,7 @@ const DataOverviewPage: React.FC<RouteComponentProps> = withIdToken(
                                         key={row.trial_id}
                                         overview={row}
                                         assays={assays}
+                                        facets={facets}
                                     />
                                 ))}
                             </TableBody>
