@@ -77,11 +77,13 @@ it("displays data as expected", async () => {
                         "h&e": 11,
                         atacseq: 3,
                         wes: 5,
-                        wes_tumor_only: 6,
                         wes_analysis: 5,
+                        wes_tumor_only: 6,
                         wes_tumor_only_analysis: 1,
                         ihc: 0,
-                        excluded_samples: { wes_analysis: [excluded] }
+                        excluded_samples: {
+                            wes_tumor_only_analysis: [excluded]
+                        }
                     },
                     {
                         trial_id: "tr2",
@@ -145,12 +147,18 @@ it("displays data as expected", async () => {
         innerText(getByTestId("na-tr2-wes-received"), "-")
     ).toBeInTheDocument();
 
-    const wesAnalyzed = getByTestId("data-tr1-wes-analyzed");
-    expect(innerText(wesAnalyzed, "5")).toBeInTheDocument();
     const wesTumorOnlyAnalyzed = getByTestId(
         "data-tr1-wes_tumor_only-analyzed"
     );
     expect(innerText(wesTumorOnlyAnalyzed, "1")).toBeInTheDocument();
+    expect(wesTumorOnlyAnalyzed.children[0]).toHaveStyle(
+        `background: ${theme.palette.warning.light}`
+    );
+    const wesAnalyzed = getByTestId("data-tr1-wes-analyzed");
+    expect(innerText(wesAnalyzed, "5")).toBeInTheDocument();
+    expect(wesAnalyzed.children[0]).toHaveStyle(
+        `background: ${theme.palette.success.light}`
+    );
 
     // links to file browser
     expect(getByTestId("chip-tr1-atacseq-received")).toHaveAttribute(
@@ -168,21 +176,19 @@ it("displays data as expected", async () => {
     );
 
     // sample exclusions are displayed on hover
-    fireEvent.mouseOver(wesAnalyzed.firstElementChild!);
+    fireEvent.mouseOver(wesTumorOnlyAnalyzed.firstElementChild!);
     expect(await findByText(excluded.cimac_id)).toBeInTheDocument();
     expect(
         queryByText(new RegExp(excluded.reason_excluded, "i"))
     ).toBeInTheDocument();
 
     // clinical data is displayed (and colored) as expected
-    const partialClinical = queryByText(/1 \/ 2 participants/i);
-    expect(partialClinical).toBeInTheDocument();
-    expect(partialClinical?.closest("div")).not.toHaveStyle(
-        `color: ${theme.palette.text.primary}`
+    expect(queryByText(/0 \/ 3 participants/i)).toBeInTheDocument();
+    expect(getByTestId("chip-tr1-clinical_participants")).toHaveStyle(
+        `color: ${theme.palette.primary.main}`
     ); // blue
-    const fullClinical = queryByText(/0 \/ 3 participants/i);
-    expect(fullClinical).toBeInTheDocument();
-    expect(fullClinical?.closest("div")).toHaveStyle(
+    expect(queryByText(/0 \/ 3 participants/i)).toBeInTheDocument();
+    expect(getByTestId("chip-tr2-clinical_participants")).toHaveStyle(
         `color: ${theme.palette.text.primary}`
     ); // grey
 
