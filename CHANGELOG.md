@@ -9,6 +9,13 @@ This Changelog tracks changes to this project. The notes below include a summary
 - `fixed` for any bug fixes.
 - `security` in case of vulnerabilities.
 
+## 20 May 2022
+
+- `changed` reverted previous "wes" -> "wes_normal" and "wes_tumor_only" -> "wes_tumor"
+- `changed` link location from just the text to whole chip
+- `added` links to the clinical data chips
+  - api already changed to return under clinical_participants
+
 ## 19 May 2022
 
 - `changed` WES display on data-overview to compensate for the changes in counting in the API
