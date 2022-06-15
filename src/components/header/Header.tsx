@@ -14,8 +14,7 @@ import {
     TabProps,
     Box,
     Menu,
-    MenuItem,
-    Chip
+    MenuItem
 } from "@material-ui/core";
 import {
     withRouter,
