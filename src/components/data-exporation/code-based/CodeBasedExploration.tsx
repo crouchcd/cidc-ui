@@ -85,8 +85,7 @@ const CodeBasedExplorationPage: React.FC<{
                         <ul>
                             {[
                                 {
-                                    name:
-                                        "Introductory Tutorial (under construction)",
+                                    name: "Introductory Tutorial",
                                     destination: null
                                 },
                                 {
