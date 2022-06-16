@@ -9,6 +9,11 @@ This Changelog tracks changes to this project. The notes below include a summary
 - `fixed` for any bug fixes.
 - `security` in case of vulnerabilities.
 
+## 16 Jun 2022
+
+- `added` "Data Exploration" tab
+
+
 ## 15 Jun 2022
 
 - `removed` transfer assays tab
