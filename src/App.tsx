@@ -9,10 +9,7 @@ import { CIDCThemeProvider, useRootStyles } from "./rootStyles";
 import { QueryParamProvider } from "use-query-params";
 import NotFoundRoute from "./components/generic/NotFoundRoute";
 import IdentityProvider from "./components/identity/IdentityProvider";
-import {
-    AssayDocsPage,
-    AnalysesDocsPage
-} from "./components/upload-docs/UploadDocsPages";
+import { AnalysesDocsPage } from "./components/upload-docs/UploadDocsPages";
 import { SWRConfig } from "swr";
 import { apiFetch } from "./api/api";
 
@@ -72,12 +69,6 @@ export default function App() {
                                                         exact
                                                         path="/"
                                                         component={HomePage}
-                                                    />
-                                                    <Route
-                                                        path="/assays"
-                                                        component={
-                                                            AssayDocsPage
-                                                        }
                                                     />
                                                     <Route
                                                         path="/analyses"

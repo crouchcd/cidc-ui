@@ -14,8 +14,7 @@ import {
     TabProps,
     Box,
     Menu,
-    MenuItem,
-    Chip
+    MenuItem
 } from "@material-ui/core";
 import {
     withRouter,
@@ -266,29 +265,9 @@ const Header: React.FunctionComponent<RouteComponentProps> = props => {
                                             value: "/browse-data"
                                         },
 
-                                        (user.showAssays ||
-                                            user.showAnalyses) && {
-                                            label: (
-                                                <div>
-                                                    transfer data{" "}
-                                                    <Box
-                                                        display="inline"
-                                                        pl={1}
-                                                    >
-                                                        <Chip
-                                                            size="small"
-                                                            label="new"
-                                                            variant="outlined"
-                                                            color="primary"
-                                                        />
-                                                    </Box>
-                                                </div>
-                                            ),
+                                        user.showAnalyses && {
+                                            label: "transfer data",
                                             value: "/transfer-data"
-                                        },
-                                        user.showAssays && {
-                                            label: "transfer assays",
-                                            value: "/assays"
                                         },
                                         user.showAnalyses && {
                                             label: "transfer analyses",
