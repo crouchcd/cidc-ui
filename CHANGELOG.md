@@ -12,6 +12,7 @@ This Changelog tracks changes to this project. The notes below include a summary
 ## 16 Jun 2022
 
 - `added` "Data Exploration" tab
+- `added` tooltip to show file short_description in File Browser
 
 
 ## 15 Jun 2022
