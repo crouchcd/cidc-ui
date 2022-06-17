@@ -12,6 +12,7 @@ This Changelog tracks changes to this project. The notes below include a summary
 ## 17 Jun 2022
 
 - `changed` width of data exploration cards
+- `changed` "Data Exploration" content update
 
 ## 16 Jun 2022
 
