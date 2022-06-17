@@ -26,7 +26,7 @@ const CodeBasedExplorationPage: React.FC<{
             <Grid
                 item
                 style={{
-                    maxWidth: 800,
+                    maxWidth: 1100,
                     width: "inherit"
                 }}
             >
@@ -48,7 +48,7 @@ const CodeBasedExplorationPage: React.FC<{
                 </Grid>
             </Grid>
             <Grid item>
-                <Card style={{ maxWidth: 800, width: "inherit" }}>
+                <Card style={{ maxWidth: 1100, width: "inherit" }}>
                     <CardHeader title="Overview" />
                     <CardContent className="markdown-body">
                         <Typography>
@@ -79,7 +79,7 @@ const CodeBasedExplorationPage: React.FC<{
                 </Card>
             </Grid>
             <Grid item>
-                <Card style={{ maxWidth: 800, width: 800 }}>
+                <Card style={{ maxWidth: 1100, width: 1100 }}>
                     <CardHeader title="Examples" />
                     <CardContent className="markdown-body">
                         <ul>
@@ -123,7 +123,7 @@ const CodeBasedExplorationPage: React.FC<{
                 </Card>
             </Grid>
             <Grid item>
-                <Card style={{ maxWidth: 800, width: "inherit" }}>
+                <Card style={{ maxWidth: 1100, width: "inherit" }}>
                     <CardHeader title="Example Screenshot" />
                     <CardContent className="markdown-body">
                         <img
