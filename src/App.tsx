@@ -43,7 +43,7 @@ const DataOverviewPage = React.lazy(() =>
     import("./components/data-overview/DataOverviewPage")
 );
 const DataExplorationPage = React.lazy(() =>
-    import("./components/data-exporation/DataExplorationPage")
+    import("./components/data-exploration/DataExplorationPage")
 );
 
 export default function App() {

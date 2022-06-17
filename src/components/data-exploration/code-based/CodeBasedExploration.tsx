@@ -26,7 +26,7 @@ const CodeBasedExplorationPage: React.FC<{
             <Grid
                 item
                 style={{
-                    maxWidth: 800,
+                    maxWidth: 1100,
                     width: "inherit"
                 }}
             >
@@ -48,7 +48,7 @@ const CodeBasedExplorationPage: React.FC<{
                 </Grid>
             </Grid>
             <Grid item>
-                <Card style={{ maxWidth: 800, width: "inherit" }}>
+                <Card style={{ maxWidth: 1100, width: "inherit" }}>
                     <CardHeader title="Overview" />
                     <CardContent className="markdown-body">
                         <Typography>
@@ -64,22 +64,21 @@ const CodeBasedExplorationPage: React.FC<{
                         <Typography>
                             These datasets are most easily accessed via python
                             notebooks hosted on Google's Colaboratory, for which
-                            we have several examples listed below. For approved
-                            users, CIDC will allow data access and pay for all
-                            costs associated with running these analyses. Please
+                            we have several examples listed below. CIDC will
+                            allow data access for all approved users. Please
                             contact CIDC at{" "}
                             <a href="mailto:cidc@jimmy.harvard.edu">
                                 cidc@jimmy.harvard.edu
                             </a>{" "}
-                            for access to the data tables and analysis hosting.
-                            The same data restrictions and security apply to all
-                            data accessed via this mechanism as via the portal.
+                            for access to the data tables. The same data
+                            restrictions and security apply to all data accessed
+                            via this mechanism as via the portal.
                         </Typography>
                     </CardContent>
                 </Card>
             </Grid>
             <Grid item>
-                <Card style={{ maxWidth: 800, width: 800 }}>
+                <Card style={{ maxWidth: 1100, width: 1100 }}>
                     <CardHeader title="Examples" />
                     <CardContent className="markdown-body">
                         <ul>
@@ -123,7 +122,7 @@ const CodeBasedExplorationPage: React.FC<{
                 </Card>
             </Grid>
             <Grid item>
-                <Card style={{ maxWidth: 800, width: "inherit" }}>
+                <Card style={{ maxWidth: 1100, width: "inherit" }}>
                     <CardHeader title="Example Screenshot" />
                     <CardContent className="markdown-body">
                         <img

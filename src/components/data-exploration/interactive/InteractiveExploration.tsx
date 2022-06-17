@@ -25,7 +25,7 @@ const InteractiveExplorationPage: React.FC<{
             <Grid
                 item
                 style={{
-                    maxWidth: 800,
+                    maxWidth: 1100,
                     width: "inherit"
                 }}
             >
@@ -47,14 +47,53 @@ const InteractiveExplorationPage: React.FC<{
                 </Grid>
             </Grid>
             <Grid item>
-                <Card style={{ maxWidth: 800, width: "inherit" }}>
-                    <CardHeader title="Overview" />
+                <Card style={{ maxWidth: 1100, width: "inherit" }}>
+                    <CardHeader title="Interactive View Overview" />
                     <CardContent className="markdown-body">
                         <Typography>
-                            In this Data Exploration View, the CIDC provides a
-                            number of interactive dashboards for exploring
-                            participant- and sample-level metadata for all
-                            trials.
+                            Using Google DataStudio we have created a few
+                            interactive dashboards to explore CIMAC-CIDC trial
+                            participant- and sample-level metadata.
+                        </Typography>
+                        <Typography>
+                            <ol>
+                                {[
+                                    {
+                                        name:
+                                            "Sample Collection Event Dashboard",
+                                        description: `Use this dashboard to explore data
+                                            available at particular timepoints.
+                                            In order to facilitate searches across trials,
+                                            timepoints are categorized as baseline (before
+                                            trial therapy initiation) or post (after trial
+                                            therapy initiation).`
+                                    },
+                                    {
+                                        name: "Assays Dashboard",
+                                        description: `Use this dashboard to explore the number
+                                            of samples available for each assay.
+                                            This dashboard also provides the ability to search
+                                            for participants who have a particular number of
+                                            samples within an assay type.
+                                            For example, patients who have 4 Olink samples which
+                                            *may* indicate samples collected at 4 separate
+                                            timepoints or the availability of replicates.`
+                                    },
+                                    {
+                                        name: "Sample Dashboard",
+                                        description: `Use this dashboard to explore other specific
+                                            sample details such as fixation type.`
+                                    }
+                                ].map(item => (
+                                    <li>
+                                        <b>{item.name}</b> - {item.description}
+                                    </li>
+                                ))}
+                            </ol>
+                        </Typography>
+                        <Typography>
+                            All three boards allow a user to limit the
+                            exploration to particular trials or cohorts.
                         </Typography>
 
                         <iframe
@@ -69,7 +108,7 @@ const InteractiveExplorationPage: React.FC<{
                 </Card>
             </Grid>
             <Grid item>
-                <Card style={{ maxWidth: 800, width: 800 }}>
+                <Card style={{ maxWidth: 1100, width: 1100 }}>
                     <CardHeader title="Direct Links" />
                     <CardContent className="markdown-body">
                         <Typography>
@@ -77,13 +116,12 @@ const InteractiveExplorationPage: React.FC<{
                                 {[
                                     {
                                         name:
-                                            "Participants Based on Sample Collection Events",
+                                            "Sample Collection Event Dashboard",
                                         destination:
                                             "https://datastudio.google.com/reporting/6865f6eb-f7f8-4f7f-87b2-f591403dd813/page/RQ4qC"
                                     },
                                     {
-                                        name:
-                                            "Participants Based on Assays Run",
+                                        name: "Assays Dashboard",
                                         destination:
                                             "https://datastudio.google.com/reporting/6865f6eb-f7f8-4f7f-87b2-f591403dd813/page/p_4edtmds7tc"
                                     },
