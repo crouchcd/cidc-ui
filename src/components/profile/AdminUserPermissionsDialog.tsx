@@ -266,6 +266,8 @@ const UserPermissionsDialog: React.FC<IUserPermissionsDialogProps & {
                                                     />
                                                 </TableCell>
                                             );
+                                        } else {
+                                            return;
                                         }
                                     })}
                                 </TableRow>
