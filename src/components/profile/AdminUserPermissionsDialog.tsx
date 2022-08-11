@@ -46,6 +46,11 @@ const UserPermissionsDialogWithInfo: React.FC<IUserPermissionsDialogProps> = pro
         ...supportedTemplates.analyses,
         ...extraDataTypes
     ];
+    const index = supportedTypes.indexOf("clinical_data");
+    if (index > -1) {
+        // only splice array when item is found
+        supportedTypes.splice(index, 1); // 2nd parameter means remove one item only
+    }
 
     return (
         <UserPermissionsDialog
@@ -248,27 +253,23 @@ const UserPermissionsDialog: React.FC<IUserPermissionsDialogProps & {
                                         />
                                     </TableCell>
                                     {props.supportedTypes.map(typ => {
-                                        if (typ !== "clinical_data") {
-                                            return (
-                                                <TableCell
-                                                    key={typ + trial.trial_id}
-                                                    align="center"
-                                                >
-                                                    <PermCheckbox
-                                                        grantee={props.grantee}
-                                                        granter={props.granter}
-                                                        trialId={trial.trial_id}
-                                                        uploadType={typ}
-                                                        token={props.token}
-                                                        disableIfUnchecked={
-                                                            tooManyPerms
-                                                        }
-                                                    />
-                                                </TableCell>
-                                            );
-                                        } else {
-                                            return;
-                                        }
+                                        return (
+                                            <TableCell
+                                                key={typ + trial.trial_id}
+                                                align="center"
+                                            >
+                                                <PermCheckbox
+                                                    grantee={props.grantee}
+                                                    granter={props.granter}
+                                                    trialId={trial.trial_id}
+                                                    uploadType={typ}
+                                                    token={props.token}
+                                                    disableIfUnchecked={
+                                                        tooManyPerms
+                                                    }
+                                                />
+                                            </TableCell>
+                                        );
                                     })}
                                 </TableRow>
                             ))}
