@@ -88,9 +88,12 @@ const usePermissions = (token: string, grantee: Account) => {
         getGranularPermission: (trialId?: string, uploadType?: string) =>
             permMap[String([trialId, uploadType])],
         getBroadPermission: (trialId?: string, uploadType?: string) =>
-            permMap[String([trialId, uploadType])] ||
-            permMap[String([trialId, undefined])] ||
-            permMap[String([undefined, uploadType])]
+            uploadType !== "clinical_data"
+                ? permMap[String([trialId, uploadType])] ||
+                  permMap[String([trialId, undefined])] ||
+                  permMap[String([undefined, uploadType])]
+                : permMap[String([trialId, uploadType])] ||
+                  permMap[String([undefined, uploadType])]
     };
 };
 
@@ -154,6 +157,31 @@ const UserPermissionsDialog: React.FC<IUserPermissionsDialogProps & {
                                 <TableCell className={classes.trialCell}>
                                     Trial
                                 </TableCell>
+                                <TableCell
+                                    key={"clinical_data"}
+                                    size="small"
+                                    align="center"
+                                >
+                                    <Grid
+                                        container
+                                        direction="row"
+                                        alignItems="center"
+                                    >
+                                        <Grid item>Clinical</Grid>
+                                        <Grid item>
+                                            <PermCheckbox
+                                                grantee={props.grantee}
+                                                granter={props.granter}
+                                                uploadType={"clinical_data"}
+                                                token={props.token}
+                                                disableIfUnchecked={
+                                                    tooManyPerms
+                                                }
+                                            />
+                                        </Grid>
+                                    </Grid>
+                                </TableCell>
+
                                 {props.supportedTypes.map(uploadType => (
                                     <TableCell
                                         key={uploadType}
@@ -206,24 +234,39 @@ const UserPermissionsDialog: React.FC<IUserPermissionsDialogProps & {
                                             </Grid>
                                         </Grid>
                                     </TableCell>
+                                    <TableCell
+                                        key={"clinical_data" + trial.trial_id}
+                                        align="center"
+                                    >
+                                        <PermCheckbox
+                                            grantee={props.grantee}
+                                            granter={props.granter}
+                                            trialId={trial.trial_id}
+                                            uploadType={"clinical_data"}
+                                            token={props.token}
+                                            disableIfUnchecked={tooManyPerms}
+                                        />
+                                    </TableCell>
                                     {props.supportedTypes.map(typ => {
-                                        return (
-                                            <TableCell
-                                                key={typ + trial.trial_id}
-                                                align="center"
-                                            >
-                                                <PermCheckbox
-                                                    grantee={props.grantee}
-                                                    granter={props.granter}
-                                                    trialId={trial.trial_id}
-                                                    uploadType={typ}
-                                                    token={props.token}
-                                                    disableIfUnchecked={
-                                                        tooManyPerms
-                                                    }
-                                                />
-                                            </TableCell>
-                                        );
+                                        if (typ !== "clinical_data") {
+                                            return (
+                                                <TableCell
+                                                    key={typ + trial.trial_id}
+                                                    align="center"
+                                                >
+                                                    <PermCheckbox
+                                                        grantee={props.grantee}
+                                                        granter={props.granter}
+                                                        trialId={trial.trial_id}
+                                                        uploadType={typ}
+                                                        token={props.token}
+                                                        disableIfUnchecked={
+                                                            tooManyPerms
+                                                        }
+                                                    />
+                                                </TableCell>
+                                            );
+                                        }
                                     })}
                                 </TableRow>
                             ))}
