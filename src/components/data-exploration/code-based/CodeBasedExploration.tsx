@@ -97,7 +97,7 @@ const CodeBasedExplorationPage: React.FC<{
                                     name:
                                         "Template: Upset Plot for Collection Events on a Single Trial",
                                     destination:
-                                        "https://colab.research.google.com/drive/1kheXUtozN6dcxdrf_U_WtnXUiDBhEMt2#scrollTo=cd0wVVlSJ7pg",
+                                        "https://colab.research.google.com/drive/1kheXUtozN6dcxdrf_U_WtnXUiDBhEMt2",
                                     description:
                                         "a template meant for copying and modification by the user to generate their own upset plots " +
                                         "showing the number of participants with a given subset of collection events across a single trial"
