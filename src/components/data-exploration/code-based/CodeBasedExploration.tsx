@@ -106,7 +106,7 @@ const CodeBasedExplorationPage: React.FC<{
                                     name:
                                         "Example: Participant and Sample Exploration",
                                     destination:
-                                        "https://colab.research.google.com/drive/1VXVLpLE9_D7fW5cZP4j2jyTOA4q42sJk#scrollTo=R_PNmBI99t4G",
+                                        "https://colab.research.google.com/drive/1VXVLpLE9_D7fW5cZP4j2jyTOA4q42sJk",
                                     description:
                                         "a demonstration of more complex code-based filtering and exploration of samples and participants"
                                 }
