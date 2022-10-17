@@ -128,14 +128,22 @@ const CodeBasedExplorationPage: React.FC<{
                                     )
                                 ) : item.description == null ? (
                                     <li key={item.name}>
-                                        <a href={item.destination}>
+                                        <a
+                                            href={item.destination}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                        >
                                             {item.name}
                                         </a>
                                     </li>
                                 ) : (
                                     <li key={item.name}>
                                         <b>
-                                            <a href={item.destination}>
+                                            <a
+                                                href={item.destination}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                            >
                                                 {item.name}
                                             </a>
                                         </b>{" "}

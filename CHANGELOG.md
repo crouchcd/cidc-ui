@@ -13,6 +13,7 @@ This Changelog tracks changes to this project. The notes below include a summary
 
 - `changed` Data Exploration > Code-based View, update for new templates and permissions scheme
 - `fixed` bug in pipelines docs pointing to chips instead of atacseq
+- `changed` Data Exploration links to open in new tab
 
 ## 14 Sep 2022
 
