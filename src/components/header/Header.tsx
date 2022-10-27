@@ -14,7 +14,8 @@ import {
     TabProps,
     Box,
     Menu,
-    MenuItem
+    MenuItem,
+    Chip
 } from "@material-ui/core";
 import {
     withRouter,
@@ -265,7 +266,8 @@ const Header: React.FunctionComponent<RouteComponentProps> = props => {
                                             value: "/browse-data"
                                         },
 
-                                        user.showAnalyses && {
+                                        (user.showAssays ||
+                                            user.showAnalyses) && {
                                             label: "transfer data",
                                             value: "/transfer-data"
                                         },
@@ -285,6 +287,25 @@ const Header: React.FunctionComponent<RouteComponentProps> = props => {
                                         {
                                             label: "data overview",
                                             value: "/data-overview"
+                                        },
+                                        {
+                                            label: (
+                                                <div>
+                                                    data exploration{" "}
+                                                    <Box
+                                                        display="inline"
+                                                        pl={1}
+                                                    >
+                                                        <Chip
+                                                            size="small"
+                                                            label="beta"
+                                                            variant="outlined"
+                                                            color="secondary"
+                                                        />
+                                                    </Box>
+                                                </div>
+                                            ),
+                                            value: "/data-exploration"
                                         }
                                     ].filter(t => !!t) as TabProps[]
                                 }
