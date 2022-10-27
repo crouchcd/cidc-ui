@@ -9,6 +9,24 @@ This Changelog tracks changes to this project. The notes below include a summary
 - `fixed` for any bug fixes.
 - `security` in case of vulnerabilities.
 
+## 27 Oct 2022
+
+- `removed` analysis for ctdna
+
+## 25 Oct 2022
+
+- `added` N/A organization for users
+
+## 17 Oct 2022
+
+- `changed` Data Exploration > Code-based View, update for new templates and permissions scheme
+- `fixed` bug in pipelines docs pointing to chips instead of atacseq
+- `changed` Data Exploration links to open in new tab
+
+## 14 Sep 2022
+
+- `changed` template download button to point to /templates/assays not /templates/metadata
+
 ## 11 Aug 2022
 
 - `changed` clinical data NOT included in cross-assay permissions
