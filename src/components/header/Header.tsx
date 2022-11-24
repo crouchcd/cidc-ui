@@ -79,6 +79,7 @@ const UserProfileMenu: React.FC<{ user: IAccountWithExtraContext }> = ({
                 style={{ textTransform: "none", textAlign: "left", width: 225 }}
                 aria-controls="profile-menu"
                 aria-haspopup="true"
+                data-test="profile-menu-button"
                 onClick={e => setMenuAnchor(e.currentTarget)}
             >
                 <Grid
@@ -119,7 +120,11 @@ const UserProfileMenu: React.FC<{ user: IAccountWithExtraContext }> = ({
                 onClose={() => setMenuAnchor(null)}
             >
                 {user.approval_date && (
-                    <MenuItem component={Link} to="/profile">
+                    <MenuItem
+                        data-test="profile-menu-item"
+                        component={Link}
+                        to="/profile"
+                    >
                         Profile
                     </MenuItem>
                 )}

@@ -403,6 +403,7 @@ const CreateNewTrial = withIdToken<ICreateNewTrialProps>(
                             variant="contained"
                             color="primary"
                             disabled={isSubmitting}
+                            data-test="trial-creation-submit"
                         >
                             Submit
                         </Button>
@@ -419,6 +420,7 @@ const CreateNewTrial = withIdToken<ICreateNewTrialProps>(
             <Button
                 fullWidth
                 variant="outlined"
+                data-test="create-new-trial"
                 color="primary"
                 startIcon={<Add />}
                 onClick={() => setIsCreating(true)}
