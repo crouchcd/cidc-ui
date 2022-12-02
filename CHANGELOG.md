@@ -9,6 +9,10 @@ This Changelog tracks changes to this project. The notes below include a summary
 - `fixed` for any bug fixes.
 - `security` in case of vulnerabilities.
 
+## 02 Dec 2022
+
+- `changed` updated google-github-actions/setup-gcloud version to be pinned to v0
+
 ## 01 Dec 2022
 
 - `changed` updated looker studio link to cimac account owned version
